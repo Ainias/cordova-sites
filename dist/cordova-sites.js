@@ -4006,7 +4006,7 @@ class Dialog {
     // }
 }
 
-var view$1 = "/home/silas/Projekte/Web/cordova-sites/src/html/Framework/Dialog/chooseDialog.html";
+import view$1 from './assets/src/html/Framework/Dialog/chooseDialog-3c982682.html';
 
 class ChooseDialog extends Dialog {
 
