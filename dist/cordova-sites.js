@@ -1584,6 +1584,7 @@ class SiteManager {
         this._siteDiv = document.getElementById(siteDivId);
 
         this._titleTranslationCallbackId = null;
+        this._appEndedListener = null;
 
         this._inversedDeepLinks = Helper.invertKeyValues(deepLinks);
 
@@ -1620,6 +1621,10 @@ class SiteManager {
                 site.onSearchPressed();
             }
         }, false);
+    }
+
+    setAppEndedListener(listener){
+        this._appEndedListener = listener;
     }
 
     goBack(){
@@ -1818,10 +1823,13 @@ class SiteManager {
             }
 
             if (this._siteStack.length <= 0) {
-                //TODO App hat sich beendet-Funktionalität
-                Helper.removeAllChildren(this._siteDiv).appendChild(document.createTextNode("App ist beendet"));
+
                 HistoryManager.getInstance().cutStack(0);
                 HistoryManager.getInstance().go(-1 * history.length, true);
+                Helper.removeAllChildren(this._siteDiv).appendChild(document.createTextNode("App ist beendet"));
+                if (typeof this._appEndedListener === "function"){
+                    this._appEndedListener(this);
+                }
             }
 
             await site.onDestroy();
@@ -1884,16 +1892,17 @@ class App {
         this._deepLinks = {};
     }
 
-    addDeepLink(link, siteConstructor){
+    addDeepLink(link, siteConstructor) {
         this._deepLinks[link] = siteConstructor;
     }
 
-    async start(startSiteConstructor){
+    async start(startSiteConstructor) {
         await this.ready();
+        let initalSiteConstructor = startSiteConstructor;
 
         let params = App._getStartParams();
 
-        if (Helper.isNotNull(params["s"])){
+        if (Helper.isNotNull(params["s"])) {
             startSiteConstructor = Helper.nonNull(this._deepLinks[params["s"]], startSiteConstructor);
             delete params["s"];
         }
@@ -1901,6 +1910,9 @@ class App {
         let siteManager = new SiteManager("site", this._deepLinks);
         Helper.removeAllChildren(document.getElementById("site"));
         siteManager.startSite(startSiteConstructor, params);
+        siteManager.setAppEndedListener(manager => {
+            manager.startSite(initalSiteConstructor);
+        });
     }
 
     /**
@@ -1909,23 +1921,22 @@ class App {
      * @param callback
      * @returns {Promise<*>}
      */
-    async ready(callback){
+    async ready(callback) {
 
         let promise = this._readyPromise.then(() => {
             App._resolver.resolve(this);
             return Promise.all(App._promises);
         });
 
-        if (callback){
+        if (callback) {
             return promise.then(callback);
-        }
-        else{
+        } else {
             return promise;
         }
     }
 
-    static addInitialization(callbackOrPromise){
-        if (typeof callbackOrPromise === "function"){
+    static addInitialization(callbackOrPromise) {
+        if (typeof callbackOrPromise === "function") {
             let promise = callbackOrPromise;
             callbackOrPromise = App._mainPromise.then((app) => {
                 return promise(app);
@@ -2558,7 +2569,7 @@ class Menu {
     }
 }
 
-import viewNavbar from './assets/src/html/siteTemplates/navbar-4f7ca236.html';
+import viewNavbar from './assets/src/html/siteTemplates/navbar-2a1b6eea.html';
 
 /**
  * Rendert ein Menü
@@ -3543,7 +3554,7 @@ class SwipeFragment extends AbstractFragment {
             this._touchStart = e.touches[0];
         }, false);
         this._view.addEventListener("touchend", e => {
-            this._handleSwipe(e.touches[0].clientX, e.touches[0].clientY);
+            this._handleSwipe(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
             this._touchStart = null;
         });
 
@@ -3561,8 +3572,11 @@ class SwipeFragment extends AbstractFragment {
         if (Helper.isNull(this._touchStart)) {
             return;
         }
-        let diffX = this._touchStart.clientX - endX;
-        if (Math.abs(this._touchStart.clientY - endY) <= SwipeFragment.MAX_Y
+        let touchStart = this._touchStart;
+        this._touchStart = null;
+
+        let diffX = touchStart.clientX - endX;
+        if (Math.abs(touchStart.clientY - endY) <= SwipeFragment.MAX_Y
             && Math.abs(diffX) >= SwipeFragment.MIN_X) {
             if (diffX > 0) {
                 await this._fragments[this._activeIndex].onSwipeLeft();

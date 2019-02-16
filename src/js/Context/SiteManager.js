@@ -26,6 +26,7 @@ export class SiteManager {
         this._siteDiv = document.getElementById(siteDivId);
 
         this._titleTranslationCallbackId = null;
+        this._appEndedListener = null;
 
         this._inversedDeepLinks = Helper.invertKeyValues(deepLinks);
 
@@ -62,6 +63,10 @@ export class SiteManager {
                 site.onSearchPressed();
             }
         }, false);
+    }
+
+    setAppEndedListener(listener){
+        this._appEndedListener = listener;
     }
 
     goBack(){
@@ -260,10 +265,13 @@ export class SiteManager {
             }
 
             if (this._siteStack.length <= 0) {
-                //TODO App hat sich beendet-Funktionalität
-                Helper.removeAllChildren(this._siteDiv).appendChild(document.createTextNode("App ist beendet"));
+
                 HistoryManager.getInstance().cutStack(0);
                 HistoryManager.getInstance().go(-1 * history.length, true);
+                Helper.removeAllChildren(this._siteDiv).appendChild(document.createTextNode("App ist beendet"));
+                if (typeof this._appEndedListener === "function"){
+                    this._appEndedListener(this);
+                }
             }
 
             await site.onDestroy();

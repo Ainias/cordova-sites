@@ -17,7 +17,6 @@
     "cordova-plugin-x-toast": "^2.7.2",
     "cordova-sqlite-storage": "^2.3.0",
     "foundation-sites": "^6.5.1",
-    "rollup-copy-plugin": "^0.1.0",
     "rollup-import-file-path": "git+https://github.com/Ainias/rollup-import-file-path.git",
     "rollup-plugin-html-import-file-path": "git+https://github.com/Ainias/rollup-plugin-html-import-file-path",
     "webpack": "^4.29.3"

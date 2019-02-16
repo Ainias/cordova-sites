@@ -16,16 +16,17 @@ export class App {
         this._deepLinks = {};
     }
 
-    addDeepLink(link, siteConstructor){
+    addDeepLink(link, siteConstructor) {
         this._deepLinks[link] = siteConstructor;
     }
 
-    async start(startSiteConstructor){
+    async start(startSiteConstructor) {
         await this.ready();
+        let initalSiteConstructor = startSiteConstructor;
 
         let params = App._getStartParams();
 
-        if (Helper.isNotNull(params["s"])){
+        if (Helper.isNotNull(params["s"])) {
             startSiteConstructor = Helper.nonNull(this._deepLinks[params["s"]], startSiteConstructor);
             delete params["s"];
         }
@@ -33,6 +34,9 @@ export class App {
         let siteManager = new SiteManager("site", this._deepLinks);
         Helper.removeAllChildren(document.getElementById("site"));
         siteManager.startSite(startSiteConstructor, params);
+        siteManager.setAppEndedListener(manager => {
+            manager.startSite(initalSiteConstructor);
+        });
     }
 
     /**
@@ -41,23 +45,22 @@ export class App {
      * @param callback
      * @returns {Promise<*>}
      */
-    async ready(callback){
+    async ready(callback) {
 
         let promise = this._readyPromise.then(() => {
             App._resolver.resolve(this);
             return Promise.all(App._promises);
         });
 
-        if (callback){
+        if (callback) {
             return promise.then(callback);
-        }
-        else{
+        } else {
             return promise;
         }
     }
 
-    static addInitialization(callbackOrPromise){
-        if (typeof callbackOrPromise === "function"){
+    static addInitialization(callbackOrPromise) {
+        if (typeof callbackOrPromise === "function") {
             let promise = callbackOrPromise;
             callbackOrPromise = App._mainPromise.then((app) => {
                 return promise(app);

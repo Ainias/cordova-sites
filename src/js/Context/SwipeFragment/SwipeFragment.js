@@ -17,7 +17,7 @@ export class SwipeFragment extends AbstractFragment {
             this._touchStart = e.touches[0];
         }, false);
         this._view.addEventListener("touchend", e => {
-            this._handleSwipe(e.touches[0].clientX, e.touches[0].clientY);
+            this._handleSwipe(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
             this._touchStart = null;
         });
 
@@ -35,8 +35,11 @@ export class SwipeFragment extends AbstractFragment {
         if (Helper.isNull(this._touchStart)) {
             return;
         }
-        let diffX = this._touchStart.clientX - endX;
-        if (Math.abs(this._touchStart.clientY - endY) <= SwipeFragment.MAX_Y
+        let touchStart = this._touchStart;
+        this._touchStart = null;
+
+        let diffX = touchStart.clientX - endX;
+        if (Math.abs(touchStart.clientY - endY) <= SwipeFragment.MAX_Y
             && Math.abs(diffX) >= SwipeFragment.MIN_X) {
             if (diffX > 0) {
                 await this._fragments[this._activeIndex].onSwipeLeft();
