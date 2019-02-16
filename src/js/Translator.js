@@ -183,7 +183,7 @@ export class Translator {
         }
 
         //Call translation callbacks
-        this._translationCallbacks.forEach(callback => callback());
+        this._translationCallbacks.forEach(callback => callback(baseElement));
     }
 
     /**
