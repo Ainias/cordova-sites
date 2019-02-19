@@ -251,7 +251,7 @@ class Translator {
         }
 
         //Call translation callbacks
-        this._translationCallbacks.forEach(callback => callback());
+        this._translationCallbacks.forEach(callback => callback(baseElement));
     }
 
     /**
@@ -2064,7 +2064,7 @@ class TemplateSite extends AbstractSite{
     }
 }
 
-import containerTemplate from './assets/src/html/siteTemplates/container-d6f0f140.html';
+import containerTemplate from './assets/src/html/siteTemplates/container.html';
 
 /**
  * Seite, welche das Container-Template benutzt
@@ -2569,7 +2569,7 @@ class Menu {
     }
 }
 
-import viewNavbar from './assets/src/html/siteTemplates/navbar-2a1b6eea.html';
+import viewNavbar from './assets/src/html/siteTemplates/navbar.html';
 
 /**
  * Rendert ein Menü
@@ -3450,7 +3450,7 @@ NavbarFragment.queries = [];
 
 NavbarFragment.defaultActions = [];
 
-import menuTemplate from './assets/src/html/siteTemplates/menuSite-a14c0b60.html';
+import menuTemplate from './assets/src/html/siteTemplates/menuSite.html';
 
 /**
  * Seite benutzt das menuTemplate, welches das ContainerTemplate includiert.
@@ -3539,7 +3539,7 @@ class SwipeChildFragment extends AbstractFragment {
     }
 }
 
-import view from './assets/src/html/Framework/Fragment/swipeFragment-42d24e2a.html';
+import view from './assets/src/html/Framework/Fragment/swipeFragment.html';
 
 class SwipeFragment extends AbstractFragment {
 
@@ -4020,7 +4020,7 @@ class Dialog {
     // }
 }
 
-import view$1 from './assets/src/html/Framework/Dialog/chooseDialog-3c982682.html';
+import view$1 from './assets/src/html/Framework/Dialog/chooseDialog.html';
 
 class ChooseDialog extends Dialog {
 
