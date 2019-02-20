@@ -1577,8 +1577,6 @@ class SiteManager {
      */
     constructor(siteDivId, deepLinks) {
 
-        this._historyId = 1;
-
         this._siteDiv = null;
         this._siteStack = [];
         this._siteDiv = document.getElementById(siteDivId);
@@ -1656,6 +1654,8 @@ class SiteManager {
      */
     async startSite(siteConstructor, paramsPromise) {
 
+        console.log("startSite");
+
         //Testen, ob der Constructor vom richtigen Typen ist
         if (!(siteConstructor.prototype instanceof AbstractSite)) {
             throw {
@@ -1668,6 +1668,8 @@ class SiteManager {
 
         //create Site
         let site = new siteConstructor(this);
+
+        this._siteStack.unshift(site);
 
         //Wartet auf onConstruct, viewPromise, onViewLoaded und zeigt dann Seite
         Promise.resolve(paramsPromise).then(async (params) => {
@@ -1768,6 +1770,8 @@ class SiteManager {
      * @private
      */
     async _show(site) {
+        console.log("show");
+
         //Mache nichts, wenn Seite bereits angezeigt wird
         if (site._state === Context.STATE_RUNNING && this.getCurrentSite() === site) {
             return;
@@ -1803,8 +1807,8 @@ class SiteManager {
      * @param site
      */
     endSite(site) {
+        console.log("endSite");
         site._onConstructPromise.then(async () => {
-
             //Aus Index entfernen
             let index = this._siteStack.indexOf(site);
             this._siteStack.splice(index, 1);
@@ -1823,7 +1827,7 @@ class SiteManager {
             }
 
             if (this._siteStack.length <= 0) {
-
+                console.log("stack is empty, starting normal site!");
                 HistoryManager.getInstance().cutStack(0);
                 HistoryManager.getInstance().go(-1 * history.length, true);
                 Helper.removeAllChildren(this._siteDiv).appendChild(document.createTextNode("App ist beendet"));

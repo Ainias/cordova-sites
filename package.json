@@ -19,10 +19,10 @@
     "foundation-sites": "^6.5.1",
     "rollup-import-file-path": "git+https://github.com/Ainias/rollup-import-file-path.git",
     "rollup-plugin-html-import-file-path": "git+https://github.com/Ainias/rollup-plugin-html-import-file-path.git",
-    "webpack": "^4.29.3"
+    "webpack": "^4.29.5"
   },
   "devDependencies": {
-    "autoprefixer": "^9.3.1",
+    "autoprefixer": "^9.4.8",
     "clean-webpack-plugin": "^1.0.0",
     "css-loader": "^1.0.1",
     "extract-loader": "^3.1.0",
@@ -31,7 +31,7 @@
     "html-webpack-plugin": "^3.2.0",
     "node-sass": "^4.10.0",
     "postcss-loader": "^3.0.0",
-    "rollup": "^1.1.2",
+    "rollup": "^1.2.2",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-json": "^3.1.0",
     "sass-loader": "^7.1.0"

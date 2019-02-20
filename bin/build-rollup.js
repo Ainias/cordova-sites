@@ -20,19 +20,19 @@ const inputOptions = {
             include: 'node_modules/**',  // Default: undefined
         }),
         htmlImportFilePath({
-            path: "**/*.html",
+            include: "**/*.html",
             importAttributes: {
                 "[data-view]": "data-view",
                 "img[src]":"src"
             },
-            "relative":true,
-            "asImport":true,
+            relative:true,
+            asImport:true,
         }),
         importFilePath({
-            path: "**/*.jpg"
+            include: "**/*.jpg"
         }),
         importFilePath({
-            path: "**/*.png"
+            include: "**/*.png"
         }),
         jsonRollup({compact: true})
     ],
