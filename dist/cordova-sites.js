@@ -314,6 +314,10 @@ class Translator {
         return this._translationClass;
     }
 
+    getCurrentLanguage(){
+        return this._currentLanguage;
+    }
+
     static async setLanguage(language) {
         let instance = Translator.getInstance();
         if (instance) {
