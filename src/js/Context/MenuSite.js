@@ -1,7 +1,8 @@
 import {TemplateSite} from "./TemplateSite";
-import menuTemplate from "../../html/siteTemplates/menuSite.html";
+import defaultMenuTemplate from "../../html/siteTemplates/menuSite.html";
 import {NavbarFragment} from "./Menu/NavbarFragment";
 import {Context} from "./Context";
+import {Helper} from "../Helper";
 
 /**
  * Seite benutzt das menuTemplate, welches das ContainerTemplate includiert.
@@ -16,8 +17,8 @@ export class MenuSite extends TemplateSite{
      * @param siteManager
      * @param view
      */
-    constructor(siteManager, view) {
-        super(siteManager, view, menuTemplate, "#site-content");
+    constructor(siteManager, view, menuTemplate) {
+        super(siteManager, view, Helper.nonNull(menuTemplate, defaultMenuTemplate), "#site-content");
         this._navbarFragment = new NavbarFragment(this);
         this.addFragment("#navbar-fragment", this._navbarFragment);
     }

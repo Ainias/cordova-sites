@@ -55,7 +55,7 @@ export class ViewInflater {
         if (viewUrl instanceof Element) {
             resultPromise = Promise.resolve(viewUrl);
         } else {
-            resultPromise = DataManager.load(viewUrl, false).then(htmlText => {
+            resultPromise = DataManager.loadAsset(viewUrl).then(htmlText => {
                 let doc = (new DOMParser()).parseFromString(htmlText, "text/html");
 
                 //Parsing hat nicht geklappt, also per innerHTML

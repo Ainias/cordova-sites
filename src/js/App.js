@@ -14,10 +14,17 @@ export class App {
         this._readyPromise = new Promise(r => document.addEventListener("deviceready", r, false));
 
         this._deepLinks = {};
+        this._siteManager = null;
     }
 
     addDeepLink(link, siteConstructor) {
         this._deepLinks[link] = siteConstructor;
+    }
+
+    async startSite(site, args){
+        if (this._siteManager){
+            return this._siteManager.startSite(site, args);
+        }
     }
 
     async start(startSiteConstructor) {
@@ -37,6 +44,8 @@ export class App {
         siteManager.setAppEndedListener(manager => {
             manager.startSite(initalSiteConstructor);
         });
+
+        this._siteManager = siteManager;
     }
 
     /**

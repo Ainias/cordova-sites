@@ -1,5 +1,5 @@
 import {AbstractFragment} from "../AbstractFragment";
-import viewNavbar from "../../../html/siteTemplates/navbar.html"
+import defaultViewNavbar from "../../../html/siteTemplates/navbar.html"
 import {MenuAction} from "./MenuAction/MenuAction";
 import {Helper} from "../../Helper";
 import {Context} from "../Context";
@@ -22,8 +22,8 @@ export class NavbarFragment extends AbstractFragment {
      * Erstellt das Fragment
      * @param site
      */
-    constructor(site) {
-        super(site, viewNavbar);
+    constructor(site, viewNavbar) {
+        super(site, Helper.nonNull(viewNavbar, defaultViewNavbar));
         this._menu = null;
 
         this._responsiveMenu = null;
@@ -40,6 +40,8 @@ export class NavbarFragment extends AbstractFragment {
      */
     async onViewLoaded() {
         let res = super.onViewLoaded();
+
+        this.setTitleElement(document.createTextNode(NavbarFragment.title));
 
         //Erstelle die Renderers und das Menü
         let renderers = [];
@@ -321,5 +323,5 @@ export class NavbarFragment extends AbstractFragment {
  * @type {Array}
  */
 NavbarFragment.queries = [];
-
+NavbarFragment.title = "MeinBerufBau";
 NavbarFragment.defaultActions = [];

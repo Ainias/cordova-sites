@@ -7,22 +7,28 @@ export class BaseModel {
         this._id = null;
     }
 
+    /**
+     * @returns {number|null}
+     */
     getId() {
         return this._id;
     }
 
+    /**
+     * @param {number} id
+     */
     setId(id) {
         this._id = id;
     }
 
-    async save(){
+    async save() {
         //Wenn direkt BaseModel.saveModel aufgerufen wird, später ein Fehler geschmissen (_method not defined), da der
         // falsche Kontext am Objekt existiert
         return this.constructor.saveModel(this);
     }
 
     static _newModel() {
-        throw new Error("_method not defined");
+        return new this();
     }
 
     static getModelName() {
@@ -50,7 +56,6 @@ export class BaseModel {
     }
 
     static async saveModel(model) {
-
         let table = this.getTable();
         let jsonModel = this._modelToJson(model);
 
@@ -70,7 +75,7 @@ export class BaseModel {
 
     static async selectOne(where, orderBy, offset) {
         let models = await this.select(where, orderBy, 1, offset);
-        if (models.length >= 1){
+        if (models.length >= 1) {
             return models[0];
         }
         return null;
@@ -81,19 +86,19 @@ export class BaseModel {
      * @param orderBy
      * @param limit
      * @param offset
-     * @returns {Promise<[Article]>}
+     * @returns {Promise<[BaseModel]>}
      */
     static async select(where, orderBy, limit, offset) {
         let table = await this.getTable();
 
         let query = table.query("select");
         if (Helper.isNotNull(where)) {
-            if (!Array.isArray(where) && typeof where === "object"){
+            if (!Array.isArray(where) && typeof where === "object") {
                 let newWhere = [];
-                let keys= Object.keys(where);
+                let keys = Object.keys(where);
                 keys.forEach((key, index) => {
                     newWhere.push([key, "=", where[key]]);
-                    if (index < keys.length-1){
+                    if (index < keys.length - 1) {
                         newWhere.push("AND");
                     }
                 });

@@ -372,6 +372,9 @@ class Translator {
         Translator.instance = new Translator(config);
     }
 
+    /**
+     * @returns {Translator|null}
+     */
     static getInstance() {
         return Translator.instance;
     }
@@ -714,6 +717,20 @@ class Helper {
         }
         return res;
     }
+
+    static newPromiseWithResolve(){
+        let resolver = null;
+        let rejecter = null;
+
+        let promise = new Promise((resolve, reject) => {
+            resolver = resolve;
+            rejecter = reject;
+        });
+        promise.resolve = resolver;
+        promise.reject = rejecter;
+
+        return promise;
+    }
 }
 
 /**
@@ -752,14 +769,29 @@ class DataManager {
      * @param asJson
      * @returns {Promise<* | never | void>}
      */
-    static async load(url, asJson) {
+    static async load(url, asJson, useBasePath) {
         asJson = Helper.nonNull(asJson, true);
+        useBasePath = Helper.nonNull(useBasePath, true);
+
+        url = (useBasePath) ? DataManager.basePath(url) : url;
         return DataManager.fetch(url, {"credentials": "same-origin"}).then(function (res) {
             if (asJson) {
                 return res.json();
             }
             return res.text();
         }).catch(e => console.error(e));
+    }
+
+    /**
+     * Vereinfachung von Laden von Resourcen.
+     * Lädt per GET das angegebene Asset und gibt diese als JSON oder Text zurück
+     *
+     * @param url
+     * @param asJson
+     * @returns {Promise<* | never | void>}
+     */
+    static async loadAsset(url) {
+        return this.load(url, false, false);
     }
 
     /**
@@ -775,7 +807,42 @@ class DataManager {
         }
         return "?" + queryStrings.join("&");
     }
+
+    static async send(url, params) {
+        url = DataManager.basePath(url);
+
+        let headers = {};
+        if (!(params instanceof FormData) && typeof params === "object") {
+            params = JSON.stringify(params);
+            headers = {
+                "Content-Type": "application/json"
+            };
+        }
+
+        return fetch(url, {
+            "credentials": "same-origin",
+            "method": "POST",
+            "headers": headers,
+            "body": params,
+        }).then(function (res) {
+            return res.json();
+        }).catch(function (e) {
+            console.error("error", e);
+            return {
+                "success": false,
+                "errors": [
+                    "not-online"
+                ]
+            }
+        });
+    }
+
+    static basePath(url) {
+        return DataManager._basePath + url;
+    }
 }
+
+DataManager._basePath = "";
 
 /**
  * Singleton-Klasse genutzt zum laden von Views
@@ -831,7 +898,7 @@ class ViewInflater {
         if (viewUrl instanceof Element) {
             resultPromise = Promise.resolve(viewUrl);
         } else {
-            resultPromise = DataManager.load(viewUrl, false).then(htmlText => {
+            resultPromise = DataManager.loadAsset(viewUrl).then(htmlText => {
                 let doc = (new DOMParser()).parseFromString(htmlText, "text/html");
 
                 //Parsing hat nicht geklappt, also per innerHTML
@@ -977,12 +1044,14 @@ class Context {
 
         this._view = null;
         this._fragments = [];
-        this._viewPromise = null;
         this._state = Context.STATE_CREATED;
+        this._viewLoadedPromise = Helper.newPromiseWithResolve();
 
         this._viewPromise = ViewInflater.getInstance().load(view).then((siteContent) => {
             this._view = siteContent;
             return siteContent;
+        }).catch(e => {
+            this._viewLoadedPromise.reject(e);
         });
     }
 
@@ -1015,7 +1084,9 @@ class Context {
 
         let onViewLoadedPromises = [];
         for (let k in this._fragments) {
-            onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].onViewLoaded()));
+            onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].onViewLoaded()).then(
+                () => this._fragments[k]._viewLoadedPromise.resolve()
+            ));
         }
         return Promise.all(onViewLoadedPromises);
     }
@@ -1680,6 +1751,7 @@ class SiteManager {
             site._onConstructPromise = site.onConstruct(params);
             await Promise.all([site._onConstructPromise, site.getViewPromise()]);
             await site.onViewLoaded();
+            site._viewLoadedPromise.resolve();
 
             return this._show(site);
         }).catch((e) => {
@@ -1692,6 +1764,7 @@ class SiteManager {
                     return this._show(this._siteStack[i]);
                 }
             }
+            site._viewLoadedPromise.reject();
         });
 
         //Gebe Site-Promise zurück
@@ -1898,10 +1971,17 @@ class App {
         this._readyPromise = new Promise(r => document.addEventListener("deviceready", r, false));
 
         this._deepLinks = {};
+        this._siteManager = null;
     }
 
     addDeepLink(link, siteConstructor) {
         this._deepLinks[link] = siteConstructor;
+    }
+
+    async startSite(site, args){
+        if (this._siteManager){
+            return this._siteManager.startSite(site, args);
+        }
     }
 
     async start(startSiteConstructor) {
@@ -1921,6 +2001,8 @@ class App {
         siteManager.setAppEndedListener(manager => {
             manager.startSite(initalSiteConstructor);
         });
+
+        this._siteManager = siteManager;
     }
 
     /**
@@ -2087,6 +2169,104 @@ class ContainerSite extends TemplateSite{
      */
     constructor(siteManager, view) {
         super(siteManager, view, containerTemplate, "#site-content");
+    }
+}
+
+import defaultTabView from './assets/src/html/Framework/Fragment/tabFragment.html';
+
+class TabFragment extends AbstractFragment {
+
+    constructor(site, view) {
+        super(site, Helper.nonNull(view, defaultTabView));
+        this._tabViews = [];
+        this._tabViewPromise = this._viewLoadedPromise;
+        if (Helper.isNotNull(view)) {
+            this._viewPromise.then(view => {
+                let views = view.querySelectorAll(".tab-site");
+                let buttons = view.querySelectorAll(".tab-button");
+
+                views.forEach((site, i) => {
+                    if (!site.classList.contains("tab-site-template")) {
+                        // site.remove();
+                        // buttons[i].remove();
+                        this.addTab(buttons[i], site);
+                    }
+                });
+            });
+        }
+    }
+
+    async onViewLoaded() {
+        let res = super.onViewLoaded();
+
+        this._nameContainer = this.findBy(".tab-names");
+        this._nameButton = this.findBy(".tab-button-template");
+        this._nameButton.classList.remove("tab-button-template");
+        this._nameButton.remove();
+
+        this._tabContent = this.findBy(".tab-content");
+        this._tabSite = this.findBy(".tab-site-template");
+        this._tabSite.classList.remove("tab-site-template");
+        this._tabSite.remove();
+
+        return res;
+    }
+
+    async addTab(name, origView, nameIsTranslatable) {
+        nameIsTranslatable = Helper.nonNull(nameIsTranslatable, true);
+        let tabView = {
+            name: name,
+            nameIsTranslatable: nameIsTranslatable,
+            viewPromise: ViewInflater.getInstance().load(origView),
+        };
+        this._tabViews.push(tabView);
+        let isFirst = this._tabViews.length === 1;
+
+        this._tabViewPromise = this._tabViewPromise.then(() => tabView.viewPromise).then((view) => {
+            let tabViewElement = null;
+            if (view.classList.contains("tab-site")) {
+                tabViewElement = origView;
+                origView.remove();
+            } else {
+                tabViewElement = this._tabSite.cloneNode(true);
+                tabViewElement.appendChild(view);
+            }
+            tabView.view = tabViewElement;
+            this._tabContent.appendChild(tabViewElement);
+
+            let nameElement = null;
+            if (name instanceof Element) {
+                nameElement = name;
+                nameElement.remove();
+            } else {
+                let nameElement = this._nameButton.cloneNode(true);
+                nameElement.appendChild((tabView.nameIsTranslatable) ? Translator.getInstance().makePersistentTranslation(name) : document.createTextNode(tabView.name));
+            }
+            this._nameContainer.appendChild(nameElement);
+
+            tabView.button = nameElement;
+
+            nameElement.addEventListener("click", () => {
+                this.setActiveTab(tabView);
+            });
+            if (isFirst) {
+                this.setActiveTab(tabView);
+            }
+        });
+        await this._tabViewPromise;
+    }
+
+    setActiveTab(tabView) {
+        let previousActive = this.findBy(".tab-site.active");
+        if (Helper.isNotNull(previousActive)) {
+            previousActive.classList.remove("active");
+        }
+        let previousActiveButton = this.findBy(".tab-button.active");
+        if (Helper.isNotNull(previousActiveButton)) {
+            previousActiveButton.classList.remove("active");
+        }
+        tabView.view.classList.add("active");
+        tabView.button.classList.add("active");
     }
 }
 
@@ -2577,7 +2757,27 @@ class Menu {
     }
 }
 
-import viewNavbar from './assets/src/html/siteTemplates/navbar.html';
+class StartSiteMenuAction extends MenuAction {
+
+    constructor(name, site, showFor, order, icon) {
+        super(name, () => {
+            if (StartSiteMenuAction._app) {
+                if (Array.isArray(site) && site.length >= 2) {
+                    StartSiteMenuAction._app.startSite(site[0], site[1]);
+                } else {
+                    StartSiteMenuAction._app.startSite(site);
+                }
+            }
+        }, showFor, order, icon);
+    }
+}
+
+StartSiteMenuAction._app = null;
+App.addInitialization(app => {
+    StartSiteMenuAction._app = app;
+});
+
+import defaultViewNavbar from './assets/src/html/siteTemplates/navbar.html';
 
 /**
  * Rendert ein Menü
@@ -3156,8 +3356,8 @@ class NavbarFragment extends AbstractFragment {
      * Erstellt das Fragment
      * @param site
      */
-    constructor(site) {
-        super(site, viewNavbar);
+    constructor(site, viewNavbar) {
+        super(site, Helper.nonNull(viewNavbar, defaultViewNavbar));
         this._menu = null;
 
         this._responsiveMenu = null;
@@ -3174,6 +3374,8 @@ class NavbarFragment extends AbstractFragment {
      */
     async onViewLoaded() {
         let res = super.onViewLoaded();
+
+        this.setTitleElement(document.createTextNode(NavbarFragment.title));
 
         //Erstelle die Renderers und das Menü
         let renderers = [];
@@ -3455,10 +3657,10 @@ class NavbarFragment extends AbstractFragment {
  * @type {Array}
  */
 NavbarFragment.queries = [];
-
+NavbarFragment.title = "MeinBerufBau";
 NavbarFragment.defaultActions = [];
 
-import menuTemplate from './assets/src/html/siteTemplates/menuSite.html';
+import defaultMenuTemplate from './assets/src/html/siteTemplates/menuSite.html';
 
 /**
  * Seite benutzt das menuTemplate, welches das ContainerTemplate includiert.
@@ -3473,8 +3675,8 @@ class MenuSite extends TemplateSite{
      * @param siteManager
      * @param view
      */
-    constructor(siteManager, view) {
-        super(siteManager, view, menuTemplate, "#site-content");
+    constructor(siteManager, view, menuTemplate) {
+        super(siteManager, view, Helper.nonNull(menuTemplate, defaultMenuTemplate), "#site-content");
         this._navbarFragment = new NavbarFragment(this);
         this.addFragment("#navbar-fragment", this._navbarFragment);
     }
@@ -3641,22 +3843,28 @@ class BaseModel {
         this._id = null;
     }
 
+    /**
+     * @returns {number|null}
+     */
     getId() {
         return this._id;
     }
 
+    /**
+     * @param {number} id
+     */
     setId(id) {
         this._id = id;
     }
 
-    async save(){
+    async save() {
         //Wenn direkt BaseModel.saveModel aufgerufen wird, später ein Fehler geschmissen (_method not defined), da der
         // falsche Kontext am Objekt existiert
         return this.constructor.saveModel(this);
     }
 
     static _newModel() {
-        throw new Error("_method not defined");
+        return new this();
     }
 
     static getModelName() {
@@ -3684,7 +3892,6 @@ class BaseModel {
     }
 
     static async saveModel(model) {
-
         let table = this.getTable();
         let jsonModel = this._modelToJson(model);
 
@@ -3704,7 +3911,7 @@ class BaseModel {
 
     static async selectOne(where, orderBy, offset) {
         let models = await this.select(where, orderBy, 1, offset);
-        if (models.length >= 1){
+        if (models.length >= 1) {
             return models[0];
         }
         return null;
@@ -3715,19 +3922,19 @@ class BaseModel {
      * @param orderBy
      * @param limit
      * @param offset
-     * @returns {Promise<[Article]>}
+     * @returns {Promise<[BaseModel]>}
      */
     static async select(where, orderBy, limit, offset) {
         let table = await this.getTable();
 
         let query = table.query("select");
         if (Helper.isNotNull(where)) {
-            if (!Array.isArray(where) && typeof where === "object"){
+            if (!Array.isArray(where) && typeof where === "object") {
                 let newWhere = [];
-                let keys= Object.keys(where);
+                let keys = Object.keys(where);
                 keys.forEach((key, index) => {
                     newWhere.push([key, "=", where[key]]);
-                    if (index < keys.length-1){
+                    if (index < keys.length - 1) {
                         newWhere.push("AND");
                     }
                 });
@@ -3850,6 +4057,7 @@ class NanoSQLWrapper {
      */
     async getTable(table) {
         await this._connectionPromise;
+        console.log(table);
         return nSQL(table);
     }
 }
@@ -4429,4 +4637,4 @@ Toast.LAST_ID = 0;
 
 Toast.DEFAULT_DURATION = 2500;
 
-export { App, AbstractFragment, AbstractSite, ContainerSite, Context, Menu, MenuAction, OpenSubmenuAction, NavbarFragment, AccordionRenderer, DropdownRenderer, MenuRenderer, Submenu, MenuSite, SiteManager, SwipeChildFragment, SwipeFragment, TemplateSite, DataManager, BaseModel, NanoSQLWrapper, ChooseDialog, ConfirmDialog, Dialog, Form, Helper, HistoryManager, NativeStoragePromise, Toast, ToastManager, Translator, ViewInflater };
+export { App, AbstractFragment, AbstractSite, ContainerSite, Context, TabFragment, Menu, MenuAction, OpenSubmenuAction, StartSiteMenuAction, NavbarFragment, AccordionRenderer, DropdownRenderer, MenuRenderer, Submenu, MenuSite, SiteManager, SwipeChildFragment, SwipeFragment, TemplateSite, DataManager, BaseModel, NanoSQLWrapper, ChooseDialog, ConfirmDialog, Dialog, Form, Helper, HistoryManager, NativeStoragePromise, Toast, ToastManager, Translator, ViewInflater };

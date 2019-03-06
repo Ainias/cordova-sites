@@ -36,14 +36,29 @@ export class DataManager {
      * @param asJson
      * @returns {Promise<* | never | void>}
      */
-    static async load(url, asJson) {
+    static async load(url, asJson, useBasePath) {
         asJson = Helper.nonNull(asJson, true);
+        useBasePath = Helper.nonNull(useBasePath, true);
+
+        url = (useBasePath) ? DataManager.basePath(url) : url;
         return DataManager.fetch(url, {"credentials": "same-origin"}).then(function (res) {
             if (asJson) {
                 return res.json();
             }
             return res.text();
         }).catch(e => console.error(e));
+    }
+
+    /**
+     * Vereinfachung von Laden von Resourcen.
+     * Lädt per GET das angegebene Asset und gibt diese als JSON oder Text zurück
+     *
+     * @param url
+     * @param asJson
+     * @returns {Promise<* | never | void>}
+     */
+    static async loadAsset(url) {
+        return this.load(url, false, false);
     }
 
     /**
@@ -59,4 +74,39 @@ export class DataManager {
         }
         return "?" + queryStrings.join("&");
     }
+
+    static async send(url, params) {
+        url = DataManager.basePath(url);
+
+        let headers = {};
+        if (!(params instanceof FormData) && typeof params === "object") {
+            params = JSON.stringify(params);
+            headers = {
+                "Content-Type": "application/json"
+            }
+        }
+
+        return fetch(url, {
+            "credentials": "same-origin",
+            "method": "POST",
+            "headers": headers,
+            "body": params,
+        }).then(function (res) {
+            return res.json();
+        }).catch(function (e) {
+            console.error("error", e);
+            return {
+                "success": false,
+                "errors": [
+                    "not-online"
+                ]
+            }
+        });
+    }
+
+    static basePath(url) {
+        return DataManager._basePath + url;
+    }
 }
+
+DataManager._basePath = "";

@@ -304,6 +304,9 @@ export class Translator {
         Translator.instance = new Translator(config);
     }
 
+    /**
+     * @returns {Translator|null}
+     */
     static getInstance() {
         return Translator.instance;
     }

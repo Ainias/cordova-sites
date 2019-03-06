@@ -322,4 +322,18 @@ export class Helper {
         }
         return res;
     }
+
+    static newPromiseWithResolve(){
+        let resolver = null;
+        let rejecter = null;
+
+        let promise = new Promise((resolve, reject) => {
+            resolver = resolve;
+            rejecter = reject;
+        });
+        promise.resolve = resolver;
+        promise.reject = rejecter;
+
+        return promise;
+    }
 }

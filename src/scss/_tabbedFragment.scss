@@ -1,0 +1,44 @@
+$border-color: #E6E6E6;
+
+.tab-fragment {
+  .tab-names {
+    .tab-button {
+      display: inline-block;
+      border: 1px solid $border-color;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      background-color: $border-color;
+      padding: 0.3rem;
+
+      &.active {
+        border-bottom: 0;
+        background-color: initial;
+      }
+    }
+    .border-bottom {
+      border-bottom: 1px solid $border-color;
+    }
+  }
+
+  .tab-content {
+    border: 1px solid $border-color;
+    border-top: 0;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    //position: relative;
+    .tab-site {
+      //position: absolute;
+      display: none;
+      //visibility: hidden;
+
+      &.active {
+        display: initial;
+        //visibility: initial;
+      }
+    }
+  }
+
+  .tab-button-template, .tab-site-template{
+    display: none;
+  }
+}

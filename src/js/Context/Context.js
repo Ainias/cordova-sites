@@ -17,12 +17,14 @@ export class Context {
 
         this._view = null;
         this._fragments = [];
-        this._viewPromise = null;
         this._state = Context.STATE_CREATED;
+        this._viewLoadedPromise = Helper.newPromiseWithResolve();
 
         this._viewPromise = ViewInflater.getInstance().load(view).then((siteContent) => {
             this._view = siteContent;
             return siteContent;
+        }).catch(e => {
+            this._viewLoadedPromise.reject(e);
         });
     }
 
@@ -55,7 +57,9 @@ export class Context {
 
         let onViewLoadedPromises = [];
         for (let k in this._fragments) {
-            onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].onViewLoaded()));
+            onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].onViewLoaded()).then(
+                () => this._fragments[k]._viewLoadedPromise.resolve()
+            ));
         }
         return Promise.all(onViewLoadedPromises);
     }

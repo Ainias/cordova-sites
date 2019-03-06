@@ -3,15 +3,57 @@ const path = require("path");
 const fs = require('fs');
 const jsonRollup = require("rollup-plugin-json");
 const commonjs = require('rollup-plugin-commonjs');
-const importFilePath = require("rollup-import-file-path");
+const importFilePath = require("rollup-plugin-import-file-path");
 const htmlImportFilePath = require("rollup-plugin-html-import-file-path");
 
-const sourceDir = "./src/";
 const tmpFile = "./tmp/script.js";
 
-console.log(process.cwd());
+const fileOptions = [{
+    input: [
+        path.resolve(process.cwd(), "src/js/"),
+    ],
+    output: {
+        format: 'es',
+        file: path.resolve(process.cwd(), 'dist/cordova-sites.js'),
+        nameFile: path.resolve(process.cwd(), 'dist/cordova-sites.names.json'),
+    }
+},
+    // {
+    // input: [
+    //     path.resolve(process.cwd(), "src/js/"),
+    // ],
+    // options: {
+    //     plugins: [
+    //         commonjs({
+    //             include: 'node_modules/**',  // Default: undefined
+    //         }),
+    //         htmlImportFilePath({
+    //             include: "**/*.html",
+    //             importAttributes: {
+    //                 "[data-view]": "data-view",
+    //                 "img[src]": "src"
+    //             },
+    //             relative: true,
+    //             asImport: false,
+    //         }),
+    //         importFilePath({
+    //             include: "**/*.jpg"
+    //         }),
+    //         importFilePath({
+    //             include: "**/*.png"
+    //         }),
+    //         jsonRollup({compact: true})
+    //     ]
+    // },
+    // output: {
+    //     format: 'es',
+    //     file: path.resolve(process.cwd(), 'dist/cordova-sites.mjs'),
+    //     // nameFile: path.resolve(process.cwd(), 'dist/cordova-sites.names.json'),
+    // }
+// }
+];
 
-const inputOptions = {
+const options = {
     input: path.resolve(process.cwd(), tmpFile),
     plugins: [
         commonjs({
@@ -23,10 +65,10 @@ const inputOptions = {
             include: "**/*.html",
             importAttributes: {
                 "[data-view]": "data-view",
-                "img[src]":"src"
+                "img[src]": "src"
             },
-            relative:true,
-            asImport:true,
+            relative: true,
+            asImport: true,
         }),
         importFilePath({
             include: "**/*.jpg"
@@ -35,14 +77,8 @@ const inputOptions = {
             include: "**/*.png"
         }),
         jsonRollup({compact: true})
-    ],
+    ]
 };
-const outputOptions = {
-    format: 'es',
-    file: path.resolve(process.cwd(), 'dist/cordova-sites.js'),
-    nameFile: path.resolve(process.cwd(), 'dist/cordova-sites.names.json'),
-};
-
 
 function findNames(dir, excluded) {
     let names = {};
@@ -63,11 +99,14 @@ function findNames(dir, excluded) {
     return names;
 }
 
-async function buildEntryPoints() {
+async function buildEntryPoints(fileOption) {
     const cutLengthFront = 0;
     const resultDir = path.resolve(process.cwd(), path.dirname(tmpFile));
 
-    const names = findNames(sourceDir, []);
+    let names = {};
+    fileOption.input.forEach(dir => {
+        Object.assign(names, findNames(dir + "/", []));
+    });
 
     let imports = '';
     for (let k in names) {
@@ -81,13 +120,21 @@ async function buildEntryPoints() {
 }
 
 async function build() {
-    await buildEntryPoints();
 
-    const bundle = await rollup.rollup(inputOptions);
+    let buildPromise = Promise.resolve();
+    fileOptions.forEach(async fileOption => {
+        buildPromise = buildPromise.then(async () => {
+            await buildEntryPoints(fileOption);
 
-    // or write the bundle to disk
-    await bundle.write(outputOptions);
-    fs.unlinkSync(tmpFile);
+            let currentOptions = options;
+            Object.assign(currentOptions, fileOption.options);
+            const bundle = await rollup.rollup(currentOptions);
+
+            // or write the bundle to disk
+            await bundle.write(fileOption.output);
+            fs.unlinkSync(tmpFile);
+        });
+    });
 }
 
 build();

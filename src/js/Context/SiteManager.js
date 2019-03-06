@@ -118,6 +118,7 @@ export class SiteManager {
             site._onConstructPromise = site.onConstruct(params);
             await Promise.all([site._onConstructPromise, site.getViewPromise()]);
             await site.onViewLoaded();
+            site._viewLoadedPromise.resolve();
 
             return this._show(site);
         }).catch((e) => {
@@ -130,6 +131,7 @@ export class SiteManager {
                     return this._show(this._siteStack[i]);
                 }
             }
+            site._viewLoadedPromise.reject();
         });
 
         //Gebe Site-Promise zurück
