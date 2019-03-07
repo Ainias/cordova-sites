@@ -62,6 +62,11 @@ export class NanoSQLWrapper {
         return this._connectionPromise;
     }
 
+    /**
+     * Waiting for connection
+     *
+     * @return {Promise<any>}
+     */
     async waitForConnection(){
         return this._connectionPromise;
     }
@@ -76,7 +81,6 @@ export class NanoSQLWrapper {
      */
     async getTable(table) {
         await this._connectionPromise;
-        console.log(table);
         return nSQL(table);
     }
 }

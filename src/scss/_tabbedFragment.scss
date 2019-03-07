@@ -15,9 +15,6 @@ $border-color: #E6E6E6;
         background-color: initial;
       }
     }
-    .border-bottom {
-      border-bottom: 1px solid $border-color;
-    }
   }
 
   .tab-content {
@@ -25,20 +22,20 @@ $border-color: #E6E6E6;
     border-top: 0;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-    //position: relative;
     .tab-site {
-      //position: absolute;
       display: none;
-      //visibility: hidden;
 
       &.active {
         display: initial;
-        //visibility: initial;
       }
     }
   }
 
   .tab-button-template, .tab-site-template{
     display: none;
+  }
+
+  .border-bottom {
+    border-bottom: 1px solid $border-color;
   }
 }

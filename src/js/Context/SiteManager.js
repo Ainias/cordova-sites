@@ -95,9 +95,6 @@ export class SiteManager {
      * @returns {Promise<any>}
      */
     async startSite(siteConstructor, paramsPromise) {
-
-        console.log("startSite");
-
         //Testen, ob der Constructor vom richtigen Typen ist
         if (!(siteConstructor.prototype instanceof AbstractSite)) {
             throw {
@@ -214,8 +211,6 @@ export class SiteManager {
      * @private
      */
     async _show(site) {
-        console.log("show");
-
         //Mache nichts, wenn Seite bereits angezeigt wird
         if (site._state === Context.STATE_RUNNING && this.getCurrentSite() === site) {
             return;
@@ -251,7 +246,6 @@ export class SiteManager {
      * @param site
      */
     endSite(site) {
-        console.log("endSite");
         site._onConstructPromise.then(async () => {
             //Aus Index entfernen
             let index = this._siteStack.indexOf(site);

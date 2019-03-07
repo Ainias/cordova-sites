@@ -1,0 +1,106 @@
+.background {
+  position: fixed;
+  z-index: 1000000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(55, 55, 55, 0.6);
+
+  .modal {
+    position: relative;
+    top: 50%;
+    margin: auto;
+    width: 80%;
+
+    border-radius: 2px;
+
+    background-color: #fefefe;
+
+    transform: translateY(-50%);
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    max-height: 80%;
+    max-width: nth(nth($breakpoints, 4), 2);
+
+    &.small-margin {
+      @include breakpoint(medium down) {
+        width: 90%;
+      }
+      @include breakpoint(small down) {
+        width: 95%;
+      }
+    }
+
+    @each $size in $breakpoints {
+      &.max-#{nth($size, 1)} {
+        max-width: nth($size, 2);
+      }
+    }
+
+    .title {
+      font-weight: bold;
+      padding-bottom: 0.5rem;
+    }
+
+    .content-container {
+      overflow-y: auto;
+      max-height: 100%;
+
+      .loader {
+        position: static;
+        transform: none;
+      }
+    }
+
+    .close {
+      text-align: right;
+      //color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      line-height: 1;
+
+      &:hover,
+      &:focus {
+        //color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    }
+
+    .modal-button-container {
+      padding-top: 0.5rem;
+
+      .button {
+        margin-left: 0.2rem;
+        margin-bottom: 0 !important;
+        padding: 0.6em 0.8em;
+        @include breakpoint(small down) {
+          margin-left: 0.1rem;
+          padding: 0.3em 0.5em;
+        }
+      }
+    }
+
+    .choose-dialog-value-row{
+      line-height: 1;
+      padding-top: 0.5em;
+      padding-bottom: 0.5em;
+      width: 100%;
+      cursor: pointer;
+      background: rgba(195, 195, 195, 0.13);
+      display: inline-block;
+    }
+
+    //Additional classes
+    &.no-title {
+      .title {
+        display: none;
+      }
+    }
+
+  }
+}

@@ -1728,9 +1728,6 @@ class SiteManager {
      * @returns {Promise<any>}
      */
     async startSite(siteConstructor, paramsPromise) {
-
-        console.log("startSite");
-
         //Testen, ob der Constructor vom richtigen Typen ist
         if (!(siteConstructor.prototype instanceof AbstractSite)) {
             throw {
@@ -1847,8 +1844,6 @@ class SiteManager {
      * @private
      */
     async _show(site) {
-        console.log("show");
-
         //Mache nichts, wenn Seite bereits angezeigt wird
         if (site._state === Context.STATE_RUNNING && this.getCurrentSite() === site) {
             return;
@@ -1884,7 +1879,6 @@ class SiteManager {
      * @param site
      */
     endSite(site) {
-        console.log("endSite");
         site._onConstructPromise.then(async () => {
             //Aus Index entfernen
             let index = this._siteStack.indexOf(site);
@@ -3875,7 +3869,7 @@ class BaseModel {
         throw new Error("_method not defined!");
     }
 
-    static async _getDBInstance() {
+    static _getDBInstance() {
         throw new Error("_method not defined!");
     }
 
@@ -3899,16 +3893,50 @@ class BaseModel {
         let res = await table.query("upsert", jsonModel).exec();
         if (res[0] && res[0]["affectedRowPKS"] && res[0]["affectedRows"] && res[0]["affectedRows"].length >= 1) {
             let jsonObject = res[0]["affectedRows"][0];
-            return this._inflate(jsonObject, model);
+            let entity = this._inflate(jsonObject, model);
+            this.entities = Helper.nonNull(this.entities, {});
+            this.entities[entity.getId()] = entity;
+            return entity;
         }
         return null;
     }
 
-    static async getTable() {
-        let db = await this._getDBInstance();
+    /**
+     * Get the table
+     * @return {Promise<Promise<NanoSQLInstance>}
+     */
+    static getTable() {
+        let db = this._getDBInstance();
         return db.getTable(this.getModelName());
     }
 
+    /**
+     * Finds element by id. Recommend approach, because it caches elements
+     *
+     * @param id
+     * @return {Promise<BaseModel>}
+     */
+    static async findById(id) {
+        id = parseInt(id);
+        this.entities = Helper.nonNull(this.entities, {});
+        if (!this.entities[id]) {
+            this.entities[id] = await this.selectOne({"id": id});
+        }
+        else {
+            console.log("loaded from cache");
+        }
+        return this.entities[id];
+
+    }
+
+    /**
+     * Selects one element from database
+     *
+     * @param where
+     * @param orderBy
+     * @param offset
+     * @return {Promise<*>}
+     */
     static async selectOne(where, orderBy, offset) {
         let models = await this.select(where, orderBy, 1, offset);
         if (models.length >= 1) {
@@ -3951,9 +3979,22 @@ class BaseModel {
         if (Helper.isNotNull(offset)) {
             query = query.offset(offset);
         }
-        return this._inflate(await query.exec());
+        let entities = this._inflate(await query.exec());
+        this.entities = Helper.nonNull(this.entities, {});
+        entities.forEach(entity => {
+            this.entities[entity.getId()] = entity;
+        });
+        return entities;
     }
 
+    /**
+     * Creates Models from json-Object
+     *
+     * @param jsonObjects
+     * @param models
+     * @return {*}
+     * @private
+     */
     static _inflate(jsonObjects, models) {
         models = Helper.nonNull(models, []);
 
@@ -4043,6 +4084,11 @@ class NanoSQLWrapper {
         return this._connectionPromise;
     }
 
+    /**
+     * Waiting for connection
+     *
+     * @return {Promise<any>}
+     */
     async waitForConnection(){
         return this._connectionPromise;
     }
@@ -4057,7 +4103,6 @@ class NanoSQLWrapper {
      */
     async getTable(table) {
         await this._connectionPromise;
-        console.log(table);
         return nSQL(table);
     }
 }
