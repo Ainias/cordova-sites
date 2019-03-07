@@ -3438,8 +3438,8 @@ class NavbarFragment extends AbstractFragment {
         this.updateToggleButton();
     }
 
-    _showCloseListener(){
-        if (this._closeListenerContainer){
+    _showCloseListener() {
+        if (this._closeListenerContainer) {
             this._closeListenerContainer.style.display = 'block';
         }
     }
@@ -3451,10 +3451,12 @@ class NavbarFragment extends AbstractFragment {
         if (Helper.isNotNull(this._responsiveMenu)) {
             this._responsiveMenu.style.display = 'none';
         }
-        if (this._closeListenerContainer){
+        if (this._closeListenerContainer) {
             this._closeListenerContainer.style.display = 'none';
         }
-        this._menu.close();
+        if (this._menu) {
+            this._menu.close();
+        }
     }
 
     /**
@@ -3466,7 +3468,6 @@ class NavbarFragment extends AbstractFragment {
         }
         this._showCloseListener();
     }
-
 
 
     /**
@@ -3873,6 +3874,10 @@ class BaseModel {
         throw new Error("_method not defined!");
     }
 
+    /**
+     * @param model
+     * @private
+     */
     static _modelToJson(model) {
         let schemaDefinition = this.getTableSchema();
         let jsonObject = {};
@@ -3885,6 +3890,11 @@ class BaseModel {
         return jsonObject;
     }
 
+    /**
+     * Saves entity
+     * @param model
+     * @return {Promise<*>}
+     */
     static async saveModel(model) {
         let table = this.getTable();
         let jsonModel = this._modelToJson(model);
@@ -3921,9 +3931,6 @@ class BaseModel {
         this.entities = Helper.nonNull(this.entities, {});
         if (!this.entities[id]) {
             this.entities[id] = await this.selectOne({"id": id});
-        }
-        else {
-            console.log("loaded from cache");
         }
         return this.entities[id];
 

@@ -110,8 +110,8 @@ export class NavbarFragment extends AbstractFragment {
         this.updateToggleButton();
     }
 
-    _showCloseListener(){
-        if (this._closeListenerContainer){
+    _showCloseListener() {
+        if (this._closeListenerContainer) {
             this._closeListenerContainer.style.display = 'block';
         }
     }
@@ -123,10 +123,12 @@ export class NavbarFragment extends AbstractFragment {
         if (Helper.isNotNull(this._responsiveMenu)) {
             this._responsiveMenu.style.display = 'none';
         }
-        if (this._closeListenerContainer){
+        if (this._closeListenerContainer) {
             this._closeListenerContainer.style.display = 'none';
         }
-        this._menu.close();
+        if (this._menu) {
+            this._menu.close();
+        }
     }
 
     /**
@@ -138,7 +140,6 @@ export class NavbarFragment extends AbstractFragment {
         }
         this._showCloseListener();
     }
-
 
 
     /**
