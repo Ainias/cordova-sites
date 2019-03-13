@@ -126,21 +126,25 @@ export class Form {
             [pair[0]]: pair[1],
         }), {});
         if (Helper.nonNull(filesToBase64, true)) {
-            let filePromises = [];
-
-            Object.keys(values).forEach(key => {
-                if (values[key] instanceof File) {
-                    filePromises.push(new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result);
-                        reader.onerror = error => reject(error);
-                        reader.readAsDataURL(values[key]);
-                    }).then(base64 => values[key] = base64));
-                }
-            });
-
-            await Promise.all(filePromises);
+            values = await Form.filesToBase64(values);
         }
+        return values;
+    }
+
+    static async filesToBase64(values) {
+        let filePromises = [];
+
+        Object.keys(values).forEach(key => {
+            if (values[key] instanceof File) {
+                filePromises.push(new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(values[key]);
+                }).then(base64 => values[key] = base64));
+            }
+        });
+        await Promise.all(filePromises);
         return values;
     }
 
@@ -232,7 +236,7 @@ export class Form {
         this._submitCallback = callback;
     }
 
-    getFormElement(){
+    getFormElement() {
         return this._formElem;
     }
 }
