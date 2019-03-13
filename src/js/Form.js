@@ -135,7 +135,7 @@ export class Form {
         let filePromises = [];
 
         Object.keys(values).forEach(key => {
-            if (values[key] instanceof File) {
+            if (values[key] instanceof Blob) {
                 filePromises.push(new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = () => resolve(reader.result);
