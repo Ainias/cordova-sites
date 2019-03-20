@@ -32,6 +32,25 @@ export class NavbarFragment extends AbstractFragment {
         NavbarFragment.defaultActions.forEach(action => {
             this._menuActions.push(action.copy());
         });
+
+        this._canGoBack = false;
+        this._goBackListener = false;
+    }
+
+    setGoBackListener(listener) {
+        this._goBackListener = listener;
+        this.setCanGoBack(listener !== null);
+    }
+
+    setCanGoBack(canGoBack) {
+        this._canGoBack = canGoBack;
+        if (this._view) {
+            if (this._canGoBack) {
+                this.findBy(".back-button").classList.remove("hidden");
+            } else {
+                this.findBy(".back-button").classList.add("hidden");
+            }
+        }
     }
 
     /**
@@ -95,6 +114,18 @@ export class NavbarFragment extends AbstractFragment {
 
         //Rendere das Menü
         this.drawMenu();
+
+        this.findBy(".back-button").addEventListener("click", () => {
+            if (this._canGoBack) {
+                if (this._goBackListener) {
+                    this._goBackListener();
+                } else {
+                    this.getSite().goBack();
+                }
+            }
+        });
+
+        this.setCanGoBack(this._canGoBack);
 
         return res;
     }

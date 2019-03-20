@@ -17,6 +17,10 @@ nav.top-bar.title-bar {
 
 .top-bar {
   white-space: nowrap;
+  //padding: initial;
+  > span{
+    display: flex;
+  }
 }
 
 #navbar-close-listener {
@@ -278,6 +282,10 @@ nav.top-bar.title-bar {
   //overflow-y:hidden;
 }
 
+
+#responsive-menu-toggle button{
+  vertical-align: initial;
+}
 
 .dropdown.menu > li.is-accordion-submenu-parent {
   //> a:after {

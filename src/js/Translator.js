@@ -250,6 +250,10 @@ export class Translator {
         return this._currentLanguage;
     }
 
+    getFallbackLanguage(){
+        return this._fallbackLanguage;
+    }
+
     static async setLanguage(language) {
         let instance = Translator.getInstance();
         if (instance) {
