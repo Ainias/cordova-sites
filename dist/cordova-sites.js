@@ -2170,6 +2170,228 @@ class ContainerSite extends TemplateSite{
     }
 }
 
+class DelegateSite extends AbstractSite {
+
+    constructor(site) {
+        super(document.createElement("span"));
+
+        /** @var {AbstractSite} */
+        this._site = site;
+    }
+
+    setTitle(titleElement, title) {
+        return this._site.setTitle(titleElement, title);
+    }
+
+    setParameter(name, value) {
+        return this._site.setParameter(name, value);
+    }
+
+    setParameters(parameters) {
+        return this._site.setParameters(parameters)
+    }
+
+    getParameters() {
+        return this._site.getParameters();
+    }
+
+    async showLoadingSymbol() {
+        return this._site.showLoadingSymbol();
+    }
+
+    async removeLoadingSymbol() {
+        return this._site.removeLoadingSymbol();
+    }
+
+    _updateTitle() {
+        return this._site._updateTitle();
+    }
+
+    updateUrl(args) {
+        return this._site.updateUrl(args);
+    }
+
+    startSite(site, args) {
+        return this._site.startSite(site, args);
+    }
+
+    finishAndStartSite(site, args, result) {
+        return this._site.finishAndStartSite(site, args, result);
+    }
+
+    finish(result) {
+        return this._site.finish();
+    }
+
+    goBack() {
+        return this._site.goBack();
+    }
+
+    getFinishPromise() {
+        return this._site.getFinishPromise();
+    }
+
+    setResult(result) {
+        return this._site.setResult(result);
+    }
+
+    getFinishResolver() {
+        return this._site.getFinishResolver();
+    }
+
+    addFragment(viewQuery, fragment) {
+        return this._site.addFragment(viewQuery, fragment);
+    }
+
+    findBy(query, all, asPromise) {
+        return this._site.findBy(query, all, asPromise);
+    }
+
+    setPauseParameters(pauseParameters) {
+        return this._site.setPauseParameters(pauseParameters);
+    }
+
+    getViewPromise() {
+        return this._site.getViewPromise();
+    }
+}
+
+class MasterSite extends AbstractSite{
+
+    constructor(siteManager, view) {
+        super(siteManager, view);
+        this._delegates = [];
+    }
+
+    addDelegate(delegateSite){
+        this._delegates.push(delegateSite);
+    }
+
+    async onConstruct(constructParameters) {
+        let res = super.onConstruct(constructParameters);
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onConstruct(constructParameters);
+        });
+        return res;
+    }
+
+    async onStart(pauseArguments) {
+        await super.onStart(pauseArguments);
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onStart(pauseArguments);
+        });
+    }
+
+    onBackPressed() {
+        super.onBackPressed();
+        this._delegates.forEach(delegate => {
+            delegate.onBackPressed();
+        });
+    }
+
+
+    onMenuPressed() {
+        super.onMenuPressed();
+        this._delegates.forEach(delegate => {
+            delegate.onMenuPressed();
+        });
+    }
+
+    onSearchPressed() {
+        super.onSearchPressed();
+        this._delegates.forEach(delegate => {
+            delegate.onSearchPressed();
+        });
+    }
+
+    async onViewLoaded() {
+        let res =  super.onViewLoaded();
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onViewLoaded();
+        });
+        return res;
+    }
+
+    async onPause() {
+        await super.onPause();
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onPause();
+        });
+    }
+
+    async onDestroy() {
+        await super.onDestroy();
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onDestroy();
+        });
+    }
+}
+
+import defaultView from './assets/src/html/Framework/Fragment/alphabeticListFragment.html';
+
+class AlphabeticListFragment extends AbstractFragment {
+    constructor(site, view) {
+        super(site, Helper.nonNull(view, defaultView));
+        this._elements = {};
+    }
+
+    async onViewLoaded() {
+        let res = super.onViewLoaded();
+
+        //TODO font-size changing
+
+        this.findBy(".alphabet-scroll-to", true).forEach(elem => {
+            let listener = ()=> {
+                this.findBy(".alphabet-section."+elem.dataset.letter).scrollIntoView({behavior:"smooth", block:"start"});
+            };
+            elem.addEventListener("touchstart", listener);
+            elem.addEventListener("touchmove", listener);
+            elem.addEventListener("click", listener);
+        });
+
+        this.renderList();
+        return res;
+    }
+
+    setElements(elements) {
+        this._elements = {};
+        Object.keys(elements).sort(function (a, b) {
+            return a.toLowerCase().localeCompare(b.toLowerCase());
+        }).forEach(key => {
+            this._elements[key] = elements[key];
+        });
+    }
+
+    renderElement(element) {
+        console.warn("should be overloaded?");
+        let elem = document.createElement("div");
+        elem.innerText = element;
+        return elem;
+    }
+
+    renderList() {
+        this.findBy(".alphabet-section", true).forEach(section => {
+            Helper.removeAllChildren(section);
+        });
+
+        let currentLetter = 'A';
+        let currentSegment = this.findBy(".alphabet-section.A");
+        Object.keys(this._elements).forEach(key => {
+            let newLetter = key.substring(0,1).toUpperCase();
+            if (newLetter !== currentLetter){
+                currentLetter = newLetter;
+                let newSegment = this.findBy(".alphabet-section."+newLetter);
+                if (newSegment !== null){
+                    currentSegment = newSegment;
+                }
+                console.log(newLetter, currentSegment);
+            }
+            let element = this.renderElement(this._elements[key]);
+            currentSegment.appendChild(element);
+        });
+    }
+}
+
 import defaultTabView from './assets/src/html/Framework/Fragment/tabFragment.html';
 
 class TabFragment extends AbstractFragment {
@@ -4728,4 +4950,4 @@ Toast.LAST_ID = 0;
 
 Toast.DEFAULT_DURATION = 2500;
 
-export { App, AbstractFragment, AbstractSite, ContainerSite, Context, TabFragment, Menu, MenuAction, OpenSubmenuAction, StartSiteMenuAction, NavbarFragment, AccordionRenderer, DropdownRenderer, MenuRenderer, Submenu, MenuSite, SiteManager, SwipeChildFragment, SwipeFragment, TemplateSite, DataManager, BaseModel, NanoSQLWrapper, ChooseDialog, ConfirmDialog, Dialog, Form, Helper, HistoryManager, NativeStoragePromise, Toast, ToastManager, Translator, ViewInflater };
+export { App, AbstractFragment, AbstractSite, ContainerSite, Context, DelegateSite, MasterSite, AlphabeticListFragment, TabFragment, Menu, MenuAction, OpenSubmenuAction, StartSiteMenuAction, NavbarFragment, AccordionRenderer, DropdownRenderer, MenuRenderer, Submenu, MenuSite, SiteManager, SwipeChildFragment, SwipeFragment, TemplateSite, DataManager, BaseModel, NanoSQLWrapper, ChooseDialog, ConfirmDialog, Dialog, Form, Helper, HistoryManager, NativeStoragePromise, Toast, ToastManager, Translator, ViewInflater };
