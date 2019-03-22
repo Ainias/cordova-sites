@@ -45,7 +45,7 @@ execPromise("npm pack").then(async (std) => {
     let name = std[0].trim();
     let pathToTar = path.resolve(thisPath, name);
 
-    if (!fs.statSync("tmp").isDirectory()) {
+    if (!fs.existsSync("tmp")) {
         fs.mkdirSync("tmp");
     }
     process.chdir("tmp");
@@ -57,6 +57,10 @@ execPromise("npm pack").then(async (std) => {
     pathsToProjects.forEach((project) => {
         promise = promise.then(async () => {
             let resultDir = path.resolve(project, "node_modules", packageName);
+            console.log(resultDir, fs.existsSync(resultDir));
+            if (!fs.existsSync(resultDir)) {
+                fs.mkdirSync(resultDir);
+            }
             return execPromise("cp -r ./* "+resultDir);
         });
     });

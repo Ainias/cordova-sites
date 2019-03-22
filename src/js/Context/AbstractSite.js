@@ -42,6 +42,10 @@ export class AbstractSite extends Context {
         this._historyId = null;
     }
 
+    getTitle(){
+        return this._title;
+    }
+
     async onConstruct(constructParameters) {
         let res = super.onConstruct(constructParameters);
         this.setParameters(Helper.nonNull(constructParameters, {}));
@@ -161,7 +165,7 @@ export class AbstractSite extends Context {
             if (Helper.isNotNull(result)) {
                 this.setResult(result);
             }
-            this._siteManager.endSite(this);
+            return this._siteManager.endSite(this);
         }
     }
 

@@ -246,7 +246,7 @@ export class SiteManager {
      * @param site
      */
     endSite(site) {
-        site._onConstructPromise.then(async () => {
+        return site._onConstructPromise.then(async () => {
             //Aus Index entfernen
             let index = this._siteStack.indexOf(site);
             this._siteStack.splice(index, 1);

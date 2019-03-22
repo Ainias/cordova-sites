@@ -84,4 +84,12 @@ export class DelegateSite extends AbstractSite {
     getViewPromise() {
         return this._site.getViewPromise();
     }
+
+    getState() {
+        return this._site.getState();
+    }
+
+    getTitle(){
+        return this._site.getTitle();
+    }
 }

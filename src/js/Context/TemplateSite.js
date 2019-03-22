@@ -1,11 +1,11 @@
-import {AbstractSite} from "./AbstractSite";
 import {ViewInflater} from "../ViewInflater";
+import {MasterSite} from "./Delegate/MasterSite";
 
 /**
  * Die Seite bekommt ein Template übergeben und ersetzt in diesem Template das mit dem Selector gefundene
  * Element mit der angebenen View
  */
-export class TemplateSite extends AbstractSite{
+export class TemplateSite extends MasterSite{
 
     /**
      * Constructor für eine TemplateSite

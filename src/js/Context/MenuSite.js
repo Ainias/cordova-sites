@@ -9,7 +9,7 @@ import {Helper} from "../Helper";
  *
  * Außerdem beinhaltet die MenuSite ein NavbarFragment, wo Menüelemente hinzugefügt werden können
  */
-export class MenuSite extends TemplateSite{
+export class MenuSite extends TemplateSite {
 
     /**
      * Constructor für eine MenuSite

@@ -28,6 +28,10 @@ export class Context {
         });
     }
 
+    getState(){
+        return this._state;
+    }
+
     /**
      * Wird von SiteManager aufgerufen, wenn Klasse erstellt wird. Das ViewPromise ist noch nicht zwangsweise geladen!
      * Gibt ein Promise zurück. onViewLoaded wird erst aufgerufen, wenn onConstruct-Promise und view-Promise fullfilled sind.

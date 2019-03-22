@@ -1,6 +1,3 @@
-import { nSQL } from 'nano-sql';
-import { SQLiteStore } from 'cordova-plugin-nano-sqlite/lib/sqlite-adapter';
-
 /**
  * Promise-Wrapper-Klasse für Native-Storage
  */
@@ -1059,6 +1056,10 @@ class Context {
         });
     }
 
+    getState(){
+        return this._state;
+    }
+
     /**
      * Wird von SiteManager aufgerufen, wenn Klasse erstellt wird. Das ViewPromise ist noch nicht zwangsweise geladen!
      * Gibt ein Promise zurück. onViewLoaded wird erst aufgerufen, wenn onConstruct-Promise und view-Promise fullfilled sind.
@@ -1270,6 +1271,10 @@ class AbstractSite extends Context {
         this._historyId = null;
     }
 
+    getTitle(){
+        return this._title;
+    }
+
     async onConstruct(constructParameters) {
         let res = super.onConstruct(constructParameters);
         this.setParameters(Helper.nonNull(constructParameters, {}));
@@ -1389,7 +1394,7 @@ class AbstractSite extends Context {
             if (Helper.isNotNull(result)) {
                 this.setResult(result);
             }
-            this._siteManager.endSite(this);
+            return this._siteManager.endSite(this);
         }
     }
 
@@ -1883,7 +1888,7 @@ class SiteManager {
      * @param site
      */
     endSite(site) {
-        site._onConstructPromise.then(async () => {
+        return site._onConstructPromise.then(async () => {
             //Aus Index entfernen
             let index = this._siteStack.indexOf(site);
             this._siteStack.splice(index, 1);
@@ -2127,11 +2132,82 @@ class AbstractFragment extends Context {
     }
 }
 
+class MasterSite extends AbstractSite{
+
+    constructor(siteManager, view) {
+        super(siteManager, view);
+        this._delegates = [];
+    }
+
+    addDelegate(delegateSite){
+        this._delegates.push(delegateSite);
+    }
+
+    async onConstruct(constructParameters) {
+        let res = super.onConstruct(constructParameters);
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onConstruct(constructParameters);
+        });
+        return res;
+    }
+
+    async onStart(pauseArguments) {
+        await super.onStart(pauseArguments);
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onStart(pauseArguments);
+        });
+    }
+
+    onBackPressed() {
+        super.onBackPressed();
+        this._delegates.forEach(delegate => {
+            delegate.onBackPressed();
+        });
+    }
+
+
+    onMenuPressed() {
+        super.onMenuPressed();
+        this._delegates.forEach(delegate => {
+            delegate.onMenuPressed();
+        });
+    }
+
+    onSearchPressed() {
+        super.onSearchPressed();
+        this._delegates.forEach(delegate => {
+            delegate.onSearchPressed();
+        });
+    }
+
+    async onViewLoaded() {
+        let res =  super.onViewLoaded();
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onViewLoaded();
+        });
+        return res;
+    }
+
+    async onPause() {
+        await super.onPause();
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onPause();
+        });
+    }
+
+    async onDestroy() {
+        await super.onDestroy();
+        await Helper.asyncForEach(this._delegates, async delegate => {
+            await delegate.onDestroy();
+        });
+    }
+}
+
 /**
  * Die Seite bekommt ein Template übergeben und ersetzt in diesem Template das mit dem Selector gefundene
  * Element mit der angebenen View
  */
-class TemplateSite extends AbstractSite{
+class TemplateSite extends MasterSite{
 
     /**
      * Constructor für eine TemplateSite
@@ -2254,76 +2330,13 @@ class DelegateSite extends AbstractSite {
     getViewPromise() {
         return this._site.getViewPromise();
     }
-}
 
-class MasterSite extends AbstractSite{
-
-    constructor(siteManager, view) {
-        super(siteManager, view);
-        this._delegates = [];
+    getState() {
+        return this._site.getState();
     }
 
-    addDelegate(delegateSite){
-        this._delegates.push(delegateSite);
-    }
-
-    async onConstruct(constructParameters) {
-        let res = super.onConstruct(constructParameters);
-        await Helper.asyncForEach(this._delegates, async delegate => {
-            await delegate.onConstruct(constructParameters);
-        });
-        return res;
-    }
-
-    async onStart(pauseArguments) {
-        await super.onStart(pauseArguments);
-        await Helper.asyncForEach(this._delegates, async delegate => {
-            await delegate.onStart(pauseArguments);
-        });
-    }
-
-    onBackPressed() {
-        super.onBackPressed();
-        this._delegates.forEach(delegate => {
-            delegate.onBackPressed();
-        });
-    }
-
-
-    onMenuPressed() {
-        super.onMenuPressed();
-        this._delegates.forEach(delegate => {
-            delegate.onMenuPressed();
-        });
-    }
-
-    onSearchPressed() {
-        super.onSearchPressed();
-        this._delegates.forEach(delegate => {
-            delegate.onSearchPressed();
-        });
-    }
-
-    async onViewLoaded() {
-        let res =  super.onViewLoaded();
-        await Helper.asyncForEach(this._delegates, async delegate => {
-            await delegate.onViewLoaded();
-        });
-        return res;
-    }
-
-    async onPause() {
-        await super.onPause();
-        await Helper.asyncForEach(this._delegates, async delegate => {
-            await delegate.onPause();
-        });
-    }
-
-    async onDestroy() {
-        await super.onDestroy();
-        await Helper.asyncForEach(this._delegates, async delegate => {
-            await delegate.onDestroy();
-        });
+    getTitle(){
+        return this._site.getTitle();
     }
 }
 
@@ -3919,7 +3932,7 @@ import defaultMenuTemplate from './assets/src/html/siteTemplates/menuSite.html';
  *
  * Außerdem beinhaltet die MenuSite ein NavbarFragment, wo Menüelemente hinzugefügt werden können
  */
-class MenuSite extends TemplateSite{
+class MenuSite extends TemplateSite {
 
     /**
      * Constructor für eine MenuSite
@@ -4086,290 +4099,6 @@ class SwipeFragment extends AbstractFragment {
 
 SwipeFragment.MAX_Y = 80;
 SwipeFragment.MIN_X = 150;
-
-// import {MBBDatabase} from "../Database/MBBDatabase";
-
-class BaseModel {
-
-    constructor() {
-        this._id = null;
-    }
-
-    /**
-     * @returns {number|null}
-     */
-    getId() {
-        return this._id;
-    }
-
-    /**
-     * @param {number} id
-     */
-    setId(id) {
-        this._id = id;
-    }
-
-    async save() {
-        //Wenn direkt BaseModel.saveModel aufgerufen wird, später ein Fehler geschmissen (_method not defined), da der
-        // falsche Kontext am Objekt existiert
-        return this.constructor.saveModel(this);
-    }
-
-    static _newModel() {
-        return new this();
-    }
-
-    static getModelName() {
-        throw new Error("_method not defined!");
-    }
-
-    static getTableSchema() {
-        throw new Error("_method not defined!");
-    }
-
-    static _getDBInstance() {
-        throw new Error("_method not defined!");
-    }
-
-    /**
-     * @param model
-     * @private
-     */
-    static _modelToJson(model) {
-        let schemaDefinition = this.getTableSchema();
-        let jsonObject = {};
-        schemaDefinition.forEach(column => {
-            let getterName = ["get", column.key.substr(0, 1).toUpperCase(), column.key.substr(1)].join('');
-            if (typeof model[getterName] === "function") {
-                jsonObject[column.key] = model[getterName]();
-            }
-        });
-        return jsonObject;
-    }
-
-    /**
-     * Saves entity
-     * @param model
-     * @return {Promise<*>}
-     */
-    static async saveModel(model) {
-        let table = this.getTable();
-        let jsonModel = this._modelToJson(model);
-
-        table = await table;
-        let res = await table.query("upsert", jsonModel).exec();
-        if (res[0] && res[0]["affectedRowPKS"] && res[0]["affectedRows"] && res[0]["affectedRows"].length >= 1) {
-            let jsonObject = res[0]["affectedRows"][0];
-            let entity = this._inflate(jsonObject, model);
-            this.entities = Helper.nonNull(this.entities, {});
-            this.entities[entity.getId()] = entity;
-            return entity;
-        }
-        return null;
-    }
-
-    /**
-     * Get the table
-     * @return {Promise<Promise<NanoSQLInstance>}
-     */
-    static getTable() {
-        let db = this._getDBInstance();
-        return db.getTable(this.getModelName());
-    }
-
-    /**
-     * Finds element by id. Recommend approach, because it caches elements
-     *
-     * @param id
-     * @return {Promise<BaseModel>}
-     */
-    static async findById(id) {
-        id = parseInt(id);
-        this.entities = Helper.nonNull(this.entities, {});
-        if (!this.entities[id]) {
-            this.entities[id] = await this.selectOne({"id": id});
-        }
-        return this.entities[id];
-
-    }
-
-    /**
-     * Selects one element from database
-     *
-     * @param where
-     * @param orderBy
-     * @param offset
-     * @return {Promise<*>}
-     */
-    static async selectOne(where, orderBy, offset) {
-        let models = await this.select(where, orderBy, 1, offset);
-        if (models.length >= 1) {
-            return models[0];
-        }
-        return null;
-    }
-
-    /**
-     * @param where
-     * @param orderBy
-     * @param limit
-     * @param offset
-     * @returns {Promise<[BaseModel]>}
-     */
-    static async select(where, orderBy, limit, offset) {
-        let table = await this.getTable();
-
-        let query = table.query("select");
-        if (Helper.isNotNull(where)) {
-            if (!Array.isArray(where) && typeof where === "object") {
-                let newWhere = [];
-                let keys = Object.keys(where);
-                keys.forEach((key, index) => {
-                    newWhere.push([key, "=", where[key]]);
-                    if (index < keys.length - 1) {
-                        newWhere.push("AND");
-                    }
-                });
-                where = newWhere;
-            }
-            query = query.where(where);
-        }
-        if (Helper.isNotNull(orderBy)) {
-            query = query.orderBy(orderBy);
-        }
-        if (Helper.isNotNull(limit)) {
-            query = query.limit(limit);
-        }
-        if (Helper.isNotNull(offset)) {
-            query = query.offset(offset);
-        }
-        let entities = this._inflate(await query.exec());
-        this.entities = Helper.nonNull(this.entities, {});
-        entities.forEach(entity => {
-            this.entities[entity.getId()] = entity;
-        });
-        return entities;
-    }
-
-    /**
-     * Creates Models from json-Object
-     *
-     * @param jsonObjects
-     * @param models
-     * @return {*}
-     * @private
-     */
-    static _inflate(jsonObjects, models) {
-        models = Helper.nonNull(models, []);
-
-        let isArray = Array.isArray(jsonObjects);
-        if (!isArray) {
-            jsonObjects = [jsonObjects];
-        }
-        if (!Array.isArray(models)) {
-            models = [models];
-        }
-
-        jsonObjects.forEach((jsonObject, index) => {
-            let model = (models.length > index) ? models[index] : this._newModel();
-            for (let k in jsonObject) {
-                let setterName = ["set", k.substr(0, 1).toUpperCase(), k.substr(1)].join('');
-                if (typeof model[setterName] === "function") {
-                    model[setterName](jsonObject[k]);
-                }
-                models[index] = model;
-            }
-        });
-        if (!isArray) {
-            models = (models.length > 0) ? models[0] : null;
-        }
-        return models;
-    }
-}
-
-/**
- * Wrapper für Nano-SQL, sollte Abgeleitet werden und setupDatabase überschrieben werden
- *
- * Handled den Datenbank-Typ (IndexedDB, SQLite, ...) in _connectToDatabase
- * Bei Anfragen durch getTable() ist die Datenbank verbunden
- */
-class NanoSQLWrapper {
-
-    /**
-     * Initialisiert das Verbindungs-Promise,
-     * Lässt die Datenbank initialisieren und verbinden
-     *
-     * @param databaseName
-     */
-    constructor(databaseName) {
-        this.connectionResolveReject = {};
-        this._connectionPromise = new Promise((resolver, rejecter) => {
-            this.connectionResolveReject.resolve = resolver;
-            this.connectionResolveReject.reject = rejecter;
-        });
-
-        this.databaseName = databaseName;
-
-        this.setupDatabase();
-        this._connectToDatabase();
-    }
-
-    /**
-     * Methode, welche von Kinderklassen überschrieben werden sollte
-     * Datenbank-Schema sollte hier definiert werden
-     */
-    setupDatabase() {
-
-    }
-
-    /**
-     * Hilfs-funktion, um ein Model/Eine Tabelle schneller zu generieren
-     *
-     * @param name
-     * @param schema
-     */
-    declareModel(name, schema) {
-        return nSQL(name).model(schema);
-    }
-
-    /**
-     * Methode, welche sich zur Datenbank verbindet. Benutzt den an den Constructor übergebenen Datenbanknamen
-     *
-     * @returns {Promise<any>}
-     */
-    async _connectToDatabase() {
-        nSQL().config({
-            mode: (typeof cordova === "undefined"
-                || window.cordova.platformId === "browser"
-                || !window["sqlitePlugin"]) ?
-                "PERM" : new SQLiteStore(),
-            id: this.databaseName
-        }).connect().then(this.connectionResolveReject.resolve).catch(this.connectionResolveReject.reject);
-        return this._connectionPromise;
-    }
-
-    /**
-     * Waiting for connection
-     *
-     * @return {Promise<any>}
-     */
-    async waitForConnection(){
-        return this._connectionPromise;
-    }
-
-    /**
-     *  Gibt ein Promise mit einer NanoSQLInstance auf die entsprechende Tabelle zurück.
-     *  Promise wartet auf das Verbinden der Datenbank (welches durch den Constructor ausgelöst wird), um vorzeitige
-     *  Anfragen zu verhindern.
-     *
-     * @param table
-     * @returns {Promise<NanoSQLInstance>}
-     */
-    async getTable(table) {
-        await this._connectionPromise;
-        return nSQL(table);
-    }
-}
 
 class Dialog {
     constructor(content, title) {
@@ -4950,4 +4679,4 @@ Toast.LAST_ID = 0;
 
 Toast.DEFAULT_DURATION = 2500;
 
-export { App, AbstractFragment, AbstractSite, ContainerSite, Context, DelegateSite, MasterSite, AlphabeticListFragment, TabFragment, Menu, MenuAction, OpenSubmenuAction, StartSiteMenuAction, NavbarFragment, AccordionRenderer, DropdownRenderer, MenuRenderer, Submenu, MenuSite, SiteManager, SwipeChildFragment, SwipeFragment, TemplateSite, DataManager, BaseModel, NanoSQLWrapper, ChooseDialog, ConfirmDialog, Dialog, Form, Helper, HistoryManager, NativeStoragePromise, Toast, ToastManager, Translator, ViewInflater };
+export { App, AbstractFragment, AbstractSite, ContainerSite, Context, DelegateSite, MasterSite, AlphabeticListFragment, TabFragment, Menu, MenuAction, OpenSubmenuAction, StartSiteMenuAction, NavbarFragment, AccordionRenderer, DropdownRenderer, MenuRenderer, Submenu, MenuSite, SiteManager, SwipeChildFragment, SwipeFragment, TemplateSite, DataManager, ChooseDialog, ConfirmDialog, Dialog, Form, Helper, HistoryManager, NativeStoragePromise, Toast, ToastManager, Translator, ViewInflater };
