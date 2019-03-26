@@ -1,259 +1,487 @@
 @import "../../node_modules/foundation-sites/scss/foundation";
 
-nav.top-bar.title-bar {
-  padding: 0.3rem 0.6rem 0;
-}
+//nav.top-bar.title-bar {
+//  padding: 0.3rem 0.6rem 0;
+//}
+$navColorBlack: #000 !default;
+$navColorWhite: #fff !default;
+$navBorderColorBlack: #7F7F7F !default;
+$navBorderColorWhite: #1e1c1c !default;
+$navBackgroundBlack: #fff !default;
+$navBackgroundWhite: #000 !default;
 
-#logo {
-  max-width: 2rem;
-  transition: none;
-}
 
-.menu, .dropdown.menu {
-  a {
-    padding: 0.2rem 0.5rem;
-  }
-}
-
-.top-bar {
+nav.top-bar {
   white-space: nowrap;
-  //padding: initial;
-  > span{
-    display: flex;
-  }
-}
+  position: relative;
+  background: $navBackgroundBlack;
+  color: $navColorBlack;
+  stroke: $navColorBlack;
+  padding: 0;
 
-#navbar-close-listener {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: transparent;
-  z-index: 8999;
-}
 
-.navbar-menu {
-  width: auto;
-  z-index: 9000;
-
-  a {
-    img + span {
-      display: none;
-    }
+  .background-img {
+    display: none;
   }
 
-  li {
-    position: relative;
-    z-index: 9000;
-
-    &.is-dropdown-submenu-parent {
-      z-index: 9001;
-    }
-
-    &.hidden {
-      display: none;
-    }
-
-    @include breakpoint(small down) {
-      &.smedium {
-        display: none;
-      }
-    }
-    @include breakpoint(smedium down) {
-      li {
-        display: table-cell;
-      }
-      &.medium {
-        display: none;
-      }
-    }
-    @include breakpoint(medium down) {
-      &.large {
-        display: none;
+  > span {
+    > span {
+      > span {
+        display: flex;
       }
     }
 
-    &.never {
-      display: none;
+    .back-button {
+      cursor: pointer;
+      text-align: left;
+
+      svg {
+        width: 0.5rem;
+        height: 1rem;
+        vertical-align: bottom;
+      }
     }
-  }
 
-  &.hidden-menu {
-    display: inline-block;
-    //float: right;
-    position: absolute;
-    z-index: 9000;
-    border: 1px solid rgb(202, 202, 202);
-    padding: 0.2rem;
-    transform: translateX(-100%);
-    text-align: left;
+    .top-bar-title {
 
-    li {
-      &.hidden {
-        display: none;
+    }
+
+    #navbar-close-listener-container {
+      #navbar-close-listener {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: transparent;
+        z-index: 8999;
+      }
+    }
+
+    #navbar-menu-visible {
+
+    }
+
+    #responsive-menu-toggle {
+      .menu-icon {
+        vertical-align: -webkit-baseline-middle;
+
+        &::after {
+          background: $navColorBlack;
+          box-shadow: 0 7px 0 $navColorBlack, 0 14px 0 $navColorBlack;
+        }
+      }
+    }
+
+    #responsive-menu {
+      display: block;
+      //right: -100%;
+      transition-duration: 0.5s;
+      transition-timing-function: ease-in-out;
+
+      &.visible {
+        .hidden-menu {
+          right: 0;
+        }
       }
 
-      &.is-dropdown-submenu-parent {
-        z-index: 9001;
+      .hidden-menu {
+        position: fixed;
+        transform: none;
+        display: inline-block;
+        z-index: 9000;
+        border: 1px solid $navBorderColorBlack;
+        //padding: 0.2rem;
+        padding: 2rem 0.2rem 0.2rem;
+        text-align: left;
+        background: $navBackgroundBlack;
+        margin-top: -0.6rem;
+        right: -100%;
 
-        ul.is-dropdown-submenu {
-          top: auto;
-          //margin-right: 0;
-          //margin-left: 1rem;
-          > li, > .close-listener {
+        li {
+          &.hidden {
+            display: none;
+          }
+
+          &.is-dropdown-submenu-parent {
             z-index: 9001;
+
+            ul.is-dropdown-submenu {
+              top: auto;
+
+              > li, > .close-listener {
+                z-index: 9001;
+              }
+            }
+
+            > a:after {
+              display: block;
+              width: 0;
+              height: 0;
+              border: 6px inset;
+              content: "";
+              border-bottom-width: 0;
+              border-top-style: solid;
+              border-color: #ffffff transparent transparent;
+              right: 5px;
+              left: auto;
+              margin-top: -3px;
+            }
+          }
+
+          a {
+            white-space: nowrap;
+
+            img {
+              display: none;
+
+              + span {
+                display: inherit;
+              }
+            }
+          }
+
+          @include breakpoint(medium) {
+            &.medium {
+              display: none;
+            }
+          }
+          @include breakpoint(smedium) {
+            &.smedium {
+              display: none;
+            }
+          }
+          @include breakpoint(large) {
+            &.large {
+              display: none;
+            }
+          }
+
+          @include breakpoint(small down) {
+            &.smedium {
+              display: block;
+
+              &.hidden {
+                display: none;
+              }
+            }
+          }
+          @include breakpoint(smedium down) {
+            &.medium {
+              display: block;
+
+              &.hidden {
+                display: none;
+              }
+            }
+          }
+          @include breakpoint(medium down) {
+            &.large {
+              display: block;
+
+              &.hidden {
+                display: none;
+              }
+            }
+          }
+
+          &.never {
+            display: block;
+
+            &.hidden {
+              display: none;
+            }
+          }
+
+          &.always {
+            display: none;
           }
         }
-
-        > a:after {
-          display: block;
-          width: 0;
-          height: 0;
-          border: 6px inset;
-          content: "";
-          border-bottom-width: 0;
-          border-top-style: solid;
-          border-color: #ffffff transparent transparent;
-          right: 5px;
-          left: auto;
-          margin-top: -3px;
-        }
       }
+    }
+
+    .navbar-menu {
+      background: initial;
+
+      width: auto;
+      z-index: 9000;
 
       a {
-        white-space: nowrap;
-
-        img {
-          display: none;
-
-          + span {
-            display: inherit;
-          }
-        }
-      }
-
-      @include breakpoint(medium) {
-        &.medium {
-          display: none;
-        }
-      }
-      @include breakpoint(smedium) {
-        &.smedium {
-          display: none;
-        }
-      }
-      @include breakpoint(large) {
-        &.large {
+        img + span {
           display: none;
         }
       }
 
-      @include breakpoint(small down) {
-        &.smedium {
-          display: block;
+      li {
+        position: relative;
+        z-index: 9000;
 
-          &.hidden {
-            display: none;
-          }
+        &.is-dropdown-submenu-parent {
+          z-index: 9001;
         }
-      }
-      @include breakpoint(smedium down) {
-        &.medium {
-          display: block;
-
-          &.hidden {
-            display: none;
-          }
-        }
-      }
-      @include breakpoint(medium down) {
-        &.large {
-          display: block;
-
-          &.hidden {
-            display: none;
-          }
-        }
-      }
-
-      &.never {
-        display: block;
 
         &.hidden {
           display: none;
         }
+
+        @include breakpoint(small down) {
+          &.smedium {
+            display: none;
+          }
+        }
+        @include breakpoint(smedium down) {
+          li {
+            display: table-cell;
+          }
+          &.medium {
+            display: none;
+          }
+        }
+        @include breakpoint(medium down) {
+          &.large {
+            display: none;
+          }
+        }
+
+        &.never {
+          display: none;
+        }
       }
 
-      &.always {
-        display: none;
+      .menu, &.menu {
+
+        li {
+          z-index: 100;
+          @include breakpoint(smedium down) {
+            a {
+              width: 100%;
+              //text-align: left;
+            }
+          }
+
+          @include breakpoint(smedium down) {
+            a {
+              padding-left: 0.68rem;
+            }
+          }
+          @include breakpoint(small down) {
+            a {
+              padding-left: 0.236rem;
+            }
+          }
+
+          &:not(.is-dropdown-submenu-parent) {
+            @include breakpoint(smedium down) {
+              a {
+                padding-right: 0.68rem;
+              }
+            }
+            @include breakpoint(small down) {
+              a {
+                padding-right: 0.236rem;
+              }
+            }
+          }
+
+          &.img a {
+            padding-top: 0;
+            padding-bottom: 0;
+
+            img {
+              vertical-align: inherit;
+              max-height: 1.8rem;
+            }
+          }
+
+        }
+
+        > li > ul.is-dropdown-submenu {
+          min-width: 0;
+
+          li {
+            display: inherit;
+          }
+        }
+
+        > li.opens-right > a {
+          margin-right: 0.5rem;
+
+          &:after {
+            right: 0.1rem;
+          }
+        }
       }
     }
   }
 
+  &.with-image {
+    background: transparent;
 
-  .menu, &.menu {
+    transition-duration: 0.15s;
+    transition-delay: 0s;
 
-    li {
-      z-index: 100;
-      @include breakpoint(smedium down) {
-        a {
-          width: 100%;
-          //text-align: left;
+    * {
+      transition-duration: 0.15s;
+      transition-delay: 0s;
+    }
+
+    .background-img {
+      display: initial;
+      @each $breakpoint, $value in $margins {
+        @include breakpoint($breakpoint) {
+          margin-left: -$value;
+          margin-right: -$value;
+          width: calc(100% + #{2*$value});
+          max-width: calc(100% + #{2*$value});
+          min-width: 2.5*$value;
+        }
+      }
+    }
+
+    > span {
+      background: inherit;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+
+      > span > span {
+        //@each $breakpoint, $value in $margins {
+        //  @include breakpoint($breakpoint) {
+        //    padding-left: $value;
+        //padding-right: 2*$value !important;
+        //}
+        //}
+      }
+
+      > * {
+        position: relative;
+      }
+
+      .back-button {
+
+      }
+
+      .top-bar-title {
+
+      }
+
+      #navbar-close-listener-container {
+        #navbar-close-listener {
+
         }
       }
 
-      @include breakpoint(smedium down) {
-        a {
-          padding-left: 0.68rem;
-        }
+      #navbar-menu-visible {
+
       }
-      @include breakpoint(small down) {
-        a {
-          padding-left: 0.236rem;
+
+      #responsive-menu-toggle {
+
+      }
+
+      #responsive-menu {
+
+      }
+
+      .navbar-menu {
+        background: initial;
+      }
+    }
+
+    &.color-black {
+      color: $navColorBlack;
+      stroke: $navColorBlack;
+
+      #responsive-menu {
+        .hidden-menu {
+          background: $navBackgroundBlack;
+          border-color: $navBorderColorBlack;
         }
       }
 
-      &:not(.is-dropdown-submenu-parent) {
-        @include breakpoint(smedium down) {
-          a {
-            padding-right: 0.68rem;
+      #responsive-menu-toggle {
+        .menu-icon::after {
+          background: $navColorBlack;
+          box-shadow: 0 7px 0 $navColorBlack, 0 14px 0 $navColorBlack;
+        }
+      }
+    }
+
+    &.color-white {
+      color: $navColorWhite;
+      stroke: $navColorWhite;
+
+      #responsive-menu {
+        .hidden-menu {
+          background: $navBackgroundWhite;
+          border-color: $navBorderColorWhite;
+        }
+      }
+
+      #responsive-menu-toggle {
+        .menu-icon::after {
+          background: $navColorWhite;
+          box-shadow: 0 7px 0 $navColorWhite, 0 14px 0 $navColorWhite;
+        }
+      }
+    }
+
+    &.solid {
+      > span {
+        //background: inherit;
+        .back-button {
+
+        }
+
+        .top-bar-title {
+
+        }
+
+        #navbar-close-listener-container {
+          #navbar-close-listener {
+
           }
         }
-        @include breakpoint(small down) {
-          a {
-            padding-right: 0.236rem;
+
+        #navbar-menu-visible {
+
+        }
+
+        #responsive-menu-toggle {
+
+        }
+
+        #responsive-menu {
+          .hidden-menu {
+            border-color: $navBorderColorBlack;
           }
         }
-      }
 
-      &.img a {
-        padding-top: 0;
-        padding-bottom: 0;
-
-        img {
-          vertical-align: inherit;
-          max-height: 1.8rem;
+        .navbar-menu {
+          background: inherit;
         }
       }
 
-    }
+      &.color-black {
+        background: $navBackgroundBlack;
+      }
 
-    > li > ul.is-dropdown-submenu {
-      min-width: 0;
-
-      li {
-        display: inherit;
+      &.color-white {
+        background: $navBackgroundWhite;
       }
     }
+  }
+}
 
-    > li.opens-right > a {
-      margin-right: 0.5rem;
+//#logo {
+//  max-width: 2rem;
+//  transition: none;
+//}
 
-      &:after {
-        right: 0.1rem;
-      }
-    }
+.menu, .dropdown.menu {
+  a {
+    padding: 0.2rem 0.5rem;
   }
 }
 
@@ -283,7 +511,7 @@ nav.top-bar.title-bar {
 }
 
 
-#responsive-menu-toggle button{
+#responsive-menu-toggle button {
   vertical-align: initial;
 }
 
@@ -296,4 +524,8 @@ nav.top-bar.title-bar {
     left: auto;
     right: 0;
   }
+}
+
+#navbar-fragment {
+  width: 100%;
 }

@@ -39,6 +39,13 @@ export class MenuSite extends TemplateSite {
         this._navbarFragment.openMenu();
     }
 
+
+    async onViewLoaded() {
+        let res = super.onViewLoaded();
+        this._navbarFragment.setScrollWidget(this.findBy("#main-content-container"));
+        return res;
+    }
+
     /**
      * Überschreibt updateTtle, um Element in der Statusbar zu setzen
      *

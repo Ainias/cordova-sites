@@ -3,7 +3,7 @@
   "displayName": "Cordova Sites",
   "version": "0.0.1",
   "description": "A Cordova JS/HTML/CSS-Framework similar to android (or at least i hope so).",
-  "main": "dist/cordova-sites.js",
+  "main": "dist/cordova-sites.mjs",
   "scripts": {
     "build": "node bin/build-rollup.js",
     "update packages": "node bin/updateCopies.js"

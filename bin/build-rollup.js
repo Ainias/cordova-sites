@@ -92,16 +92,22 @@ function findNames(dir, excluded) {
         if (stats.isDirectory()) {
             let nameObject = findNames(dir + file + '/', excluded);
             names = Object.assign(names, nameObject);
-        } else if (file.endsWith(".js") && !excluded.includes(dir + file)) {
+        } else if ((file.endsWith(".js") ) && !excluded.includes(dir + file)) {
             names[file.substring(0, file.length - 3)] = dir + file.substring(0, file.length - 3);
+        }
+        else if ((file.endsWith(".mjs") ) && !excluded.includes(dir + file)) {
+            names[file.substring(0, file.length - 4)] = dir + file.substring(0, file.length - 4);
         }
     });
     return names;
 }
 
-async function buildEntryPoints(fileOption) {
+async function buildEntryPoints(fileOption, target) {
     const cutLengthFront = 0;
-    const resultDir = path.resolve(process.cwd(), path.dirname(tmpFile));
+
+    target = target || tmpFile;
+
+    const resultDir = path.resolve(process.cwd(), path.dirname(target));
 
     let names = {};
     fileOption.input.forEach(dir => {
@@ -110,31 +116,36 @@ async function buildEntryPoints(fileOption) {
 
     let imports = '';
     for (let k in names) {
-        imports += "export * from '" + path.resolve(process.cwd(), names[k].substring(cutLengthFront)) + "';\n";
+        imports += "export * from './" + path.relative(resultDir, path.resolve(process.cwd(), names[k].substring(cutLengthFront))) + "';\n";
     }
 
     if (!fs.existsSync(resultDir)) {
         fs.mkdirSync(resultDir);
     }
-    fs.writeFileSync(tmpFile, imports);
+    fs.writeFileSync(target, imports);
 }
 
-async function build() {
+// async function build() {
+//
+//     let buildPromise = Promise.resolve();
+//     fileOptions.forEach(async fileOption => {
+//         buildPromise = buildPromise.then(async () => {
+//             await buildEntryPoints(fileOption);
+//
+//             let currentOptions = options;
+//             Object.assign(currentOptions, fileOption.options);
+//             const bundle = await rollup.rollup(currentOptions);
+//
+//             // or write the bundle to disk
+//             await bundle.write(fileOption.output);
+//             fs.unlinkSync(tmpFile);
+//         });
+//     });
+// }
 
-    let buildPromise = Promise.resolve();
-    fileOptions.forEach(async fileOption => {
-        buildPromise = buildPromise.then(async () => {
-            await buildEntryPoints(fileOption);
-
-            let currentOptions = options;
-            Object.assign(currentOptions, fileOption.options);
-            const bundle = await rollup.rollup(currentOptions);
-
-            // or write the bundle to disk
-            await bundle.write(fileOption.output);
-            fs.unlinkSync(tmpFile);
-        });
-    });
-}
-
-build();
+// build();
+buildEntryPoints({
+    input: [
+        path.resolve(process.cwd(), "src/js/"),
+    ],
+}, "./dist/cordova-sites.mjs");

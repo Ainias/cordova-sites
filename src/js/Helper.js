@@ -239,6 +239,13 @@ export class Helper {
         return array;
     }
 
+    static padZero(n, width, z) {
+        z = Helper.nonNull(z, '0');
+        n = n + '';
+        width = Helper.nonNull(width, 1);
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+
 
     //Ältere evtl nützliche Funktionen
 
@@ -309,7 +316,7 @@ export class Helper {
         return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
     }
 
-    static objectForEach(object, callback){
+    static objectForEach(object, callback) {
         Object.keys(object).forEach(key => {
             callback(object[key], key, object);
         });
@@ -323,7 +330,7 @@ export class Helper {
         return res;
     }
 
-    static newPromiseWithResolve(){
+    static newPromiseWithResolve() {
         let resolver = null;
         let rejecter = null;
 

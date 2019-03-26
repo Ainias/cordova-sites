@@ -7,6 +7,7 @@ import {Menu} from "./Menu";
 import {OpenSubmenuAction} from "./MenuAction/OpenSubmenuAction";
 import {DropdownRenderer} from "./Renderer/DropdownRenderer";
 import {AccordionRenderer} from "./Renderer/AccordionRenderer";
+import {ColorIndicator} from "../../ColorIndicator/ColorIndicator";
 
 /**
  * Fragment, welches ein Menü in der Navbar anzeigt und hinzufügt.
@@ -21,25 +22,24 @@ export class NavbarFragment extends AbstractFragment {
     /**
      * Erstellt das Fragment
      * @param site
+     * @param {string|Node|null} viewNavbar
      */
     constructor(site, viewNavbar) {
         super(site, Helper.nonNull(viewNavbar, defaultViewNavbar));
         this._menu = null;
 
-        this._responsiveMenu = null;
+        this._responsiveMenu = "";
+        // this._backgroundImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4wMYFQcQxhIhFAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC";
+        this._backgroundImage = "";
 
         this._menuActions = [];
         NavbarFragment.defaultActions.forEach(action => {
             this._menuActions.push(action.copy());
         });
 
-        this._canGoBack = false;
-        this._goBackListener = false;
-    }
+        this._scrollWidget = null;
 
-    setGoBackListener(listener) {
-        this._goBackListener = listener;
-        this.setCanGoBack(listener !== null);
+        this._canGoBack = true;
     }
 
     setCanGoBack(canGoBack) {
@@ -49,6 +49,67 @@ export class NavbarFragment extends AbstractFragment {
                 this.findBy(".back-button").classList.remove("hidden");
             } else {
                 this.findBy(".back-button").classList.add("hidden");
+            }
+        }
+    }
+
+    setScrollWidget(scrollWidget) {
+        this._scrollWidget = scrollWidget;
+        if (this._view && this._scrollWidget) {
+            let nav = this.findBy(".top-bar > span");
+            let background = this.findBy(".background-img");
+
+            let listener = () => {
+                let navbarElem = this.findBy("nav.top-bar");
+                if (nav.getBoundingClientRect().bottom >= background.getBoundingClientRect().bottom) {
+                    navbarElem.classList.add("solid");
+                } else {
+                    navbarElem.classList.remove("solid");
+                }
+            };
+
+            background.addEventListener("load", listener);
+            scrollWidget.addEventListener("scroll", listener);
+            requestAnimationFrame(listener);
+        }
+    }
+
+    setBackgroundImage(backgroundImage) {
+        this._backgroundImage = backgroundImage;
+        if (this._view) {
+            let navbarElem = this.findBy("nav.top-bar");
+            if (Helper.isNotNull(this._backgroundImage)) {
+                let imgElem = this.findBy(".background-img");
+
+                let colorIndicator = ColorIndicator.getInstance();
+
+                navbarElem.classList.add("color-black");
+                imgElem.addEventListener("load", () => {
+                    let color = (colorIndicator.getAverageImgColor(imgElem, undefined, 150));
+                    let textColor = colorIndicator.invertColorBW(color);
+
+                    if (textColor.r === 0 && textColor.g === 0 && textColor.b === 0) {
+                        navbarElem.classList.remove("color-white");
+                        navbarElem.classList.add("color-black");
+                    } else {
+                        navbarElem.classList.remove("color-black");
+                        navbarElem.classList.add("color-white");
+                    }
+                });
+
+                requestAnimationFrame(() => {
+                    let heightElement = navbarElem.querySelector(".grid-container");
+                    navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
+                    heightElement.addEventListener("resize", () => {
+                        navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
+                    });
+                });
+
+                imgElem.src = this._backgroundImage;
+                navbarElem.classList.add("with-image");
+
+            } else {
+                navbarElem.classList.remove("with-image");
             }
         }
     }
@@ -86,10 +147,10 @@ export class NavbarFragment extends AbstractFragment {
         //Fügt close/open-Listener für den Toggle-Button hinzu
         this._responsiveMenu = this.findBy("#responsive-menu");
         this.findBy("#responsive-menu-toggle").onclick = () => {
-            if (window.getComputedStyle(this._responsiveMenu).getPropertyValue('display') === 'none') {
-                this.openMenu();
-            } else {
+            if (this._responsiveMenu.classList.contains("visible")) {
                 this.closeMenu();
+            } else {
+                this.openMenu();
             }
         };
 
@@ -116,18 +177,20 @@ export class NavbarFragment extends AbstractFragment {
         this.drawMenu();
 
         this.findBy(".back-button").addEventListener("click", () => {
-            if (this._canGoBack) {
-                if (this._goBackListener) {
-                    this._goBackListener();
-                } else {
-                    this.getSite().goBack();
-                }
-            }
+            this.goBack();
         });
 
         this.setCanGoBack(this._canGoBack);
+        this.setBackgroundImage(this._backgroundImage);
+        this.setScrollWidget(this._scrollWidget);
 
         return res;
+    }
+
+    goBack() {
+        if (this._canGoBack) {
+            this.getSite().goBack();
+        }
     }
 
     /**
@@ -152,7 +215,8 @@ export class NavbarFragment extends AbstractFragment {
      */
     closeMenu() {
         if (Helper.isNotNull(this._responsiveMenu)) {
-            this._responsiveMenu.style.display = 'none';
+            // this._responsiveMenu.style.display = 'none';
+            this._responsiveMenu.classList.remove("visible");
         }
         if (this._closeListenerContainer) {
             this._closeListenerContainer.style.display = 'none';
@@ -167,7 +231,8 @@ export class NavbarFragment extends AbstractFragment {
      */
     openMenu() {
         if (Helper.isNotNull(this._responsiveMenu)) {
-            this._responsiveMenu.style.display = 'block';
+            // this._responsiveMenu.style.display = 'block';
+            this._responsiveMenu.classList.add("visible");
         }
         this._showCloseListener();
     }
