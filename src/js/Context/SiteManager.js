@@ -50,24 +50,24 @@ export class SiteManager {
 
         document.addEventListener("menubutton", () => {
             let site = this.getCurrentSite();
-            if (Helper.isNotNull(site)){
+            if (Helper.isNotNull(site)) {
                 site.onMenuPressed();
             }
         }, false);
 
         document.addEventListener("searchbutton", () => {
             let site = this.getCurrentSite();
-            if (Helper.isNotNull(site)){
+            if (Helper.isNotNull(site)) {
                 site.onSearchPressed();
             }
         }, false);
     }
 
-    setAppEndedListener(listener){
+    setAppEndedListener(listener) {
         this._appEndedListener = listener;
     }
 
-    goBack(){
+    goBack() {
         if (this._siteStack.length >= 1) {
             let site = this.getCurrentSite();
             if (site && site.onBackPressed() !== false) {
@@ -103,7 +103,8 @@ export class SiteManager {
         }
 
         //Loading-Symbol, falls ViewParameters noch länger brauchen
-        this._siteDiv.appendChild(ViewInflater.createLoadingSymbol("overlay"));
+        let loadingSymbol = ViewInflater.createLoadingSymbol("overlay");
+        this._siteDiv.appendChild(loadingSymbol);
 
         //create Site
         let site = new siteConstructor(this);
@@ -114,13 +115,19 @@ export class SiteManager {
         Promise.resolve(paramsPromise).then(async (params) => {
             site._onConstructPromise = site.onConstruct(params);
             await Promise.all([site._onConstructPromise, site.getViewPromise()]);
-            await site.onViewLoaded();
-            site._viewLoadedPromise.resolve();
 
-            return this._show(site);
+            //If site is ended inside onConstruct, don't do anything
+            if (site._state !== Context.STATE_DESTROYED && site._state !== Context.STATE_DESTROYING) {
+                await site.onViewLoaded();
+                site._viewLoadedPromise.resolve();
+                return this._show(site);
+            }
+            console.log("site has ended");
+            loadingSymbol.remove();
         }).catch((e) => {
             console.error("site start error for site ", siteConstructor.name, e);
             site.getFinishResolver().reject(e);
+            loadingSymbol.remove();
 
             //Zeige alte Seite im Fehlerfall wieder an
             for (let i = this._siteStack.length - 1; i >= 0; i--) {
@@ -211,6 +218,12 @@ export class SiteManager {
      * @private
      */
     async _show(site) {
+
+        //check if site is ended
+        if (site._state === Context.STATE_DESTROYING || site._state === Context.STATE_DESTROYED) {
+            return;
+        }
+
         //Mache nichts, wenn Seite bereits angezeigt wird
         if (site._state === Context.STATE_RUNNING && this.getCurrentSite() === site) {
             return;
@@ -231,7 +244,6 @@ export class SiteManager {
 
         //Anzeigen der Seite. Stelle sicher, dass die View wirklich geladen ist!
         return site.getViewPromise().then(async () => {
-
             //Stelle sicher, dass in der Zwischenzeit keine andere Seite gestartet wurde
             if (this.getCurrentSite() === site) {
 
@@ -245,38 +257,39 @@ export class SiteManager {
      *
      * @param site
      */
-    endSite(site) {
-        return site._onConstructPromise.then(async () => {
-            //Aus Index entfernen
-            let index = this._siteStack.indexOf(site);
-            this._siteStack.splice(index, 1);
+    async endSite(site) {
+        // return site._onConstructPromise.then(async () => {
+        //Aus Index entfernen
 
-            //Seite war/ist die aktive Seite
-            if (index === this._siteStack.length) {
-                this._pauseSite(site);
-                //Seite ist aktiv, zeige Ladesymbol
-                this._siteDiv.appendChild(ViewInflater.createLoadingSymbol('overlay'));
-                site.getFinishPromise().then(() => {
-                    let newSiteToShow = this.getCurrentSite();
-                    if (Helper.isNotNull(newSiteToShow)) {
-                        this.toForeground(newSiteToShow);
-                    }
-                });
-            }
+        let index = this._siteStack.indexOf(site);
+        this._siteStack.splice(index, 1);
 
-            if (this._siteStack.length <= 0) {
-                console.log("stack is empty, starting normal site!");
-                HistoryManager.getInstance().cutStack(0);
-                HistoryManager.getInstance().go(-1 * history.length, true);
-                Helper.removeAllChildren(this._siteDiv).appendChild(document.createTextNode("App ist beendet"));
-                if (typeof this._appEndedListener === "function"){
-                    this._appEndedListener(this);
+        //Seite war/ist die aktive Seite
+        if (index === this._siteStack.length) {
+            this._pauseSite(site);
+            //Seite ist aktiv, zeige Ladesymbol
+            this._siteDiv.appendChild(ViewInflater.createLoadingSymbol('overlay'));
+            site.getFinishPromise().then(() => {
+                let newSiteToShow = this.getCurrentSite();
+                if (Helper.isNotNull(newSiteToShow)) {
+                    this.toForeground(newSiteToShow);
                 }
-            }
+            });
+        }
 
-            await site.onDestroy();
-            site.getFinishResolver().resolve(site._result);
-        });
+        if (this._siteStack.length <= 0) {
+            console.log("stack is empty, starting normal site!");
+            HistoryManager.getInstance().cutStack(0);
+            HistoryManager.getInstance().go(-1 * history.length, true);
+            Helper.removeAllChildren(this._siteDiv).appendChild(document.createTextNode("App ist beendet"));
+            if (typeof this._appEndedListener === "function") {
+                this._appEndedListener(this);
+            }
+        }
+
+        await site.onDestroy();
+        site.getFinishResolver().resolve(site._result);
+        // });
     }
 
     /**
