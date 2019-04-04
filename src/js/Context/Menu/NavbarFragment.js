@@ -28,7 +28,7 @@ export class NavbarFragment extends AbstractFragment {
         super(site, Helper.nonNull(viewNavbar, defaultViewNavbar));
         this._menu = null;
 
-        this._responsiveMenu = "";
+        this._responsiveMenu = null;
         // this._backgroundImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4wMYFQcQxhIhFAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC";
         this._backgroundImage = "";
 
@@ -215,7 +215,6 @@ export class NavbarFragment extends AbstractFragment {
      */
     closeMenu() {
         if (Helper.isNotNull(this._responsiveMenu)) {
-            // this._responsiveMenu.style.display = 'none';
             this._responsiveMenu.classList.remove("visible");
         }
         if (this._closeListenerContainer) {

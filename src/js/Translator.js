@@ -14,6 +14,7 @@ export class Translator {
 
         config = Helper.nonNull(config, {});
         this._translations = {};
+        this.addDynamicTranslations(Translator._translations);
         this.addDynamicTranslations(config.translations || {});
         // this._translations = config.translations || {};
         this._fallbackLanguage = config.fallbackLanguage || "en";
@@ -274,6 +275,14 @@ export class Translator {
         if (instance) {
             return instance.addDynamicTranslations(trans);
         }
+        else {
+            Object.keys(trans).forEach(lang => {
+                if (Helper.isNull(Translator._translations[lang])){
+                    Translator._translations[lang] = {};
+                }
+                Object.assign(Translator._translations[lang], trans[lang]);
+            });
+        }
     }
 
     static makePersistentTranslation(key, args, tag) {
@@ -325,6 +334,7 @@ export class Translator {
         });
     }
 }
+Translator._translations = {};
 
 Translator.logMissingTranslations = true;
 

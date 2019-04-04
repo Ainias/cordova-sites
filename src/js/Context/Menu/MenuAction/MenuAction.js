@@ -39,7 +39,7 @@ export class MenuAction {
      * @param action
      * @return {MenuAction}
      */
-    copy(action){
+    copy(action) {
         let copiedAction = Helper.nonNull(action, new MenuAction());
 
         copiedAction._name = this._name;
@@ -67,13 +67,15 @@ export class MenuAction {
      * Sorgt dafür, dass die Action neu gezeichnet wird
      */
     redraw() {
-        this._menu.redrawAction(this);
+        if (Helper.isNotNull(this._menu)) {
+            this._menu.redrawAction(this);
+        }
     }
 
     /**
      * Sorgt dafür, dass die ActionElemente geupdatet wird
      */
-    update(){
+    update() {
         this._menu.updateAction(this);
     }
 
@@ -101,7 +103,7 @@ export class MenuAction {
      *
      * @returns {boolean}
      */
-    isShouldTranslate(){
+    isShouldTranslate() {
         return this._shouldTranslate;
     }
 
@@ -110,7 +112,7 @@ export class MenuAction {
      *
      * @returns {boolean}
      */
-    isVisible(){
+    isVisible() {
         return this._visible;
     }
 
@@ -119,7 +121,7 @@ export class MenuAction {
      *
      * @returns {*}
      */
-    getName(){
+    getName() {
         return this._name;
     }
 
@@ -143,7 +145,7 @@ export class MenuAction {
      * Gibt das Icon der MenuAction zurück
      * @returns {string|null}
      */
-    getIcon(){
+    getIcon() {
         return this._icon;
     }
 
@@ -151,7 +153,7 @@ export class MenuAction {
      * Gibt die View-Klasse der Action zurück
      * @returns {string}
      */
-    getShowFor(){
+    getShowFor() {
         return this._showFor;
     }
 
@@ -159,7 +161,7 @@ export class MenuAction {
      * Gibt eine odder mehrere extra Klasse zurück, die dem li-Element der Action hinzugefügt werden kann
      * @returns {string}
      */
-    getLiClass(){
+    getLiClass() {
         return this._liClass;
     }
 
@@ -168,7 +170,7 @@ export class MenuAction {
      *
      * @returns {null}
      */
-    getMenu(){
+    getMenu() {
         return this._menu;
     }
 

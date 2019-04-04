@@ -55,7 +55,6 @@ export class App {
      * @returns {Promise<*>}
      */
     async ready(callback) {
-
         let promise = this._readyPromise.then(() => {
             App._resolver.resolve(this);
             return Promise.all(App._promises);

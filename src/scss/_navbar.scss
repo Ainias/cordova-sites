@@ -12,6 +12,7 @@ $navBackgroundWhite: #000 !default;
 
 
 nav.top-bar {
+  z-index: 1;
   white-space: nowrap;
   position: relative;
   background: $navBackgroundBlack;
