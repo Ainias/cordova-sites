@@ -209,14 +209,14 @@ export class Translator {
             //sicherstellen, dass überhaupt eine Sprache gefunden wird
             userLanguages.push(this._fallbackLanguage);
 
-            if (userLanguages !== undefined) {
+            // if (userLanguages !== undefined) {
                 for (let i = 0, numLanguages = userLanguages.length; i < numLanguages; i++) {
                     if (userLanguages[i] in this._translations) {
                         userLanguage = userLanguages[i];
                         break;
                     }
                 }
-            }
+            // }
         }
         return userLanguage;
     }
