@@ -7,11 +7,11 @@ const packageName = require("../package.json").name;
 let pathsToProjects = [
     // "/home/silas/Projekte/Web/project-echo",
     // "/home/silas/Projekte/Web/cordova-sites-easy-sync",
-    // "/home/silas/Projekte/Web/cordova-sites-user-management",
-    // "/home/silas/Projekte/i9/mbb"
+    "/home/silas/Projekte/Web/cordova-sites-user-management",
+    "/home/silas/Projekte/i9/mbb"
 
-    "/var/www/i9/mbb",
-    "/home/silas/PhpstormProjects/cordova-sites-user-management"
+    // "/var/www/i9/mbb",
+    // "/home/silas/PhpstormProjects/cordova-sites-user-management"
 ];
 
 const deleteFolderRecursive = function(path) {

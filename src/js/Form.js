@@ -152,7 +152,14 @@ export class Form {
         this._elementChangeListener = listener;
     }
 
-    async setErrors(errors) {
+    clearErrors(){
+        Object.keys(this._formElem.elements).forEach(elemKey => {
+            this._formElem.elements[elemKey].setCustomValidity("");
+        });
+        this._formElem.reportValidity();
+    }
+
+    setErrors(errors) {
         let hasElem = false;
         let firstError = null;
 
