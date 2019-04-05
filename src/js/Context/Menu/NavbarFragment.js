@@ -83,17 +83,23 @@ export class NavbarFragment extends AbstractFragment {
 
                 let colorIndicator = ColorIndicator.getInstance();
 
-                navbarElem.classList.add("color-black");
+                // navbarElem.classList.add("color-black");
                 imgElem.addEventListener("load", () => {
-                    let color = (colorIndicator.getAverageImgColor(imgElem, undefined, 150));
-                    let textColor = colorIndicator.invertColorBW(color);
+                    if (this._backgroundImage !== "") {
+                        let color = (colorIndicator.getAverageImgColor(imgElem, undefined, 150));
+                        let textColor = colorIndicator.invertColorBW(color);
 
-                    if (textColor.r === 0 && textColor.g === 0 && textColor.b === 0) {
-                        navbarElem.classList.remove("color-white");
-                        navbarElem.classList.add("color-black");
-                    } else {
+                        if (textColor.r === 0 && textColor.g === 0 && textColor.b === 0) {
+                            navbarElem.classList.remove("color-white");
+                            navbarElem.classList.add("color-black");
+                        } else {
+                            navbarElem.classList.remove("color-black");
+                            navbarElem.classList.add("color-white");
+                        }
+                    }
+                    else {
                         navbarElem.classList.remove("color-black");
-                        navbarElem.classList.add("color-white");
+                        navbarElem.classList.remove("color-white");
                     }
                 });
 

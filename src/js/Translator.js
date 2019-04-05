@@ -194,7 +194,6 @@ export class Translator {
     async loadUserLanguage() {
         // debugger;
         let userLanguage = await NativeStoragePromise.getItem(this._nativeStorageKey);
-        console.log("userLangzage", userLanguage);
         if (!Translator._isValid(userLanguage) || !(userLanguage in this._translations)) {
             let userLanguages = [];
 
@@ -209,8 +208,6 @@ export class Translator {
 
             //sicherstellen, dass überhaupt eine Sprache gefunden wird
             userLanguages.push(this._fallbackLanguage);
-
-            console.log("Translator", userLanguages);
 
             if (userLanguages !== undefined) {
                 for (let i = 0, numLanguages = userLanguages.length; i < numLanguages; i++) {
