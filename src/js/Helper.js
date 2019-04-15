@@ -246,6 +246,28 @@ export class Helper {
         return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
     }
 
+    static deepEqual(a, b) {
+        // debugger;
+        if (a === b) {
+            return true;
+        }
+
+        if (typeof a === "object" && typeof b === "object") {
+            let keysOfB = Object.keys(b);
+            let childrenDeepEqual = Object.keys(a).every((key) => {
+                let index = keysOfB.indexOf(key);
+                if (index < 0) {
+                    return false;
+                }
+
+                keysOfB.splice(index, 1);
+                return Helper.deepEqual(a[key], b[key]);
+            });
+            return (childrenDeepEqual && keysOfB.length === 0);
+        }
+        return false;
+    }
+
 
     //Ältere evtl nützliche Funktionen
 
