@@ -20,10 +20,17 @@ export class DataManager {
             xhr.onload = function () {
                 resolve(new Response(xhr.responseText, {status: xhr.status}))
             };
-            xhr.onerror = function () {
-                reject(new TypeError('Local request failed'))
+            xhr.onerror = function (e) {
+                reject(e)
             };
+
             xhr.open('GET', url);
+
+            //set headers
+            Object.keys(DataManager._additionalHeaders).forEach(header => {
+                xhr.setRequestHeader(header, DataManager._additionalHeaders[header]);
+            });
+
             xhr.send(null)
         });
     }
@@ -107,6 +114,10 @@ export class DataManager {
     static basePath(url) {
         return DataManager._basePath + url;
     }
-}
 
+    static setHeader(header, value){
+        DataManager._additionalHeaders[header] = value;
+    }
+}
+DataManager._additionalHeaders = {};
 DataManager._basePath = "";
