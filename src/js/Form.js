@@ -156,7 +156,7 @@ export class Form {
         Object.keys(this._formElem.elements).forEach(elemKey => {
             this._formElem.elements[elemKey].setCustomValidity("");
         });
-        this._formElem.reportValidity();
+        // this._formElem.reportValidity();
     }
 
     setErrors(errors) {
