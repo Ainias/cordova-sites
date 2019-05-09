@@ -156,7 +156,6 @@ export class Form {
         Object.keys(this._formElem.elements).forEach(elemKey => {
             this._formElem.elements[elemKey].setCustomValidity("");
         });
-        // this._formElem.reportValidity();
     }
 
     setErrors(errors) {
@@ -186,7 +185,7 @@ export class Form {
         }
 
         if (hasElem) {
-            this._formElem.reportValidity();//querySelector("input[type=submit], button").click();
+            "reportValidity" in this._formElem && this._formElem.reportValidity();
         }
     }
 
@@ -210,7 +209,7 @@ export class Form {
     }
 
     async validate() {
-        if (!this._formElem.reportValidity()) {
+        if ("reportValidity" in this._formElem && !this._formElem.reportValidity()) {
             return false;
         }
         let values = await this.getValues();
