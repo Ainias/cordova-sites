@@ -18,7 +18,7 @@ export class DataManager {
         return new Promise(function (resolve, reject) {
             let xhr = new XMLHttpRequest();
             xhr.onload = function () {
-                resolve(new Response(xhr.responseText, {status: xhr.status}))
+                resolve(new Response(xhr.responseText, {status: (xhr.status === 0)?200:xhr.status}))
             };
             xhr.onerror = function (e) {
                 reject(e)
