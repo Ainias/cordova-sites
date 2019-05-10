@@ -64,7 +64,7 @@ export class Translator {
      * @returns {*}
      */
     translate(key, args) {
-        if (Helper.isNull(key)){
+        if (Helper.isNull(key)) {
             return "";
         }
 
@@ -148,7 +148,7 @@ export class Translator {
      *
      * @param callbackId
      */
-    removeTranslationCallback(callbackId){
+    removeTranslationCallback(callbackId) {
         this._translationCallbacks.delete(callbackId);
     }
 
@@ -163,7 +163,12 @@ export class Translator {
                 let key = (Translator._isValid(elements[i].dataset["translation"]) ? elements[i].dataset["translation"] : (elements[i].innerText || ""));
                 if (key !== "") {
                     try {
-                        elements[i].innerHTML = this.translate(key, (elements[i].dataset["translationArgs"] !== undefined) ? JSON.parse(elements[i].dataset["translationArgs"]) : undefined);
+                        let translation = this.translate(key, (elements[i].dataset["translationArgs"] !== undefined) ? JSON.parse(elements[i].dataset["translationArgs"]) : undefined);
+                        if (elements[i].dataset["translationUseText"] === "1") {
+                            elements[i].innerText = translation;
+                        } else {
+                            elements[i].innerHTML = translation;
+                        }
                         elements[i].dataset["translation"] = key;
                     } catch (err) {
                         console.error("wrong configured translation: " + err);
@@ -210,12 +215,12 @@ export class Translator {
             userLanguages.push(this._fallbackLanguage);
 
             // if (userLanguages !== undefined) {
-                for (let i = 0, numLanguages = userLanguages.length; i < numLanguages; i++) {
-                    if (userLanguages[i] in this._translations) {
-                        userLanguage = userLanguages[i];
-                        break;
-                    }
+            for (let i = 0, numLanguages = userLanguages.length; i < numLanguages; i++) {
+                if (userLanguages[i] in this._translations) {
+                    userLanguage = userLanguages[i];
+                    break;
                 }
+            }
             // }
         }
         return userLanguage;
@@ -226,10 +231,18 @@ export class Translator {
      * @param key
      * @param args
      * @param tag
+     * @param useText
      * @returns {any}
      */
-    makePersistentTranslation(key, args, tag) {
+    makePersistentTranslation(key, args, tag, useText) {
+        useText = Helper.nonNull(useText, tag, args, false);
         tag = tag || "span";
+
+        // if (key === "church-description-1"){
+        //     debugger;
+        // }
+        // console.log("trans", key, useText);
+
 
         if (typeof document !== 'undefined') {
             let htmlElem = document.createElement(tag);
@@ -238,7 +251,12 @@ export class Translator {
             if (args !== undefined) {
                 htmlElem.dataset["translationArgs"] = JSON.stringify(args);
             }
-            htmlElem.innerHTML = this.translate(key, args);
+            if (useText === true) {
+                htmlElem.innerText = this.translate(key, args);
+                htmlElem.dataset["translationUseText"] = "1";
+            } else {
+                htmlElem.innerHTML = this.translate(key, args);
+            }
             return htmlElem;
         }
     }
@@ -247,11 +265,11 @@ export class Translator {
         return this._translationClass;
     }
 
-    getCurrentLanguage(){
+    getCurrentLanguage() {
         return this._currentLanguage;
     }
 
-    getFallbackLanguage(){
+    getFallbackLanguage() {
         return this._fallbackLanguage;
     }
 
@@ -274,10 +292,9 @@ export class Translator {
         let instance = Translator.getInstance();
         if (instance) {
             return instance.addDynamicTranslations(trans);
-        }
-        else {
+        } else {
             Object.keys(trans).forEach(lang => {
-                if (Helper.isNull(Translator._translations[lang])){
+                if (Helper.isNull(Translator._translations[lang])) {
                     Translator._translations[lang] = {};
                 }
                 Object.assign(Translator._translations[lang], trans[lang]);
@@ -285,10 +302,10 @@ export class Translator {
         }
     }
 
-    static makePersistentTranslation(key, args, tag) {
+    static makePersistentTranslation(key, args, tag, useText) {
         let instance = Translator.getInstance();
         if (instance) {
-            return instance.makePersistentTranslation(key, args, tag);
+            return instance.makePersistentTranslation(key, args, tag, useText);
         }
     }
 
@@ -334,6 +351,7 @@ export class Translator {
         });
     }
 }
+
 Translator._translations = {};
 
 Translator.logMissingTranslations = true;

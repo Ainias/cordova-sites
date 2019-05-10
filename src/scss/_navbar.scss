@@ -100,13 +100,14 @@ nav.top-bar {
         z-index: 9000;
         border: 1px solid $navBorderColorDefault;
         //padding: 0.2rem;
-        padding: 2rem 0.2rem 0.2rem;
+        padding: 4.5rem 1.65rem 0rem 2.75rem;
         text-align: left;
         background: $navBackgroundDefault;
-        margin-top: -0.6rem;
+        margin-top: -1rem;
         right: -100%;
 
         li {
+          font-size: 1.15rem;
           &.hidden {
             display: none;
           }

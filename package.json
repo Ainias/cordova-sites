@@ -9,7 +9,7 @@
     "update packages": "node bin/updateCopies.js"
   },
   "license": "MIT",
-  "peerDependencies":  {
+  "peerDependencies": {
     "cordova-plugin-nativestorage": "^2.3.2",
     "cordova-plugin-webpack": "0.0.2",
     "cordova-plugin-whitelist": "^1.3.3",
