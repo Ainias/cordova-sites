@@ -35,3 +35,4 @@ export * from './../src/js/Toast/Toast';
 export * from './../src/js/Toast/ToastManager';
 export * from './../src/js/Translator';
 export * from './../src/js/ViewInflater';
+export * from './../src/js/translationInit';
