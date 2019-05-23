@@ -14,7 +14,7 @@ export class App {
         this._readyPromise = new Promise(r => document.addEventListener("deviceready", r, false));
 
         this._deepLinks = {};
-        this._siteManager = null;
+        this._siteManager = SiteManager.getInstance();
     }
 
     addDeepLink(link, siteConstructor) {
@@ -38,14 +38,15 @@ export class App {
             delete params["s"];
         }
 
-        let siteManager = new SiteManager("site", this._deepLinks);
+        let siteManager = this._siteManager;
+        siteManager.init("site", this._deepLinks);
         Helper.removeAllChildren(document.getElementById("site"));
         siteManager.startSite(startSiteConstructor, params);
         siteManager.setAppEndedListener(manager => {
             manager.startSite(initalSiteConstructor);
         });
 
-        this._siteManager = siteManager;
+        // this._siteManager = siteManager;
     }
 
     /**

@@ -5,6 +5,7 @@ import {Context} from "./Context";
 import {Translator} from "../Translator";
 import {DataManager} from "../DataManager";
 import {HistoryManager} from "../HistoryManager";
+import {EventManager} from "../EventManager/EventManager";
 
 /**
  * Manager-Klasse für die Seiten
@@ -12,13 +13,29 @@ import {HistoryManager} from "../HistoryManager";
 export class SiteManager {
 
     /**
-     * Constructor für Manager. Fügt Listener für zurück (onpopstate) hinzu
      *
+     * @return {SiteManager}
+     */
+    static getInstance(){
+        if (!this._instance){
+            this._instance = new SiteManager();
+        }
+        return this._instance;
+    }
+
+    /**
+     * Constructor für Manager. Fügt Listener für zurück (onpopstate) hinzu
+     */
+    constructor() {
+        this._isInit = false;
+    }
+
+    /**
      * @param siteDivId
      * @param deepLinks
      */
-    constructor(siteDivId, deepLinks) {
 
+    init(siteDivId, deepLinks){
         this._siteDiv = null;
         this._siteStack = [];
         this._siteDiv = document.getElementById(siteDivId);
@@ -61,6 +78,8 @@ export class SiteManager {
                 site.onSearchPressed();
             }
         }, false);
+
+        this._isInit = true;
     }
 
     setAppEndedListener(listener) {
@@ -101,6 +120,10 @@ export class SiteManager {
                 "error": "wrong class given! Expected AbstractSite, given " + siteConstructor.name
             };
         }
+
+        EventManager.trigger("site-manager-start-site", {
+            site: siteConstructor, paramPromise: paramsPromise
+        });
 
         //Loading-Symbol, falls ViewParameters noch länger brauchen
         let loadingSymbol = ViewInflater.createLoadingSymbol("overlay");
@@ -330,3 +353,4 @@ export class SiteManager {
         });
     }
 }
+SiteManager._instance = null;
