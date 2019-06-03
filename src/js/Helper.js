@@ -352,6 +352,10 @@ export class Helper {
         return res;
     }
 
+    static imageUrlIsEmpty(url){
+        return (url.trim() === "" && url.trim() === "data:")
+    }
+
     static newPromiseWithResolve() {
         let resolver = null;
         let rejecter = null;

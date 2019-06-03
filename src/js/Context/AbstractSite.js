@@ -95,7 +95,7 @@ export class AbstractSite extends Context {
     }
 
     async showLoadingSymbol() {
-        if (Helper.isNull(this._loadingSymbol) && this._state >= Context.STATE_PAUSED) {
+        if (Helper.isNull(this._loadingSymbol)) {
             this._loadingSymbol = ViewInflater.createLoadingSymbol();
             let view = await this.getViewPromise();
             if (Helper.isNotNull(this._loadingSymbol)) {

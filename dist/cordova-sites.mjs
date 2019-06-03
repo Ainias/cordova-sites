@@ -30,6 +30,7 @@ export * from './../src/js/Form';
 export * from './../src/js/Helper';
 export * from './../src/js/HistoryManager';
 export * from './../src/js/NativeStoragePromise';
+export * from './../src/js/PromiseHelper';
 export * from './../src/js/Singleton';
 export * from './../src/js/Toast/Toast';
 export * from './../src/js/Toast/ToastManager';
