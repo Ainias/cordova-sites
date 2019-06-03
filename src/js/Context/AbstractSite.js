@@ -2,6 +2,7 @@ import {Context} from "./Context";
 import {Helper} from "../Helper";
 import {Translator} from "../Translator";
 import {ViewInflater} from "../ViewInflater";
+import {EventManager} from "../EventManager/EventManager";
 
 /**
  * Basisklasse für eine Seite
@@ -49,6 +50,9 @@ export class AbstractSite extends Context {
     async onConstruct(constructParameters) {
         let res = super.onConstruct(constructParameters);
         this.setParameters(Helper.nonNull(constructParameters, {}));
+        EventManager.trigger(AbstractSite.EVENT.ON_CONSTRUCT, {
+            site: this, params: constructParameters
+        });
         return res;
     }
 
@@ -56,6 +60,34 @@ export class AbstractSite extends Context {
         await super.onStart(pauseArguments);
         this._updateTitle();
         this.updateUrl(this._parameters);
+        EventManager.trigger(AbstractSite.EVENT.ON_START, {
+            site: this, params: pauseArguments
+        });
+    }
+
+
+    async onViewLoaded() {
+        let res = super.onViewLoaded();
+        EventManager.trigger(AbstractSite.EVENT.ON_VIEW_LOADED, {
+            site: this
+        });
+        return res;
+    }
+
+    async onPause() {
+        let res = super.onPause();
+        EventManager.trigger(AbstractSite.EVENT.ON_PAUSE, {
+            site: this
+        });
+        return res;
+    }
+
+    async onDestroy() {
+        let res = super.onDestroy();
+        EventManager.trigger(AbstractSite.EVENT.ON_DESTROY, {
+            site: this
+        });
+        return res;
     }
 
     /**
@@ -216,4 +248,20 @@ export class AbstractSite extends Context {
     getFinishResolver() {
         return this._finishPromiseResolver;
     }
+
+    addEventListener(siteEvent, listener){
+        return EventManager.getInstance().addListener(siteEvent, data => {
+            if (data.site && data.site instanceof this.constructor.name){
+                listener(data);
+            }
+        });
+    }
 }
+
+AbstractSite.EVENT = {
+    ON_CONSTRUCT: "abstract-site-on-construct",
+    ON_VIEW_LOADED: "abstract-site-on-view-loaded",
+    ON_START:"abstract-site-on-start",
+    ON_PAUSE:"abstract-site-on-pause",
+    ON_DESTROY:"abstract-site-on-destroy"
+};

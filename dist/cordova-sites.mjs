@@ -26,6 +26,7 @@ export * from './../src/js/DataManager';
 export * from './../src/js/Dialog/ChooseDialog';
 export * from './../src/js/Dialog/ConfirmDialog';
 export * from './../src/js/Dialog/Dialog';
+export * from './../src/js/EventManager/EventManager';
 export * from './../src/js/Form';
 export * from './../src/js/Helper';
 export * from './../src/js/HistoryManager';
