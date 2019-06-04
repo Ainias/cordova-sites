@@ -353,7 +353,7 @@ export class Helper {
     }
 
     static imageUrlIsEmpty(url){
-        return (url.trim() === "" && url.trim() === "data:")
+        return (Helper.isNull(url) || url.trim() === "" || url.trim() === "data:")
     }
 
     static newPromiseWithResolve() {
