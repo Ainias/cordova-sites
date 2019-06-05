@@ -14,11 +14,13 @@ export class DelegateSite extends AbstractSite {
     }
 
     setParameter(name, value) {
-        return this._site.setParameter(name, value);
+        //Todo changing
+        // return this._site.setParameter(name, value);
     }
 
     setParameters(parameters) {
-        return this._site.setParameters(parameters)
+        //TODO changing
+        // return this._site.setParameters(parameters)
     }
 
     getParameters() {
@@ -38,7 +40,8 @@ export class DelegateSite extends AbstractSite {
     }
 
     updateUrl(args) {
-        return this._site.updateUrl(args);
+        //todo
+        // return this._site.updateUrl(args);
     }
 
     startSite(site, args) {
