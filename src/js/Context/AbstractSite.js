@@ -17,6 +17,8 @@ export class AbstractSite extends Context {
     constructor(siteManager, view) {
         super(view);
 
+        this._isDestroying = false;
+
         //Promise und Resolver, welches erfüllt wird, wenn Seite beendet wird
         this._finishPromiseResolver = {
             resolve: null,
@@ -128,7 +130,7 @@ export class AbstractSite extends Context {
 
     async showLoadingSymbol() {
         if (Helper.isNull(this._loadingSymbol)) {
-            this._loadingSymbol = ViewInflater.createLoadingSymbol();
+            this._loadingSymbol = ViewInflater.createLoadingSymbol("overlay");
             let view = await this.getViewPromise();
             if (Helper.isNotNull(this._loadingSymbol)) {
                 view.appendChild(this._loadingSymbol);
@@ -192,8 +194,8 @@ export class AbstractSite extends Context {
      * @param result
      */
     finish(result) {
-        if (!(this._state === Context.STATE_DESTROYING || this._state === Context.STATE_DESTROYED)) {
-            this._state = Context.STATE_DESTROYING;
+        if (!(this._isDestroying || this._state === Context.STATE_DESTROYED)) {
+            this._isDestroying = true;
             if (Helper.isNotNull(result)) {
                 this.setResult(result);
             }

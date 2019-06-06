@@ -310,9 +310,10 @@ export class SiteManager {
             }
         }
 
+        site._context = Context.STATE_DESTROYING;
         await site.onDestroy();
+        site._context = Context.STATE_DESTROYED;
         site.getFinishResolver().resolve(site._result);
-        // });
     }
 
     /**
