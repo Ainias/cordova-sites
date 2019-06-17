@@ -90,8 +90,11 @@ export class Helper {
      * @returns {*|void|string|never}
      */
     static strftime(sFormat, date, useUTC) {
-        if (!(date instanceof Date)) date = new Date(date);
         useUTC = Helper.nonNull(useUTC, false);
+
+        date = Helper.nonNull(date, new Date());
+        if (!(date instanceof Date)) date = new Date(date);
+
         let nDay = (useUTC) ? date.getUTCDay() : date.getDay(),
             nDate = (useUTC) ? date.getUTCDate() : date.getDate(),
             nMonth = (useUTC) ? date.getUTCMonth() : date.getMonth(),
@@ -156,6 +159,14 @@ export class Helper {
                 '%Z': date.toTimeString().replace(/.+\((.+?)\)$/, '$1')
             }[sMatch] || sMatch;
         });
+    }
+
+    static arrayToObject(array, indexFunction){
+        let obj = {};
+        array.forEach(val => {
+            obj[indexFunction(val)] = val;
+        });
+        return obj;
     }
 
     /**

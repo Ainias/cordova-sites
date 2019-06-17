@@ -12,7 +12,7 @@ let pathsToProjects = [
 
     "/var/www/i9/mbb",
     // "/home/silas/PhpstormProjects/cordova-sites-user-management",
-    // "/home/silas/PhpstormProjects/project-echo",
+    "/home/silas/PhpstormProjects/project-echo",
 ];
 
 const deleteFolderRecursive = function(path) {
