@@ -93,6 +93,10 @@ export class DataManager {
             }
         }
 
+        Object.keys(DataManager._additionalHeaders).forEach(header => {
+            headers[header] = DataManager._additionalHeaders[header];
+        });
+
         return fetch(url, {
             "credentials": "same-origin",
             "method": "POST",
