@@ -26,6 +26,8 @@ export class Form {
             this._submitHandler = urlOrCallback;
         }
 
+        this._editors = [];
+
         this._submitCallback = null;
         this.errorCallback = async (errors) => {
             await this.setErrors(errors);
@@ -62,6 +64,10 @@ export class Form {
 
     onError(errorHandler) {
         this.errorCallback = errorHandler;
+    }
+
+    addEditor(e){
+        this._editors.push(e);
     }
 
     async doSubmit() {
@@ -108,11 +114,17 @@ export class Form {
                     }
                 }
 
-                this._formElem.elements[k].value = Helper.htmlspecialcharsDecode(values[k]);
-                if (Helper.isNotNull(values[k]) && ("" + values[k]).trim() !== "") {
-                    this._formElem.elements[k].classList.add("notEmpty");
+                if (this._formElem.elements[k].type && (this._formElem.elements[k].type === "checkbox" || this._formElem.elements[k].type === "radio")) {
+                    if (this._formElem.elements[k].value == values[k]){
+                        this._formElem.elements[k].checked = true;
+                    }
                 } else {
-                    this._formElem.elements[k].classList.remove("notEmpty");
+                    this._formElem.elements[k].value = Helper.htmlspecialcharsDecode(values[k]);
+                    if (Helper.isNotNull(values[k]) && ("" + values[k]).trim() !== "") {
+                        this._formElem.elements[k].classList.add("notEmpty");
+                    } else {
+                        this._formElem.elements[k].classList.remove("notEmpty");
+                    }
                 }
             }
         }
@@ -152,7 +164,7 @@ export class Form {
         this._elementChangeListener = listener;
     }
 
-    clearErrors(){
+    clearErrors() {
         Object.keys(this._formElem.elements).forEach(elemKey => {
             this._formElem.elements[elemKey].setCustomValidity("");
         });
@@ -199,6 +211,7 @@ export class Form {
     }
 
     async submit() {
+        this._editors.forEach(e => e.updateSourceElement());
         this.setIsBusy(true);
         if (await this.validate()) {
             this.setIsBusy(false);

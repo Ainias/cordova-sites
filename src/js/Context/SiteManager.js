@@ -136,7 +136,7 @@ export class SiteManager {
 
         //Wartet auf onConstruct, viewPromise, onViewLoaded und zeigt dann Seite
         Promise.resolve(paramsPromise).then(async (params) => {
-            site._onConstructPromise = site.onConstruct(params);
+            site._onConstructPromise = site.onConstruct(Helper.nonNull(params, {}));
             await Promise.all([site._onConstructPromise, site.getViewPromise()]);
 
             //If site is ended inside onConstruct, don't do anything
