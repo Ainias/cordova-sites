@@ -1,6 +1,7 @@
 import {DataManager} from "./DataManager";
 import {Helper} from "./Helper";
 import {Translator} from "./Translator";
+import {Toast} from "./Toast/Toast"
 
 export class Form {
     constructor(formElem, urlOrCallback, method) {
@@ -173,6 +174,7 @@ export class Form {
     setErrors(errors) {
         let hasElem = false;
         let firstError = null;
+        // let notCatchedErrors = [];
 
         for (let k in errors) {
             if (Helper.isNotNull(this._formElem.elements[k]) && this._formElem.elements[k].type !== "hidden"
@@ -182,19 +184,22 @@ export class Form {
                 this._formElem.elements[k].setCustomValidity(Translator.translate(Helper.nonNull(errors[k], "form-default-error")));
                 hasElem = true;
             }
-            if (Helper.isNull(firstError)) {
-                firstError = Helper.nonNull(errors[k], "form-default-error");
+            else {
+                new Toast(Helper.nonNull(errors[k], "form-default-error")).show();
             }
+            // if (Helper.isNull(firstError)) {
+            //     firstError = ;
+            // }
         }
-        if (!hasElem && Helper.isNotNull(firstError)) {
-            for (let k in this._formElem.elements) {
-                if (this._formElem.elements[k].type !== "hidden") {
-                    this._formElem.elements[k].setCustomValidity(Translator.translate(firstError));
-                    hasElem = true;
-                    break;
-                }
-            }
-        }
+        // if (!hasElem && Helper.isNotNull(firstError)) {
+        //     for (let k in this._formElem.elements) {
+        //         if (this._formElem.elements[k].type !== "hidden") {
+        //             this._formElem.elements[k].setCustomValidity(Translator.translate(firstError));
+        //             hasElem = true;
+        //             break;
+        //         }
+        //     }
+        // }
 
         if (hasElem) {
             "reportValidity" in this._formElem && this._formElem.reportValidity();
