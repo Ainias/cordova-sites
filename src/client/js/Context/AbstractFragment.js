@@ -33,6 +33,10 @@ export class AbstractFragment extends Context {
         return this._site;
     }
 
+    async startSite(site, args){
+        return this._site.startSite(site, args);
+    }
+
     /**
      * Gibt zurück, ob das Fragment aktiv ist. Wenn nicht, wird es in der Seite nicht angezeigt
      *

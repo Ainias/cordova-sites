@@ -3,7 +3,7 @@ import {AbstractSite} from "../AbstractSite";
 export class DelegateSite extends AbstractSite {
 
     constructor(site) {
-        super(document.createElement("span"));
+        super(undefined, document.createElement("span"));
 
         /** @var {AbstractSite} */
         this._site = site;
