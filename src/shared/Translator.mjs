@@ -92,6 +92,14 @@ export class Translator {
         }
     }
 
+    getLanguages() {
+        return Object.keys(this._translations);
+    }
+
+    getFallbackLanguage() {
+        return this._fallbackLanguage;
+    }
+
     static translate(key, args, language) {
         let instance = Translator.getInstance();
         if (instance) {

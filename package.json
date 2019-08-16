@@ -16,24 +16,20 @@
     "cordova-plugin-x-toast": "^2.7.2",
     "cordova-sqlite-storage": "^3.2.0",
     "foundation-sites": "^6.5.1",
-    "webpack": "^4.29.5",
     "js-helper": "git+https://github.com/Ainias/js-helper"
   },
   "devDependencies": {
     "js-helper": "git+https://github.com/Ainias/js-helper",
-    "cordova-plugin-nano-sqlite": "^1.5.0",
     "cordova-plugin-nativestorage": "^2.3.2",
     "cordova-plugin-webpack": "^0.0.2",
     "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-x-toast": "^2.7.2",
     "cordova-sqlite-storage": "^3.2.0",
-    "foundation-sites": "^6.5.1",
-    "webpack": "^4.29.5"
+    "foundation-sites": "^6.5.1"
   },
   "cordova": {
     "plugins": {
       "cordova-plugin-webpack": {},
-      "cordova-plugin-nano-sqlite": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-nativestorage": {},
       "cordova-plugin-x-toast": {}
