@@ -89,8 +89,9 @@ export class Helper {
      * @param useUTC
      * @returns {*|void|string|never}
      */
-    static strftime(sFormat, date, useUTC) {
+    static strftime(sFormat, date, useUTC, makePersistentTranslation) {
         useUTC = Helper.nonNull(useUTC, false);
+        makePersistentTranslation = Helper.nonNull(makePersistentTranslation, true);
 
         date = Helper.nonNull(date, new Date());
         if (!(date instanceof Date)) date = new Date(date);
@@ -119,10 +120,10 @@ export class Helper {
 
         return sFormat.replace(/%[a-z]/gi, function (sMatch) {
             return {
-                '%a': Translator.makePersistentTranslation(aDaysShort[nDay]).outerHTML,
-                '%A': Translator.makePersistentTranslation(aDays[nDay]).outerHTML,
-                '%b': Translator.makePersistentTranslation(aMonths[nMonth].slice(0, 3)).outerHTML,
-                '%B': Translator.makePersistentTranslation(aMonths[nMonth]).outerHTML,
+                '%a': (makePersistentTranslation)?Translator.makePersistentTranslation(aDaysShort[nDay]).outerHTML:Translator.translate(aDaysShort[nDay]),
+                '%A': (makePersistentTranslation)?Translator.makePersistentTranslation(aDays[nDay]).outerHTML:Translator.translate(aDays[nDay]),
+                '%b': (makePersistentTranslation)?Translator.makePersistentTranslation(aMonths[nMonth].slice(0, 3)).outerHTML:Translator.translate(aMonths[nMonth].slice(0, 3)),
+                '%B': (makePersistentTranslation)?Translator.makePersistentTranslation(aMonths[nMonth]).outerHTML:Translator.translate(aMonths[nMonth]),
                 '%c': date.toUTCString(),
                 '%C': Math.floor(nYear / 100),
                 '%d': zeroPad(nDate, 2),

@@ -13,6 +13,7 @@ export class App {
     public static _resolver: { resolve: any; reject: any };
     private static _promises: Promise<any>[] = [];
     public static _mainPromise;
+    static _startParams: {};
 
     /**
      * Erstellt eine neue App, speichert ein internes Promise, welches resolved wird, sobald das deviceready-Event gefeuert wird
@@ -87,7 +88,7 @@ export class App {
     }
 
     static _getStartParams() {
-        return App._extractParams(window.location.search.substr(1));
+        return Object.assign(App._extractParams(window.location.search.substr(1)), App._startParams);
     }
 
     static _extractParams(paramString) {
@@ -104,6 +105,10 @@ export class App {
         }
         return result;
     }
+
+    static setStartParam(name, value){
+        this._startParams[name] = value;
+    }
 }
 
 App._resolver = {
@@ -116,3 +121,4 @@ App._mainPromise = new Promise((res, rej) => {
         reject: rej,
     };
 });
+App._startParams = {};
