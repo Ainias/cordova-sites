@@ -78,7 +78,7 @@ export class Form {
         this.errorCallback = errorHandler;
     }
 
-    addEditor(e){
+    addEditor(e) {
         this._editors.push(e);
     }
 
@@ -127,7 +127,7 @@ export class Form {
                 }
 
                 if (this._formElem.elements[k].type && (this._formElem.elements[k].type === "checkbox" || this._formElem.elements[k].type === "radio")) {
-                    if (this._formElem.elements[k].value == values[k]){
+                    if (this._formElem.elements[k].value == values[k]) {
                         this._formElem.elements[k].checked = true;
                     }
                 } else {
@@ -194,8 +194,7 @@ export class Form {
             ) {
                 this._formElem.elements[k].setCustomValidity(Translator.translate(Helper.nonNull(errors[k], "form-default-error")));
                 hasElem = true;
-            }
-            else {
+            } else {
                 new Toast(Helper.nonNull(errors[k], "form-default-error")).show();
             }
             // if (Helper.isNull(firstError)) {
@@ -230,8 +229,15 @@ export class Form {
         this._editors.forEach(e => e.updateSourceElement());
         this.setIsBusy(true);
         if (await this.validate()) {
-            this.setIsBusy(false);
-            return await (this._submitHandler(await this.getValues(), this));
+            let res = false;
+            try {
+                res = await (this._submitHandler(await this.getValues(), this));
+            }catch(e){
+                console.error(e);
+            } finally {
+                this.setIsBusy(false);
+            }
+            return res;
         }
         this.setIsBusy(false);
         return false;
