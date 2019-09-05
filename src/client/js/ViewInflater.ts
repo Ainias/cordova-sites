@@ -1,4 +1,5 @@
-import {Helper} from "./Helper";
+import {ViewHelper} from "js-helper/dist/client";
+import {Helper, JsonHelper} from "js-helper/dist/shared";
 import {DataManager} from "./DataManager";
 
 /**
@@ -21,7 +22,6 @@ export class ViewInflater {
         return ViewInflater.instance;
     }
 
-
     constructor() {
         this.loadingPromises = {};
     }
@@ -40,7 +40,7 @@ export class ViewInflater {
         // console.log("viewUrl", viewUrl, parentUrls);
 
         //Kopiere Elemente, damit originale parentURLS nicht verändert werden
-        parentUrls = Helper.cloneJson(Helper.nonNull(parentUrls, []));
+        parentUrls = JsonHelper.deepCopy(Helper.nonNull(parentUrls, []));
 
         //Detektiert eine Schleife in den Views
         if (parentUrls.indexOf(viewUrl) !== -1) {
@@ -148,18 +148,7 @@ export class ViewInflater {
      * @returns {*}
      */
     static moveChildren(from, to) {
-        let children = [];
-
-        //Zwischenspeichern der Children, da removeChild die forEach-Schleife durcheinander bringt
-        from.childNodes.forEach(child => {
-            children.push(child);
-        });
-
-        children.forEach(child => {
-            from.removeChild(child);
-            to.appendChild(child);
-        });
-        return to;
+       return ViewHelper.moveChildren(from, to);
     }
 
     /**
