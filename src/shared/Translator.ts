@@ -61,7 +61,7 @@ export class Translator {
         let translation = null;
 
         key = key.toLowerCase();
-        if (this._translations[language] && this._translations[language][key]) {
+        if (Helper.isNotNull(this._translations[language]) && Helper.isNotNull(this._translations[language][key])) {
             translation = this._translations[language][key];
         }
 
