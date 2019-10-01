@@ -36,7 +36,6 @@ export class MasterSite extends AbstractSite{
         });
     }
 
-
     onMenuPressed() {
         super.onMenuPressed();
         this._delegates.forEach(delegate => {

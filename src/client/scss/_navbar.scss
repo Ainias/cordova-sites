@@ -12,6 +12,7 @@ $navColorDefault: #fff !default;
 $navBorderColorDefault: #1e1c1c !default;
 $navBackgroundDefault: #000 !default;
 
+$navBackgroundWithImage: transparent !default;
 
 
 nav.top-bar {
@@ -108,6 +109,7 @@ nav.top-bar {
 
         li {
           font-size: 1.15rem;
+
           &.hidden {
             display: none;
           }
@@ -328,13 +330,13 @@ nav.top-bar {
   }
 
   &.with-image {
-    background: transparent;
+    background: $navBackgroundWithImage;
 
-    transition-duration: 0.15s;
+    transition: all 0.15s, background 0.0s;
     transition-delay: 0s;
 
     * {
-      transition-duration: 0.15s;
+      transition: all 0.15s, background 0.0s;
       transition-delay: 0s;
     }
 
@@ -390,7 +392,7 @@ nav.top-bar {
       }
 
       #responsive-menu-toggle {
-        z-index:9100;
+        z-index: 9100;
       }
 
       #responsive-menu {
@@ -454,6 +456,7 @@ nav.top-bar {
 
     &.solid {
       background: $navBackgroundDefault;
+
       > span {
         //background: inherit;
         .back-button {

@@ -136,6 +136,10 @@ export class Context {
         }
     }
 
+    isShowing(){
+        return this._state === Context.STATE_RUNNING;
+    }
+
     /**
      * Fügt ein neues Fragment hinzu.
      *

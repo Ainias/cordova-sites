@@ -97,4 +97,8 @@ export class DelegateSite extends AbstractSite {
     getTitle(){
         return this._site.getTitle();
     }
+
+    isShowing(): boolean {
+        return this._site.isShowing();
+    }
 }
