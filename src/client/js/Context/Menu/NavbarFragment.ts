@@ -1,5 +1,6 @@
 import {AbstractFragment} from "../AbstractFragment";
-const defaultViewNavbar = require( "../../../html/siteTemplates/navbar.html");
+
+const defaultViewNavbar = require("../../../html/siteTemplates/navbar.html");
 import {MenuAction} from "./MenuAction/MenuAction";
 import {Helper} from "../../Helper";
 import {Context} from "../Context";
@@ -8,6 +9,7 @@ import {OpenSubmenuAction} from "./MenuAction/OpenSubmenuAction";
 import {DropdownRenderer} from "./Renderer/DropdownRenderer";
 import {AccordionRenderer} from "./Renderer/AccordionRenderer";
 import {ColorIndicator} from "../../ColorIndicator/ColorIndicator";
+import {App} from "../../App";
 
 /**
  * Fragment, welches ein Menü in der Navbar anzeigt und hinzufügt.
@@ -26,6 +28,7 @@ export class NavbarFragment extends AbstractFragment {
     _responsiveMenu;
     _backgroundImage;
     _menuActions;
+    private _logo: string;
     private _scrollWidget: null;
     private _canGoBack: boolean;
     private _closeListenerContainer: any;
@@ -51,6 +54,20 @@ export class NavbarFragment extends AbstractFragment {
         this._scrollWidget = null;
 
         this._canGoBack = true;
+
+        this._logo = App.getLogo();
+    }
+
+    setLogo(logo) {
+        this._logo = logo;
+        if (this._view) {
+            if (Helper.isNotNull(this._logo)) {
+                this.findBy(".logo").classList.remove("hidden");
+                this.findBy(".logo-img").src = this._logo;
+            } else {
+                this.findBy(".logo").classList.add("hidden");
+            }
+        }
     }
 
     setCanGoBack(canGoBack) {
@@ -107,8 +124,7 @@ export class NavbarFragment extends AbstractFragment {
                             navbarElem.classList.remove("color-black");
                             navbarElem.classList.add("color-white");
                         }
-                    }
-                    else {
+                    } else {
                         navbarElem.classList.remove("color-black");
                         navbarElem.classList.remove("color-white");
                     }
@@ -200,6 +216,7 @@ export class NavbarFragment extends AbstractFragment {
         this.setCanGoBack(this._canGoBack);
         this.setBackgroundImage(this._backgroundImage);
         this.setScrollWidget(this._scrollWidget);
+        this.setLogo(this._logo);
 
         return res;
     }

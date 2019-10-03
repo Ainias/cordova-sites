@@ -45,6 +45,10 @@ nav.top-bar {
         height: 100%;
         vertical-align: bottom;
       }
+      &.hidden{
+        visibility: hidden;
+        display: initial;
+      }
     }
 
     .top-bar-title {
@@ -557,4 +561,12 @@ nav.top-bar {
 
 #navbar-fragment {
   width: 100%;
+}
+
+.logo{
+  .logo-img{
+    margin-left: 1rem;
+    margin-right: 0.5rem;
+    max-width: 2.35rem;
+  }
 }

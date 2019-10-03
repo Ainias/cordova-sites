@@ -10,6 +10,7 @@ export class App {
     private _readyPromise: Promise<unknown>;
     private _deepLinks: {};
     private _siteManager: any;
+    private static _logo: string;
     public static _resolver: { resolve: any; reject: any };
     private static _promises: Promise<any>[] = [];
     public static _mainPromise;
@@ -34,6 +35,14 @@ export class App {
         if (this._siteManager){
             return this._siteManager.startSite(site, args);
         }
+    }
+
+    static setLogo(logo){
+        this._logo = logo;
+    }
+
+    static getLogo(){
+        return this._logo;
     }
 
     async start(startSiteConstructor) {
