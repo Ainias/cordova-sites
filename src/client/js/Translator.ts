@@ -9,6 +9,7 @@ export class Translator extends SharedTranslator{
     private _currentLanguage: string;
     private _nativeStorageKey: string;
     private _translationClass: string;
+    private _initPromise: any;
 
     static logMissingTranslations: boolean;
 
@@ -24,7 +25,7 @@ export class Translator extends SharedTranslator{
         this._nativeStorageKey = config.nativeStorageKey || "language";
         this._translationClass = config.translationClass || "translation";
 
-        this.loadUserLanguage().then(userLanguage => this.setLanguage((<string>userLanguage).toLowerCase()));
+        this._initPromise = this.loadUserLanguage().then(userLanguage => this.setLanguage((<string>userLanguage).toLowerCase()));
     }
 
     /**
@@ -33,7 +34,7 @@ export class Translator extends SharedTranslator{
      */
     async setLanguage(language) {
         if (this._currentLanguage === language) {
-            this.updateTranslations();
+            await this.updateTranslations();
             return;
         }
 
@@ -46,7 +47,7 @@ export class Translator extends SharedTranslator{
         }
 
         this._currentLanguage = language;
-        this.updateTranslations();
+        await this.updateTranslations();
 
         //zum schluss => Falls setzen des Keys fehlschlägt, wird trotzdem noch übersetzt
         await NativeStoragePromise.setItem(this._nativeStorageKey, this._currentLanguage);
@@ -98,7 +99,7 @@ export class Translator extends SharedTranslator{
     /**
      * Updated die aktuellen übersetzungen
      */
-    updateTranslations(baseElement?) {
+    async updateTranslations(baseElement?) {
         baseElement = Helper.nonNull(baseElement, document);
         if (typeof baseElement !== 'undefined') {
             let elements = baseElement.getElementsByClassName(this._translationClass);
@@ -132,7 +133,8 @@ export class Translator extends SharedTranslator{
         }
 
         //Call translation callbacks
-        this._translationCallbacks.forEach(callback => callback(baseElement));
+        await Helper.asyncForEach(this._translationCallbacks, async callback => callback(baseElement));
+        // this._translationCallbacks.forEach(callback => callback(baseElement));
     }
 
     /**
@@ -240,7 +242,7 @@ export class Translator extends SharedTranslator{
         }
     }
 
-    static updateTranslations(baseElement) {
+    static async updateTranslations(baseElement) {
         let instance = Translator.getInstance();
         if (instance) {
             return (<Translator>instance).updateTranslations(baseElement);

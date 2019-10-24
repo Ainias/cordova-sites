@@ -328,6 +328,10 @@ export class Helper {
     static async asyncForEach(array, callback, runAsyncronous?) {
         runAsyncronous = Helper.nonNull(runAsyncronous, false);
 
+        if (array instanceof Map){
+            array = Array.from(array.values());
+        }
+
         let validPromises = [];
         for (let i = 0; i < array.length; i++) {
             let index = i;

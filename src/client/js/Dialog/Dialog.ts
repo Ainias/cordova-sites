@@ -164,7 +164,7 @@ export class Dialog {
         }
 
         document.body.appendChild(this._backgroundElement);
-        (<Translator>Translator.getInstance()).updateTranslations();
+        await (<Translator>Translator.getInstance()).updateTranslations();
 
         return new Promise(function (resolve) {
             self._resolver = resolve;

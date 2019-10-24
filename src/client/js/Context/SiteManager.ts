@@ -226,7 +226,7 @@ export class SiteManager {
             await site.getViewPromise();
 
             Helper.removeAllChildren(this._siteDiv).appendChild(site._view);
-            Translator.getInstance().updateTranslations();
+            await Translator.getInstance().updateTranslations();
 
             if (Helper.isNull(site._historyId)) {
                 site._historyId = HistoryManager.getInstance().pushState({
