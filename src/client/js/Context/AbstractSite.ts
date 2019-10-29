@@ -273,6 +273,10 @@ export class AbstractSite extends Context {
             }
         });
     }
+
+    isDestroying(): boolean {
+        return this._isDestroying;
+    }
 }
 
 AbstractSite.EVENT = {

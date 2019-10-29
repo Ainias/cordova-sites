@@ -101,4 +101,8 @@ export class DelegateSite extends AbstractSite {
     isShowing(): boolean {
         return this._site.isShowing();
     }
+
+    isDestroying(): boolean {
+        return this._site.isDestroying();
+    }
 }
