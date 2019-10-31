@@ -22,6 +22,7 @@ export * from './../src/client/js/Context/SiteManager';
 export * from './../src/client/js/Context/SwipeFragment/SwipeChildFragment';
 export * from './../src/client/js/Context/SwipeFragment/SwipeFragment';
 export * from './../src/client/js/Context/TemplateSite';
+export * from './../src/client/js/DataManager/NotOnlineError';
 export * from './../src/client/js/DataManager';
 export * from './../src/client/js/Dialog/ChooseDialog';
 export * from './../src/client/js/Dialog/ConfirmDialog';

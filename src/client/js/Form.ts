@@ -63,6 +63,19 @@ export class Form {
                     self._elementChangeListener();
                 }
                 this.setCustomValidity("");
+
+                if (element.accept && element.accept.indexOf("image") !== -1) {
+                    if (element.files && element.files[0]) {
+                        let reader = new FileReader();
+                        reader.onload = e => {
+                            formElem.querySelector("." + element.name + "-preview").src = e.target.result;
+                        };
+                        reader.readAsDataURL(element.files[0]);
+                    } else {
+                        formElem.querySelector("." + element.name + "-preview").src = "";
+                    }
+                }
+
             });
             element.addEventListener("keydown", function () {
                 this.setCustomValidity("");
@@ -129,6 +142,17 @@ export class Form {
                 if (this._formElem.elements[k].type && (this._formElem.elements[k].type === "checkbox" || this._formElem.elements[k].type === "radio")) {
                     if (this._formElem.elements[k].value == values[k]) {
                         this._formElem.elements[k].checked = true;
+                    }
+                } else if (this._formElem.elements[k].type && this._formElem.elements[k].type === "file") {
+                    if (this._formElem.elements[k + "-hidden"]) {
+                        this._formElem.elements[k + "-hidden"].value = values[k];
+                    }
+
+                    if (this._formElem.elements[k].accept && this._formElem.elements[k].accept.indexOf("image") !== -1) {
+                        let previewImage = this._formElem.querySelector("." + k + "-preview");
+                        if (previewImage) {
+                            previewImage.src = values[k];
+                        }
                     }
                 } else {
                     this._formElem.elements[k].value = Helper.htmlspecialcharsDecode(values[k]);
@@ -232,7 +256,7 @@ export class Form {
             let res = false;
             try {
                 res = await (this._submitHandler(await this.getValues(), this));
-            }catch(e){
+            } catch (e) {
                 console.error(e);
             } finally {
                 this.setIsBusy(false);
