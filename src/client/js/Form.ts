@@ -68,7 +68,7 @@ export class Form {
                     if (element.files && element.files[0]) {
                         let reader = new FileReader();
                         reader.onload = e => {
-                            formElem.querySelector("." + element.name + "-preview").src = e.target.result;
+                            formElem.querySelector("." + element.name + "-preview").src = e.target["result"];
                         };
                         reader.readAsDataURL(element.files[0]);
                     } else {

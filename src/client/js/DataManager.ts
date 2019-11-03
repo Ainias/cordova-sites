@@ -1,4 +1,5 @@
 import {Helper} from "./Helper";
+import {NotOnlineError} from "./DataManager/NotOnlineError";
 
 /**
  * Ein Manager, welches das Laden von Resourcen übernimmt.
@@ -7,6 +8,8 @@ export class DataManager {
 
     static _additionalHeaders;
     static _basePath: string;
+
+    static onlineCallback = null;
 
     /**
      * Diese Funktion sollte anstelle von dem nativen "fetch" verwendet werden!
@@ -24,7 +27,8 @@ export class DataManager {
                 resolve(new Response(xhr.responseText, {status: (xhr.status === 0) ? 200 : xhr.status}))
             };
             xhr.onerror = function (e) {
-                reject(e)
+                console.error(e);
+                reject(new NotOnlineError("not-online"));
             };
 
             xhr.open('GET', url);
@@ -35,6 +39,16 @@ export class DataManager {
             });
 
             xhr.send(null)
+        }).then(res => {
+            if (DataManager.onlineCallback){
+                DataManager.onlineCallback(true);
+            }
+            return res;
+        }).catch(e => {
+            if (DataManager.onlineCallback){
+                DataManager.onlineCallback(false);
+            }
+            throw e;
         });
     }
 
@@ -51,12 +65,20 @@ export class DataManager {
         useBasePath = Helper.nonNull(useBasePath, true);
 
         url = (useBasePath) ? DataManager.basePath(url) : url;
-        return DataManager.fetch(url, {"credentials": "same-origin"}).then(function (res: Response) {
+        return DataManager.fetch(url, {"credentials": "same-origin"}).catch(e => {
+            if (DataManager.onlineCallback){
+                DataManager.onlineCallback(false);
+            }
+            throw new NotOnlineError(e);
+        }).then(function (res: Response) {
+            if (DataManager.onlineCallback){
+                DataManager.onlineCallback(true);
+            }
             if (asJson) {
                 return res.json();
             }
             return res.text();
-        }).catch(e => console.error(e));
+        });
     }
 
     /**
@@ -108,6 +130,7 @@ export class DataManager {
         }).then(function (res) {
             return res.json();
         }).catch(function (e) {
+            debugger;
             console.error("error", e);
             return {
                 "success": false,
