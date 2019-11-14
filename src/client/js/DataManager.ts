@@ -40,12 +40,12 @@ export class DataManager {
 
             xhr.send(null)
         }).then(res => {
-            if (DataManager.onlineCallback){
+            if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(true);
             }
             return res;
         }).catch(e => {
-            if (DataManager.onlineCallback){
+            if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(false);
             }
             throw e;
@@ -58,7 +58,8 @@ export class DataManager {
      *
      * @param url
      * @param asJson
-     * @returns {Promise<* | never | void>}
+     * @param useBasePath
+     * @returns {Promise<*  | void>}
      */
     static async load(url, asJson?, useBasePath?) {
         asJson = Helper.nonNull(asJson, true);
@@ -66,12 +67,12 @@ export class DataManager {
 
         url = (useBasePath) ? DataManager.basePath(url) : url;
         return DataManager.fetch(url, {"credentials": "same-origin"}).catch(e => {
-            if (DataManager.onlineCallback){
+            if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(false);
             }
             throw new NotOnlineError(e);
         }).then(function (res: Response) {
-            if (DataManager.onlineCallback){
+            if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(true);
             }
             if (asJson) {
@@ -86,8 +87,7 @@ export class DataManager {
      * Lädt per GET das angegebene Asset und gibt diese als JSON oder Text zurück
      *
      * @param url
-     * @param asJson
-     * @returns {Promise<* | never | void>}
+     * @returns {Promise<*  | void>}
      */
     static async loadAsset(url) {
         return this.load(url, false, false);
@@ -105,6 +105,22 @@ export class DataManager {
             queryStrings.push(encodeURIComponent(k) + "=" + encodeURIComponent(values[k]));
         }
         return "?" + queryStrings.join("&");
+    }
+
+    /**
+     * Wandelt ein Key-Value-Objekt in einen QueryString um
+     *
+     * @param values
+     * @return {string}
+     */
+    static buildQueryWithoutNullValues(values) {
+        let queryValues = {};
+        for (let k in values) {
+            if (Helper.isNotNull(values[k])) {
+                queryValues[k] = values[k];
+            }
+        }
+        return this.buildQuery(queryValues);
     }
 
     static async send(url, params) {
