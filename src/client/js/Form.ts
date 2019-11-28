@@ -169,7 +169,7 @@ export class Form {
 
     async getValues(filesToBase64?) {
         let valuesFormData = new FormData(this._formElem);
-        let values = Array.from(valuesFormData["entries"]()).reduce((memo, pair) => ({
+        let values = Array.from(valuesFormData["entries"]()).reduce((memo: {}, pair: [string, FormDataEntryValue]) => ({
             ...memo,
             [pair[0]]: pair[1],
         }), {});
