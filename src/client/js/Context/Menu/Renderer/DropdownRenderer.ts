@@ -1,4 +1,4 @@
-import {Helper} from "../../../Helper";
+import {Helper} from "../../../Legacy/Helper";
 import {Translator} from "../../../Translator";
 import {OpenSubmenuAction} from "../MenuAction/OpenSubmenuAction";
 import {AccordionRenderer} from "./AccordionRenderer";

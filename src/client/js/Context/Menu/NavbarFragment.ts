@@ -2,7 +2,7 @@ import {AbstractFragment} from "../AbstractFragment";
 
 const defaultViewNavbar = require("../../../html/siteTemplates/navbar.html");
 import {MenuAction} from "./MenuAction/MenuAction";
-import {Helper} from "../../Helper";
+import {Helper} from "../../Legacy/Helper";
 import {Context} from "../Context";
 import {Menu} from "./Menu";
 import {OpenSubmenuAction} from "./MenuAction/OpenSubmenuAction";

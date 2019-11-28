@@ -1,6 +1,6 @@
 import {OpenSubmenuAction} from "../MenuAction/OpenSubmenuAction";
 import {MenuRenderer} from "./MenuRenderer";
-import {Helper} from "../../../Helper";
+import {Helper} from "../../../Legacy/Helper";
 import {Translator} from "../../../Translator";
 
 /**

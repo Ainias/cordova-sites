@@ -1,5 +1,5 @@
 import {AbstractFragment} from "../AbstractFragment";
-import {Helper} from "../../Helper";
+import {Helper} from "../../Legacy/Helper";
 
 export class SwipeChildFragment extends AbstractFragment {
     private _parent: any;

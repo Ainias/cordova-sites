@@ -1,5 +1,5 @@
 import {MenuAction} from "./MenuAction";
-import {Helper} from "../../../Helper";
+import {Helper} from "../../../Legacy/Helper";
 
 /**
  * Action, welche ein Untermenü öffnet

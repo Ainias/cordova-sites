@@ -1,5 +1,5 @@
 import {AbstractFragment} from "../AbstractFragment";
-import {Helper} from "../../Helper";
+import {Helper} from "../../Legacy/Helper";
 
 const defaultView = require("../../../html/Framework/Fragment/alphabeticListFragment.html");
 

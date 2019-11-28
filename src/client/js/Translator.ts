@@ -1,5 +1,5 @@
 import {NativeStoragePromise} from "./NativeStoragePromise";
-import {Helper} from "./Helper";
+import {Helper} from "./Legacy/Helper";
 import {Translator as SharedTranslator} from "../../shared/Translator"
 
 /**

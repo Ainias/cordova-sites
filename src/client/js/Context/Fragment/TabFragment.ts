@@ -1,7 +1,7 @@
 import {AbstractFragment} from "../AbstractFragment";
 
 const defaultTabView = require( "../../../html/Framework/Fragment/tabFragment.html");
-import {Helper} from "../../Helper";
+import {Helper} from "../../Legacy/Helper";
 import {ViewInflater} from "../../ViewInflater";
 import {Translator} from "../../Translator";
 

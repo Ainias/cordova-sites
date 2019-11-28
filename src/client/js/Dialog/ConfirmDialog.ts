@@ -1,5 +1,5 @@
 import {Dialog} from "./Dialog";
-import {Helper} from "../Helper";
+import {Helper} from "../Legacy/Helper";
 
 export class ConfirmDialog extends Dialog {
     constructor(content, title) {

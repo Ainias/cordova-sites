@@ -1,7 +1,7 @@
 /**
  * Eine Klasse, welche als Ursprung für die App genutzt wird
  */
-import {Helper} from "./Helper";
+import {Helper} from "./Legacy/Helper";
 import {SiteManager} from "./Context/SiteManager";
 
 

@@ -1,5 +1,5 @@
 import {Context} from "./Context";
-import {Helper} from "../Helper";
+import {Helper} from "../Legacy/Helper";
 
 /**
  * Ein Fragment ist ein TeilView einer Ansicht.

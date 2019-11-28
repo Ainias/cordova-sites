@@ -2,7 +2,7 @@ import {TemplateSite} from "./TemplateSite";
 const defaultMenuTemplate = require("../../html/siteTemplates/menuSite.html");
 import {NavbarFragment} from "./Menu/NavbarFragment";
 import {Context} from "./Context";
-import {Helper} from "../Helper";
+import {Helper} from "../Legacy/Helper";
 
 /**
  * Seite benutzt das menuTemplate, welches das ContainerTemplate includiert.

@@ -1,7 +1,7 @@
 /**
  * Eine Klasse mit häufig genutzten, nützlichen Funktionen
  */
-import {Translator} from "./Translator";
+import {Translator} from "../Translator";
 
 export class Helper {
     /**

@@ -1,4 +1,4 @@
-import {Helper} from "../Helper";
+import {Helper} from "../Legacy/Helper";
 import {ToastManager} from "./ToastManager";
 
 export class Toast{

@@ -1,5 +1,5 @@
 import {DataManager} from "./DataManager";
-import {Helper} from "./Helper";
+import {Helper} from "./Legacy/Helper";
 import {Translator} from "./Translator";
 import {Toast} from "./Toast/Toast"
 

@@ -1,5 +1,5 @@
 import {Menu} from "./Menu";
-import {Helper} from "../../Helper";
+import {Helper} from "../../Legacy/Helper";
 import {OpenSubmenuAction} from "./MenuAction/OpenSubmenuAction";
 
 /**

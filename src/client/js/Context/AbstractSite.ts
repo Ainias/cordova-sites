@@ -1,8 +1,8 @@
 import {Context} from "./Context";
-import {Helper} from "../Helper";
+import {Helper} from "../Legacy/Helper";
 import {Translator} from "../Translator";
 import {ViewInflater} from "../ViewInflater";
-import {EventManager} from "../EventManager/EventManager";
+import {EventManager} from "../Legacy/EventManager/EventManager";
 import {SiteManager} from "./SiteManager";
 
 /**

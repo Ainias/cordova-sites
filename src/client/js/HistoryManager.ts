@@ -1,4 +1,4 @@
-import {Helper} from "./Helper";
+import {Helper} from "./Legacy/Helper";
 
 /**
  * Manager, welcher sich um die Manipulation von der Historie kümmert

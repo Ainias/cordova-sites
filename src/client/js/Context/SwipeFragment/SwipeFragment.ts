@@ -1,6 +1,6 @@
 import {AbstractFragment} from "../AbstractFragment";
 import {SwipeChildFragment} from "./SwipeChildFragment";
-import {Helper} from "../../Helper";
+import {Helper} from "../../Legacy/Helper";
 
 const view = require("../../../html/Framework/Fragment/swipeFragment.html");
 

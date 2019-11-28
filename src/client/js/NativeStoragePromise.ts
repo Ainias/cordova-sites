@@ -1,7 +1,7 @@
 /**
  * Promise-Wrapper-Klasse für Native-Storage
  */
-import {Helper} from "./Helper";
+import {Helper} from "./Legacy/Helper";
 
 declare const NativeStorage;
 

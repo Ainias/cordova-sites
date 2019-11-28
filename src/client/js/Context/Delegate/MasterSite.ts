@@ -1,5 +1,5 @@
 import {AbstractSite} from "../AbstractSite";
-import {Helper} from "../../Helper";
+import {Helper} from "../../Legacy/Helper";
 
 export class MasterSite extends AbstractSite{
 

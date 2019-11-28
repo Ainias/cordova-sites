@@ -1,11 +1,11 @@
-import {Helper} from "../Helper";
+import {Helper} from "../Legacy/Helper";
 import {AbstractSite} from "./AbstractSite";
 import {ViewInflater} from "../ViewInflater";
 import {Context} from "./Context";
 import {Translator} from "../Translator";
 import {DataManager} from "../DataManager";
 import {HistoryManager} from "../HistoryManager";
-import {EventManager} from "../EventManager/EventManager";
+import {EventManager} from "../Legacy/EventManager/EventManager";
 
 /**
  * Manager-Klasse für die Seiten
