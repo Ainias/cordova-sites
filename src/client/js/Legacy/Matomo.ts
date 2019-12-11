@@ -76,7 +76,7 @@ export class Matomo{
         return fetch(Matomo.TRACK_SITE + Matomo.BASE_PATH + method, {
             "mode": "cors",
             "credentials": "include",
-        }).then(res => res.text()).then(text => (new window.DOMParser()).parseFromString(text, "text/xml"));
+        }).then(res => res.text()).then(text => (new window["DOMParser"]()).parseFromString(text, "text/xml"));
     }
 
     static getTrackingPromise() {

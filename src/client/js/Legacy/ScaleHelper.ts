@@ -68,8 +68,8 @@ export class ScaleHelper {
 
             let containerStyle = window.getComputedStyle(container);
 
-            containerWidth = containerStyle.getPropertyValue("width").replace('px', '');
-            containerHeight = containerStyle.getPropertyValue("height").replace('px', '');
+            containerWidth = parseFloat(containerStyle.getPropertyValue("width").replace('px', ''));
+            containerHeight = parseFloat(containerStyle.getPropertyValue("height").replace('px', ''));
 
             widthDiff = containerWidth - fontElement.offsetWidth;
             heightDiff = containerHeight - fontElement.offsetHeight;
