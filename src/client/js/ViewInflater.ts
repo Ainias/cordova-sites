@@ -88,6 +88,10 @@ export class ViewInflater {
             return Promise.all(promises).then(function () {
                 return parentElement;
             });
+        }).catch(e => {
+            console.error(e);
+            this.loadingPromises[viewUrl] = null;
+            throw e;
         });
         return this.loadingPromises[viewUrl].then(view => view.cloneNode(true));
     }

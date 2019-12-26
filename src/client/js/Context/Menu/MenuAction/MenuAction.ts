@@ -17,6 +17,7 @@ export class MenuAction {
     _shouldTranslate = true;
     _visible = true;
     _activated = true;
+    _copies = [];
 
     _menu = null;
 
@@ -57,7 +58,7 @@ export class MenuAction {
         this._activated = true;
 
         this._menu = null;
-        // this._copies = [];
+        this._copies = [];
     }
 
     /**
@@ -77,9 +78,11 @@ export class MenuAction {
         copiedAction._shouldTranslate = this._shouldTranslate;
         copiedAction._visible = this._visible;
         copiedAction._activated = this._activated;
+        copiedAction._icon = this._icon;
 
         copiedAction._id = MenuAction.lastId++;
-        // this._copies.push(copiedAction);
+
+        this._copies.push(copiedAction);
         return copiedAction;
         // return new MenuActionSlave(this);
     }
@@ -97,6 +100,7 @@ export class MenuAction {
         if (Helper.isNotNull(this._menu)) {
             this._menu.redrawAction(this);
         }
+        this._copies.forEach(copy => copy.redraw());
     }
 
     /**
@@ -104,6 +108,7 @@ export class MenuAction {
      */
     update() {
         this._menu.updateAction(this);
+        this._copies.forEach(copy => copy.update());
     }
 
     /**
@@ -132,6 +137,12 @@ export class MenuAction {
      */
     isShouldTranslate() {
         return this._shouldTranslate;
+    }
+
+    setVisibility(visibility){
+        this._visible = visibility;
+        this.redraw();
+        this._copies.forEach(copy => copy.setVisibility(visibility));
     }
 
     /**

@@ -14,7 +14,7 @@ import {App} from "../../App";
 /**
  * Fragment, welches ein Menü in der Navbar anzeigt und hinzufügt.
  *
- * Technisch gesehen wird das gleiche Menü zwei mal gezeichnet und hinzugefügt. Einmal das Menü in der Navbar, welches
+ * Technisch gesehen wird das gleiche Menü zwei mal gerendert und hinzugefügt. Einmal das Menü in der Navbar, welches
  * immer sichtbar ist und einmal das versteckte Menü, welches durch einen Toggle-Button angezeigt werden kann.
  * Dabei hat jede MenuAction eine Sichtbarkeitsklasse. Anhand der Sichtbarkeitsklasse und der Bildschirmgröße wird
  * entweder das eine oder das andere Element sichtbar, jedoch niemals beide.

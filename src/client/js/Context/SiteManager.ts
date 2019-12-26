@@ -146,13 +146,13 @@ export class SiteManager {
             site._onConstructPromise = site.onConstruct(Helper.nonNull(params, {}));
             await Promise.all([site._onConstructPromise, site.getViewPromise()]);
 
+
             //If site is ended inside onConstruct, don't do anything
             if (site._state !== Context.STATE_DESTROYED && site._state !== Context.STATE_DESTROYING) {
                 await site.onViewLoaded();
                 site._viewLoadedPromise.resolve();
                 return this._show(site);
             }
-            console.log("site has ended");
             loadingSymbol.remove();
         }).catch((e) => {
             console.error("site start error for site ", siteConstructor.name, e);
