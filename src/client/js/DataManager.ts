@@ -148,6 +148,9 @@ export class DataManager {
         }).catch(function (e) {
             debugger;
             console.error("error", e);
+            if (DataManager.onlineCallback) {
+                DataManager.onlineCallback(false);
+            }
             return {
                 "success": false,
                 "errors": [
