@@ -10,7 +10,7 @@ let pathsToProjects = [
     "/home/silas/Projekte/Web/cordova-sites-easy-sync",
     "/home/silas/Projekte/Web/cordova-sites-user-management",
     "/home/silas/Projekte/i9/mbb",
-    "/var/www/pwa/wordRotator",
+    // "/var/www/pwa/wordRotator",
 
     // "/var/www/i9/mbb",
     // "/home/silas/PhpstormProjects/cordova-sites-user-management",

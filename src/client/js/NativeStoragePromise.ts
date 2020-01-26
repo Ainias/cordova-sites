@@ -20,22 +20,15 @@ export class NativeStoragePromise {
 
     /**
      * Bekomme ein Item von NativeStorage
-     * sofern nothrow auf true oder weggelassen wird, wird null zurückgegeben, sollte der Index nicht existieren
      *
      * @param key
-     * @param nothrow?
+     * @param defaultValue?
      * @returns {Promise<*>}
      */
-    static async getItem(key, nothrow?) {
-        nothrow = Helper.nonNull(nothrow, true);
+    static async getItem(key, defaultValue?) {
         return new Promise((res, rej) => {
             NativeStorage.getItem(key, res, (e => {
-                if (nothrow){
-                    res(null);
-                }
-                else{
-                    rej(e);
-                }
+                res(defaultValue);
             }))
         });
     }
