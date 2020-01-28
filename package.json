@@ -5,7 +5,7 @@
   "description": "A Cordova JS/HTML/CSS-Framework similar to android (or at least i hope so).",
   "main": "dist/client.js",
   "scripts": {
-    "build": "node bin/build.js && tsc && cd ./src && find . -regextype sed -regex '.*\\.\\(html\\|png\\|svg\\)' -type f -exec cp --parents {} ../dist \\;",
+    "build": "node bin/build.js && tsc && cd ./src && find . -regextype sed -regex '.*\\.\\(html\\|png\\|svg\\|json\\)' -type f -exec cp --parents {} ../dist \\;",
     "update packages": "node bin/updateCopies.js"
   },
   "license": "MIT",
