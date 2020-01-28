@@ -3,9 +3,9 @@
   "displayName": "Cordova Sites",
   "version": "0.0.1",
   "description": "A Cordova JS/HTML/CSS-Framework similar to android (or at least i hope so).",
-  "main": "dist/cordova-sites.ts",
+  "main": "dist/client.js",
   "scripts": {
-    "build": "node bin/build.js",
+    "build": "node bin/build.js && tsc && cd ./src && find . -regextype sed -regex '.*\\.\\(html\\|png\\|svg\\)' -type f -exec cp --parents {} ../dist \\;",
     "update packages": "node bin/updateCopies.js"
   },
   "license": "MIT",
@@ -29,7 +29,10 @@
     "cordova-plugin-x-toast": "^2.7.2",
     "cordova-sqlite-storage": "^3.2.0",
     "foundation-sites": "^6.5.1",
-    "serialize-javascript": ">=2.1.1"
+    "serialize-javascript": ">=2.1.1",
+    "@types/node": "^12.12.14",
+    "typeorm": "^0.2.20",
+    "typescript": "^3.7.2"
   },
   "cordova": {
     "plugins": {

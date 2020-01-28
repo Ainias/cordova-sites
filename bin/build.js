@@ -15,9 +15,10 @@ function findNames(dir, excluded) {
         if (stats.isDirectory()) {
             let nameObject = findNames(dir + file + '/', excluded);
             names = Object.assign(names, nameObject);
-        } else if ((file.endsWith(".ts") || file.endsWith(".js")) && !excluded.includes(dir + file)) {
+        } else if ((file.endsWith(".ts") ) && !excluded.includes(dir + file)) {
             names[file.substring(0, file.length - 3)] = dir + file.substring(0, file.length - 3);
-        } else if ((file.endsWith(".mjs")) && !excluded.includes(dir + file)) {
+        }
+        else if ((file.endsWith(".mjs") ) && !excluded.includes(dir + file)) {
             names[file.substring(0, file.length - 4)] = dir + file.substring(0, file.length - 4);
         }
     });
@@ -51,16 +52,15 @@ async function buildEntryPoints(fileOption, target) {
 buildEntryPoints({
     input: [
         path.resolve(process.cwd(), "src/server/"),
-        // path.resolve(process.cwd(), "src/shared/"),
     ],
-}, "./server.ts");
+}, "./src/server.ts");
+buildEntryPoints({
+    input: [
+        path.resolve(process.cwd(), "src/client/"),
+    ],
+}, "./src/client.ts");
 buildEntryPoints({
     input: [
         path.resolve(process.cwd(), "src/shared/"),
     ],
-}, "./shared.ts");
-buildEntryPoints({
-    input: [
-        path.resolve(process.cwd(), "src/client/js/"),
-    ],
-}, "./dist/cordova-sites.ts");
+}, "./src/shared.ts");
