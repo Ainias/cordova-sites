@@ -6,6 +6,9 @@ const packageName = require("../package.json").name;
 
 let pathsToProjects = [
     "/home/silas/Projekte/Web/project-echo",
+    "/home/silas/Projekte/Web/orgel",
+    "/home/silas/Projekte/Web/bible-lexicon",
+    "/home/silas/Projekte/Web/wordRotator",
     "/home/silas/Projekte/Web/stories",
     "/home/silas/Projekte/Web/cordova-sites-easy-sync",
     "/home/silas/Projekte/Web/cordova-sites-user-management",

@@ -82,6 +82,7 @@ export declare class MenuAction {
      * @returns {*}
      */
     getName(): any;
+    setName(name: any): void;
     /**
      * Gibt die Action, welche beim Click ausgeführt werden soll zurück
      * @returns {string|function}

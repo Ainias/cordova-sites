@@ -103,12 +103,13 @@ class Matomo {
             return this.push(ev);
         });
     }
+    //TODO Matomo
     static push(arr, force) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!Array.isArray(arr)) {
-                arr = [arr];
-            }
-            window["_paq"].push(arr);
+            // if (!Array.isArray(arr)) {
+            //     arr = [arr];
+            // }
+            // window["_paq"].push(arr);
         });
     }
 }

@@ -124,6 +124,10 @@ class MenuAction {
     getName() {
         return this._name;
     }
+    setName(name) {
+        this._name = name;
+        this.redraw();
+    }
     /**
      * Gibt die Action, welche beim Click ausgeführt werden soll zurück
      * @returns {string|function}

@@ -1,6 +1,6 @@
 import {Helper} from "js-helper";
 
-export class Matomo{
+export class Matomo {
 
     static LOCAL_STORAGE_KEY = "matomoShouldTrack";
     static TRACK_SITE = "";
@@ -17,8 +17,7 @@ export class Matomo{
             if (Helper.isNull(shouldTrack)) {
                 shouldTrack = await Matomo._askIsTracking();
                 localStorage.setItem(Matomo.LOCAL_STORAGE_KEY, shouldTrack);
-            }
-            else {
+            } else {
                 shouldTrack = (shouldTrack === "1");
                 Matomo.setTrack(shouldTrack);
             }
@@ -89,29 +88,28 @@ export class Matomo{
 
         if (shouldTrack) {
             Matomo.push(["forgetUserOptOut"], true);
-        }
-        else {
+        } else {
             Matomo.push(["optUserOut"], true);
         }
     }
 
-    static async trackEvent(event, name, label, value){
+    static async trackEvent(event, name, label, value) {
         let ev = ["trackEvent", event, name];
-        if (Helper.isNotNull(label)){
+        if (Helper.isNotNull(label)) {
             ev.push(label);
         }
-        if (Helper.isNotNull(value) && !isNaN(parseFloat(value)) && isFinite(value)){
+        if (Helper.isNotNull(value) && !isNaN(parseFloat(value)) && isFinite(value)) {
             ev.push(value);
         }
 
         return this.push(ev);
     }
 
+    //TODO Matomo
     static async push(arr, force?) {
-
-        if (!Array.isArray(arr)) {
-            arr = [arr];
-        }
-        window["_paq"].push(arr);
+        // if (!Array.isArray(arr)) {
+        //     arr = [arr];
+        // }
+        // window["_paq"].push(arr);
     }
 }

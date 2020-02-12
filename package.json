@@ -16,12 +16,12 @@
     "cordova-plugin-x-toast": "^2.7.2",
     "cordova-sqlite-storage": "^3.2.0",
     "foundation-sites": "^6.5.1",
-    "js-helper": "git+https://github.com/Ainias/js-helper#0.3",
+    "js-helper": "git+https://github.com/Ainias/js-helper#0.3.1",
     "event-manager": "git@github.com:Ainias/event-manager.git#0.2",
     "serialize-javascript": ">=2.1.1"
   },
   "devDependencies": {
-    "js-helper": "git+https://github.com/Ainias/js-helper#0.3",
+    "js-helper": "git+https://github.com/Ainias/js-helper#0.3.1",
     "cs-event-manager": "git@github.com:Ainias/event-manager.git#0.2",
     "cordova-plugin-nativestorage": "^2.3.2",
     "cordova-plugin-webpack": "^0.0.2",
