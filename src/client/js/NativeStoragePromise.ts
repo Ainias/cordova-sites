@@ -1,11 +1,15 @@
 /**
  * Promise-Wrapper-Klasse für Native-Storage
  */
-import {Helper} from "./Legacy/Helper";
+import {Helper} from "js-helper/dist/shared/Helper";
 
 declare const NativeStorage;
 
 export class NativeStoragePromise {
+
+    static _cache: any = {};
+    static prefix: string = "";
+    static persistent: boolean = true;
 
     /**
      * Setzt ein Item für NativeStorage
@@ -15,7 +19,11 @@ export class NativeStoragePromise {
      * @returns {Promise<*>}
      */
     static async setItem(key, value) {
-        return new Promise((res, rej) => NativeStorage.setItem(key, value, res, rej));
+        if (this.persistent) {
+            return new Promise((res, rej) => NativeStorage.setItem(this.prefix + key, value, res, rej));
+        } else {
+            this._cache[this.prefix + key] = value;
+        }
     }
 
     /**
@@ -27,8 +35,8 @@ export class NativeStoragePromise {
      */
     static async getItem(key, defaultValue?) {
         return new Promise((res, rej) => {
-            NativeStorage.getItem(key, res, (e => {
-                res(defaultValue);
+            NativeStorage.getItem(this.prefix + key, res, (e => {
+                res(Helper.nonNull(this._cache[this.prefix + key], defaultValue));
             }))
         });
     }
@@ -39,7 +47,13 @@ export class NativeStoragePromise {
      * @returns {Promise<*>}
      */
     static async keys() {
-        return new Promise((res, rej) => NativeStorage.keys(res, rej));
+        let keys = [];
+        if (this.persistent) {
+            keys = await new Promise((res, rej) => NativeStorage.keys(res, rej));
+        } else {
+            keys = Object.keys(this._cache);
+        }
+        return keys.filter(key => key.startsWith(this.prefix));
     }
 
     /**
@@ -49,7 +63,8 @@ export class NativeStoragePromise {
      * @returns {Promise<*>}
      */
     static async remove(key) {
-        return new Promise((res, rej) => NativeStorage.remove(key, res, rej));
+        delete this._cache[this.prefix + key];
+        return new Promise((res, rej) => NativeStorage.remove(this.prefix + key, res, rej));
     }
 
     /**
@@ -58,6 +73,31 @@ export class NativeStoragePromise {
      * @returns {Promise<*>}
      */
     static async clear() {
-        return new Promise((res, rej) => NativeStorage.clear(res, rej));
+        let keys = await this.keys();
+        await Helper.asyncForEach((keys), async key => {
+            await this.remove(key);
+        }, true);
+    }
+
+    static async makePersistent() {
+        if (!this.persistent) {
+            this.persistent = true;
+            await Helper.asyncForEach(Object.keys(this._cache), async key => {
+                await this.setItem(key, this._cache[key]);
+            }, true);
+        }
+    }
+
+    static async makeUnpersistent() {
+        if (this.persistent) {
+            let keys = await this.keys();
+            let values = {};
+            await Helper.asyncForEach(keys, async key => {
+                values[key] = await this.getItem(key);
+            });
+            this.clear();
+            this.persistent = false;
+            this._cache = values;
+        }
     }
 }

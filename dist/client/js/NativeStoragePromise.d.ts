@@ -1,4 +1,7 @@
 export declare class NativeStoragePromise {
+    static _cache: any;
+    static prefix: string;
+    static persistent: boolean;
     /**
      * Setzt ein Item für NativeStorage
      *
@@ -20,7 +23,7 @@ export declare class NativeStoragePromise {
      *
      * @returns {Promise<*>}
      */
-    static keys(): Promise<unknown>;
+    static keys(): Promise<any[]>;
     /**
      * Entfernt ein Object aus dem NativeStorage
      *
@@ -33,5 +36,7 @@ export declare class NativeStoragePromise {
      *
      * @returns {Promise<*>}
      */
-    static clear(): Promise<unknown>;
+    static clear(): Promise<void>;
+    static makePersistent(): Promise<void>;
+    static makeUnpersistent(): Promise<void>;
 }

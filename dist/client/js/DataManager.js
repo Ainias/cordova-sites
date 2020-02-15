@@ -33,7 +33,7 @@ class DataManager {
                 };
                 xhr.onerror = function (e) {
                     console.error(e);
-                    reject(new NotOnlineError_1.NotOnlineError("not-online"));
+                    reject(new NotOnlineError_1.NotOnlineError("not-online", url));
                 };
                 xhr.open('GET', url);
                 //set headers
@@ -72,7 +72,7 @@ class DataManager {
                 if (DataManager.onlineCallback) {
                     DataManager.onlineCallback(false);
                 }
-                throw new NotOnlineError_1.NotOnlineError(e);
+                throw new NotOnlineError_1.NotOnlineError(e, url);
             }).then(function (res) {
                 if (DataManager.onlineCallback) {
                     DataManager.onlineCallback(true);

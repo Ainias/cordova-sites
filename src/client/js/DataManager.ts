@@ -28,7 +28,7 @@ export class DataManager {
             };
             xhr.onerror = function (e) {
                 console.error(e);
-                reject(new NotOnlineError("not-online"));
+                reject(new NotOnlineError("not-online", url));
             };
 
             xhr.open('GET', url);
@@ -70,7 +70,7 @@ export class DataManager {
             if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(false);
             }
-            throw new NotOnlineError(e);
+            throw new NotOnlineError(e, url);
         }).then(function (res: Response) {
             if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(true);
