@@ -11,10 +11,10 @@ export declare class DataManager {
      * Daher wird heir auf XMLHttpRequest zurückgegriffen
      *
      * @param url
-     * @param options
      * @returns {Promise<*>}
      */
-    static fetch(url: any, options: any): Promise<unknown>;
+    static fetch(url: any): Promise<unknown>;
+    static fetchBlob(url: any): Promise<unknown>;
     /**
      * Vereinfachung von Laden von Resourcen.
      * Lädt per GET die angegebene URL und gibt diese als JSON oder Text zurück

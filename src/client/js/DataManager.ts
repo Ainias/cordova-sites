@@ -17,10 +17,9 @@ export class DataManager {
      * Daher wird heir auf XMLHttpRequest zurückgegriffen
      *
      * @param url
-     * @param options
      * @returns {Promise<*>}
      */
-    static async fetch(url, options) {
+    static async fetch(url) {
         return new Promise(function (resolve, reject) {
             let xhr = new XMLHttpRequest();
             xhr.onload = function () {
@@ -32,6 +31,39 @@ export class DataManager {
             };
 
             xhr.open('GET', url);
+
+            //set headers
+            Object.keys(DataManager._additionalHeaders).forEach(header => {
+                xhr.setRequestHeader(header, DataManager._additionalHeaders[header]);
+            });
+
+            xhr.send(null)
+        }).then(res => {
+            if (DataManager.onlineCallback) {
+                DataManager.onlineCallback(true);
+            }
+            return res;
+        }).catch(e => {
+            if (DataManager.onlineCallback) {
+                DataManager.onlineCallback(false);
+            }
+            throw e;
+        });
+    }
+
+    static async fetchBlob(url) {
+        return new Promise(function (resolve, reject) {
+            let xhr = new XMLHttpRequest();
+            xhr.onload = function (e) {
+                resolve(xhr.response)
+            };
+            xhr.onerror = function (e) {
+                console.error(e);
+                reject(new NotOnlineError("not-online", url));
+            };
+
+            xhr.open('GET', url);
+            xhr.responseType = "blob";
 
             //set headers
             Object.keys(DataManager._additionalHeaders).forEach(header => {
@@ -66,7 +98,7 @@ export class DataManager {
         useBasePath = Helper.nonNull(useBasePath, true);
 
         url = (useBasePath) ? DataManager.basePath(url) : url;
-        return DataManager.fetch(url, {"credentials": "same-origin"}).catch(e => {
+        return DataManager.fetch(url).catch(e => {
             if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(false);
             }
