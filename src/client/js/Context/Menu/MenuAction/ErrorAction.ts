@@ -39,7 +39,7 @@ export class ErrorAction extends MenuAction {
 
     constructor() {
         super("", () => {
-            let d = new Dialog(ErrorAction._errors.join("<br/>"), Translator.makePersistentTranslation("error"));
+            let d = new Dialog(ErrorAction._errors.join("<br/>"), Translator.translate("error"));
             d.setTranslatable(false);
             d.show();
         }, MenuAction.SHOW_ALWAYS, -1000, ErrorAction.ERROR_ICON);

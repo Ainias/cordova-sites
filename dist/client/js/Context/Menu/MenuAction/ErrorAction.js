@@ -7,7 +7,7 @@ const errorIcon = require("../../../../img/errorIcon.png");
 class ErrorAction extends MenuAction_1.MenuAction {
     constructor() {
         super("", () => {
-            let d = new Dialog_1.Dialog(ErrorAction._errors.join("<br/>"), Translator_1.Translator.makePersistentTranslation("error"));
+            let d = new Dialog_1.Dialog(ErrorAction._errors.join("<br/>"), Translator_1.Translator.translate("error"));
             d.setTranslatable(false);
             d.show();
         }, MenuAction_1.MenuAction.SHOW_ALWAYS, -1000, ErrorAction.ERROR_ICON);
