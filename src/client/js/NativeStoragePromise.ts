@@ -10,6 +10,12 @@ export class NativeStoragePromise {
     static _cache: any = {};
     static prefix: string = "";
     static persistent: boolean = true;
+    static electronStorage = null;
+
+    static _isElectron() {
+        return (typeof navigator === 'object' && typeof navigator.userAgent === 'string' && navigator.userAgent.indexOf('Electron') >= 0);
+    }
+
 
     /**
      * Setzt ein Item für NativeStorage
@@ -20,7 +26,17 @@ export class NativeStoragePromise {
      */
     static async setItem(key, value) {
         if (this.persistent) {
-            return new Promise((res, rej) => NativeStorage.setItem(this.prefix + key, value, res, rej));
+            if (this._isElectron()) {
+                return new Promise((res, rej) => this.electronStorage.set(this.prefix + key, value, err => {
+                    if (err) {
+                        rej(err);
+                    } else {
+                        res();
+                    }
+                }));
+            } else {
+                return new Promise((res, rej) => NativeStorage.setItem(this.prefix + key, value, res, rej));
+            }
         } else {
             this._cache[this.prefix + key] = value;
         }
@@ -35,9 +51,19 @@ export class NativeStoragePromise {
      */
     static async getItem(key, defaultValue?) {
         return new Promise((res, rej) => {
-            NativeStorage.getItem(this.prefix + key, res, (e => {
-                res(Helper.nonNull(this._cache[this.prefix + key], defaultValue));
-            }))
+            if (this._isElectron()) {
+                this.electronStorage.get(this.prefix + key, (e, data) => {
+                    if (e) {
+                        res(Helper.nonNull(this._cache[this.prefix + key], defaultValue));
+                    } else {
+                        res(Helper.nonNull(data, defaultValue));
+                    }
+                });
+            } else {
+                NativeStorage.getItem(this.prefix + key, data => res(Helper.nonNull(data, defaultValue)), (e => {
+                    res(Helper.nonNull(this._cache[this.prefix + key], defaultValue));
+                }));
+            }
         });
     }
 
@@ -49,7 +75,17 @@ export class NativeStoragePromise {
     static async keys() {
         let keys = [];
         if (this.persistent) {
-            keys = await new Promise((res, rej) => NativeStorage.keys(res, rej));
+            if (this._isElectron()) {
+                keys = await new Promise((res, rej) => this.electronStorage.keys((err, keys) => {
+                    if (err) {
+                        rej(err);
+                    } else {
+                        res(keys);
+                    }
+                }));
+            } else {
+                keys = await new Promise((res, rej) => NativeStorage.keys(res, rej));
+            }
         } else {
             keys = Object.keys(this._cache);
         }
@@ -64,7 +100,18 @@ export class NativeStoragePromise {
      */
     static async remove(key) {
         delete this._cache[this.prefix + key];
-        return new Promise((res, rej) => NativeStorage.remove(this.prefix + key, res, rej));
+        if (this._isElectron()) {
+            return new Promise((res, rej) => this.electronStorage.remove(this.prefix + key, err => {
+                if (err){
+                    rej(err);
+                }
+                else {
+                    res();
+                }
+            }));
+        } else {
+            return new Promise((res, rej) => NativeStorage.remove(this.prefix + key, res, rej));
+        }
     }
 
     /**

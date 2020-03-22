@@ -42,6 +42,8 @@ __export(require("./client/js/Legacy/Matomo"));
 __export(require("./client/js/Legacy/ScaleHelper"));
 __export(require("./client/js/NativeStoragePromise"));
 __export(require("./client/js/PromiseHelper"));
+__export(require("./client/js/ShareManager/ShareDialog"));
+__export(require("./client/js/ShareManager/ShareManager"));
 __export(require("./client/js/Singleton"));
 __export(require("./client/js/Toast/Toast"));
 __export(require("./client/js/Toast/ToastManager"));

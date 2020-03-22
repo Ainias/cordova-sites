@@ -2,6 +2,8 @@ export declare class NativeStoragePromise {
     static _cache: any;
     static prefix: string;
     static persistent: boolean;
+    static electronStorage: any;
+    static _isElectron(): boolean;
     /**
      * Setzt ein Item für NativeStorage
      *

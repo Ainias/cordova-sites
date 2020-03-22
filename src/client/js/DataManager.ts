@@ -193,7 +193,7 @@ export class DataManager {
     }
 
     static basePath(url) {
-        return DataManager._basePath + url;
+        return DataManager._basePath + ((url)?url:"");
     }
 
     static setHeader(header, value) {

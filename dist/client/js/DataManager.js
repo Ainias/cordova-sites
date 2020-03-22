@@ -190,7 +190,7 @@ class DataManager {
         });
     }
     static basePath(url) {
-        return DataManager._basePath + url;
+        return DataManager._basePath + ((url) ? url : "");
     }
     static setHeader(header, value) {
         DataManager._additionalHeaders[header] = value;

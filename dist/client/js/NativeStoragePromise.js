@@ -14,6 +14,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const Helper_1 = require("js-helper/dist/shared/Helper");
 class NativeStoragePromise {
+    static _isElectron() {
+        return (typeof navigator === 'object' && typeof navigator.userAgent === 'string' && navigator.userAgent.indexOf('Electron') >= 0);
+    }
     /**
      * Setzt ein Item für NativeStorage
      *
@@ -24,7 +27,19 @@ class NativeStoragePromise {
     static setItem(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.persistent) {
-                return new Promise((res, rej) => NativeStorage.setItem(this.prefix + key, value, res, rej));
+                if (this._isElectron()) {
+                    return new Promise((res, rej) => this.electronStorage.set(this.prefix + key, value, err => {
+                        if (err) {
+                            rej(err);
+                        }
+                        else {
+                            res();
+                        }
+                    }));
+                }
+                else {
+                    return new Promise((res, rej) => NativeStorage.setItem(this.prefix + key, value, res, rej));
+                }
             }
             else {
                 this._cache[this.prefix + key] = value;
@@ -41,9 +56,21 @@ class NativeStoragePromise {
     static getItem(key, defaultValue) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((res, rej) => {
-                NativeStorage.getItem(this.prefix + key, res, (e => {
-                    res(Helper_1.Helper.nonNull(this._cache[this.prefix + key], defaultValue));
-                }));
+                if (this._isElectron()) {
+                    this.electronStorage.get(this.prefix + key, (e, data) => {
+                        if (e) {
+                            res(Helper_1.Helper.nonNull(this._cache[this.prefix + key], defaultValue));
+                        }
+                        else {
+                            res(Helper_1.Helper.nonNull(data, defaultValue));
+                        }
+                    });
+                }
+                else {
+                    NativeStorage.getItem(this.prefix + key, data => res(Helper_1.Helper.nonNull(data, defaultValue)), (e => {
+                        res(Helper_1.Helper.nonNull(this._cache[this.prefix + key], defaultValue));
+                    }));
+                }
             });
         });
     }
@@ -56,7 +83,19 @@ class NativeStoragePromise {
         return __awaiter(this, void 0, void 0, function* () {
             let keys = [];
             if (this.persistent) {
-                keys = yield new Promise((res, rej) => NativeStorage.keys(res, rej));
+                if (this._isElectron()) {
+                    keys = yield new Promise((res, rej) => this.electronStorage.keys((err, keys) => {
+                        if (err) {
+                            rej(err);
+                        }
+                        else {
+                            res(keys);
+                        }
+                    }));
+                }
+                else {
+                    keys = yield new Promise((res, rej) => NativeStorage.keys(res, rej));
+                }
             }
             else {
                 keys = Object.keys(this._cache);
@@ -73,7 +112,19 @@ class NativeStoragePromise {
     static remove(key) {
         return __awaiter(this, void 0, void 0, function* () {
             delete this._cache[this.prefix + key];
-            return new Promise((res, rej) => NativeStorage.remove(this.prefix + key, res, rej));
+            if (this._isElectron()) {
+                return new Promise((res, rej) => this.electronStorage.remove(this.prefix + key, err => {
+                    if (err) {
+                        rej(err);
+                    }
+                    else {
+                        res();
+                    }
+                }));
+            }
+            else {
+                return new Promise((res, rej) => NativeStorage.remove(this.prefix + key, res, rej));
+            }
         });
     }
     /**
@@ -118,4 +169,5 @@ exports.NativeStoragePromise = NativeStoragePromise;
 NativeStoragePromise._cache = {};
 NativeStoragePromise.prefix = "";
 NativeStoragePromise.persistent = true;
+NativeStoragePromise.electronStorage = null;
 //# sourceMappingURL=NativeStoragePromise.js.map

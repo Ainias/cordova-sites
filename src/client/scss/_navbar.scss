@@ -14,7 +14,6 @@ $navBackgroundDefault: #000 !default;
 
 $navBackgroundWithImage: transparent !default;
 
-
 nav.top-bar {
   z-index: 1;
   white-space: nowrap;
@@ -24,6 +23,14 @@ nav.top-bar {
   stroke: $navColorDefault;
   padding: 0;
 
+  @each $breakpoint, $value in $margins {
+    @include breakpoint($breakpoint) {
+      margin-left: -$value;
+      margin-right: -$value;
+      width: calc(100% + #{2*$value});
+      max-width: calc(100% + #{2*$value});
+    }
+  }
 
   .background-img {
     display: none;
