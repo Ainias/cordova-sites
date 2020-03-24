@@ -2,6 +2,7 @@
  * Promise-Wrapper-Klasse für Native-Storage
  */
 import {Helper} from "js-helper/dist/shared/Helper";
+import {JsonHelper} from "js-helper/dist/shared/JsonHelper";
 
 declare const NativeStorage;
 
@@ -15,7 +16,6 @@ export class NativeStoragePromise {
     static _isElectron() {
         return (typeof navigator === 'object' && typeof navigator.userAgent === 'string' && navigator.userAgent.indexOf('Electron') >= 0);
     }
-
 
     /**
      * Setzt ein Item für NativeStorage
@@ -56,7 +56,7 @@ export class NativeStoragePromise {
                     if (e) {
                         res(Helper.nonNull(this._cache[this.prefix + key], defaultValue));
                     } else {
-                        res(Helper.nonNull(data, defaultValue));
+                        res(JsonHelper.deepEqual(data, {})?defaultValue:data);
                     }
                 });
             } else {
