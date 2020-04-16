@@ -23,12 +23,15 @@ nav.top-bar {
   stroke: $navColorDefault;
   padding: 0;
 
-  @each $breakpoint, $value in $margins {
-    @include breakpoint($breakpoint) {
-      margin-left: -$value;
-      margin-right: -$value;
-      width: calc(100% + #{2*$value});
-      max-width: calc(100% + #{2*$value});
+  &:not(.with-image) {
+
+    @each $breakpoint, $value in $margins {
+      @include breakpoint($breakpoint) {
+        margin-left: -$value;
+        margin-right: -$value;
+        width: calc(100% + #{2*$value});
+        max-width: calc(100% + #{2*$value});
+      }
     }
   }
 
@@ -52,7 +55,8 @@ nav.top-bar {
         height: 100%;
         vertical-align: bottom;
       }
-      &.hidden{
+
+      &.hidden {
         visibility: hidden;
         display: initial;
       }
@@ -570,8 +574,8 @@ nav.top-bar {
   width: 100%;
 }
 
-.logo{
-  .logo-img{
+.logo {
+  .logo-img {
     margin-left: 1rem;
     margin-right: 0.5rem;
     max-width: 2.35rem;

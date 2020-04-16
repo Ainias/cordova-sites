@@ -22,7 +22,22 @@ class Translator {
         this._fallbackLanguage = config.fallbackLanguage;
         this._markUntranslatedTranslations = config.markUntranslatedTranslations;
         this._markTranslations = config.markTranslations;
-        this._logMissingTranslations = config.logMissingTranslations;
+        if (config.logMissingTranslations === true) {
+            this._logMissingTranslationsFunction = (missingTranslation, language) => {
+                if (language === this._fallbackLanguage) {
+                    console.error("missing base translation for key " + missingTranslation);
+                }
+                else {
+                    console.warn("missing translation for language " + language + " and key " + missingTranslation);
+                }
+            };
+        }
+        else if (typeof config.logMissingTranslations === "function") {
+            this._logMissingTranslationsFunction = config.logMissingTranslations;
+        }
+        else {
+            this._logMissingTranslationsFunction = null;
+        }
         this._translationCallbacks = new Map();
         this._lastTranslationCallbackId = 0;
     }
@@ -44,15 +59,15 @@ class Translator {
             translation = this._translations[language][key];
         }
         if (!Translator._isValid(translation)) {
-            if (this._logMissingTranslations) {
-                console.warn("missing translation for language " + language + " and key " + key);
+            if (this._logMissingTranslationsFunction !== null) {
+                this._logMissingTranslationsFunction(key, language);
             }
             if (this._translations[this._fallbackLanguage]) {
                 translation = this._translations[this._fallbackLanguage][key];
             }
             if (!Translator._isValid(translation)) {
-                if (this._logMissingTranslations) {
-                    console.error("missing base translation for key " + key + ". FIX IT");
+                if (this._logMissingTranslationsFunction !== null) {
+                    this._logMissingTranslationsFunction(key, language);
                 }
                 translation = key;
             }

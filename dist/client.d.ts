@@ -40,6 +40,8 @@ export * from './client/js/PromiseHelper';
 export * from './client/js/ShareManager/ShareDialog';
 export * from './client/js/ShareManager/ShareManager';
 export * from './client/js/Singleton';
+export * from './client/js/Sound/AudioChain';
+export * from './client/js/Sound/SoundManager';
 export * from './client/js/Toast/Toast';
 export * from './client/js/Toast/ToastManager';
 export * from './client/js/Translator';

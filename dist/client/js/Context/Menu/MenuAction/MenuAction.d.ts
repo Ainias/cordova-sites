@@ -108,6 +108,7 @@ export declare class MenuAction {
      * @returns {string}
      */
     getLiClass(): string;
+    setLiClass(cssClass: any): void;
     /**
      * Gibt das zugehörige Menu zurück
      *

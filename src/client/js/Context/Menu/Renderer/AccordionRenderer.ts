@@ -66,7 +66,7 @@ export class AccordionRenderer extends MenuRenderer{
         let liElement = document.createElement("li");
 
         if (action.getLiClass().trim() !== "") {
-            liElement.classList.add(action.getLiClass());
+            liElement.classList.add(...action.getLiClass().split(" "));
         }
         // liElement.appendChild(aElement);
         liElement.dataset["id"] = action.getId();

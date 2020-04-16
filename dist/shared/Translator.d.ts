@@ -8,7 +8,7 @@ export declare class Translator {
     _fallbackLanguage: string;
     _markUntranslatedTranslations: boolean;
     _markTranslations: boolean;
-    _logMissingTranslations: boolean;
+    _logMissingTranslationsFunction: any;
     _translationCallbacks: any;
     _lastTranslationCallbackId: number;
     /**

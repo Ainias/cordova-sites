@@ -163,6 +163,10 @@ class MenuAction {
     getLiClass() {
         return this._liClass;
     }
+    setLiClass(cssClass) {
+        this._liClass = cssClass;
+        this.redraw();
+    }
     /**
      * Gibt das zugehörige Menu zurück
      *

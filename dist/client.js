@@ -45,6 +45,8 @@ __export(require("./client/js/PromiseHelper"));
 __export(require("./client/js/ShareManager/ShareDialog"));
 __export(require("./client/js/ShareManager/ShareManager"));
 __export(require("./client/js/Singleton"));
+__export(require("./client/js/Sound/AudioChain"));
+__export(require("./client/js/Sound/SoundManager"));
 __export(require("./client/js/Toast/Toast"));
 __export(require("./client/js/Toast/ToastManager"));
 __export(require("./client/js/Translator"));
