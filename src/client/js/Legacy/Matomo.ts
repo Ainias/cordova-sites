@@ -1,4 +1,5 @@
 import {Helper} from "js-helper";
+import {NativeStoragePromise} from "../NativeStoragePromise";
 
 export class Matomo {
 
@@ -13,13 +14,13 @@ export class Matomo {
 
     static init() {
         Matomo.isTrackingPromise = new Promise(async (resolve) => {
-            let shouldTrack = Helper.nonNull(localStorage.getItem(Matomo.LOCAL_STORAGE_KEY), "1");
+            let shouldTrack = await NativeStoragePromise.getItem(Matomo.LOCAL_STORAGE_KEY, "1");
             if (Helper.isNull(shouldTrack)) {
                 shouldTrack = await Matomo._askIsTracking();
-                localStorage.setItem(Matomo.LOCAL_STORAGE_KEY, shouldTrack);
+                await NativeStoragePromise.setItem(Matomo.LOCAL_STORAGE_KEY, shouldTrack);
             } else {
                 shouldTrack = (shouldTrack === "1");
-                Matomo.setTrack(shouldTrack);
+                await Matomo.setTrack(shouldTrack);
             }
             resolve(shouldTrack);
         });
@@ -64,9 +65,6 @@ export class Matomo {
             Matomo.push([function () {
                 resolve(!this["isUserOptedOut"]());
             }]);
-            Matomo.push([function () {
-                resolve(!this["isUserOptedOut"]());
-            }]);
         });
         return Matomo.isTrackingPromise;
     }
@@ -84,12 +82,12 @@ export class Matomo {
 
     static async setTrack(shouldTrack) {
         Matomo.isTrackingPromise = Promise.resolve(shouldTrack);
-        localStorage.setItem(Matomo.LOCAL_STORAGE_KEY, (shouldTrack === true) ? "1" : "0");
+        await NativeStoragePromise.setItem(Matomo.LOCAL_STORAGE_KEY, (shouldTrack === true) ? "1" : "0");
 
         if (shouldTrack) {
-            Matomo.push(["forgetUserOptOut"], true);
+            await Matomo.push(["forgetUserOptOut"], true);
         } else {
-            Matomo.push(["optUserOut"], true);
+            await Matomo.push(["optUserOut"], true);
         }
     }
 

@@ -77,6 +77,15 @@ class Menu {
             }
         }
     }
+    removeAllActions(redraw) {
+        this._actions.forEach(action => action.setMenu(null));
+        this._actions = [];
+        this._submenus = [];
+        //Falls redraw true (oder nicht angegeben, redraw)
+        if (Helper_1.Helper.nonNull(redraw, true)) {
+            this.redraw();
+        }
+    }
     /**
      * Sortiert die Actions und sagt danach den Renderern, dass diese das Menü zeuchnen sollen
      */

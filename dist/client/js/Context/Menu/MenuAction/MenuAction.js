@@ -103,6 +103,10 @@ class MenuAction {
     isShouldTranslate() {
         return this._shouldTranslate;
     }
+    setShouldTranslate(shouldTranslate) {
+        this._shouldTranslate = (shouldTranslate === true);
+        this.redraw();
+    }
     setVisibility(visibility) {
         this._visible = visibility;
         this.redraw();
@@ -148,6 +152,10 @@ class MenuAction {
      */
     getIcon() {
         return this._icon;
+    }
+    setIcon(icon) {
+        this._icon = icon;
+        this.redraw();
     }
     /**
      * Gibt die View-Klasse der Action zurück

@@ -294,6 +294,17 @@ class NavbarFragment extends AbstractFragment_1.AbstractFragment {
         }
     }
     /**
+     * Funktion zum hinzufügen von Actions
+     * @param redraw
+     */
+    removeAllActions(redraw) {
+        this._menuActions = [];
+        //Falls Menü schon existiert, füge Elemente hinzu
+        if (Helper_1.Helper.isNotNull(this._menu)) {
+            this._menu.removeAllActions(redraw);
+        }
+    }
+    /**
      * Updatet das Title-Element
      * @param titleElement
      */

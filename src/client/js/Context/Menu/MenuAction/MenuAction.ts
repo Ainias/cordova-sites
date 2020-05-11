@@ -139,6 +139,11 @@ export class MenuAction {
         return this._shouldTranslate;
     }
 
+    setShouldTranslate(shouldTranslate){
+        this._shouldTranslate = (shouldTranslate === true);
+        this.redraw();
+    }
+
     setVisibility(visibility){
         this._visible = visibility;
         this.redraw();
@@ -190,6 +195,11 @@ export class MenuAction {
      */
     getIcon() {
         return this._icon;
+    }
+
+    setIcon(icon){
+        this._icon = icon;
+        this.redraw();
     }
 
     /**

@@ -10,17 +10,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const js_helper_1 = require("js-helper");
+const NativeStoragePromise_1 = require("../NativeStoragePromise");
 class Matomo {
     static init() {
         Matomo.isTrackingPromise = new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-            let shouldTrack = js_helper_1.Helper.nonNull(localStorage.getItem(Matomo.LOCAL_STORAGE_KEY), "1");
+            let shouldTrack = yield NativeStoragePromise_1.NativeStoragePromise.getItem(Matomo.LOCAL_STORAGE_KEY, "1");
             if (js_helper_1.Helper.isNull(shouldTrack)) {
                 shouldTrack = yield Matomo._askIsTracking();
-                localStorage.setItem(Matomo.LOCAL_STORAGE_KEY, shouldTrack);
+                yield NativeStoragePromise_1.NativeStoragePromise.setItem(Matomo.LOCAL_STORAGE_KEY, shouldTrack);
             }
             else {
                 shouldTrack = (shouldTrack === "1");
-                Matomo.setTrack(shouldTrack);
+                yield Matomo.setTrack(shouldTrack);
             }
             resolve(shouldTrack);
         }));
@@ -61,9 +62,6 @@ class Matomo {
                 Matomo.push([function () {
                         resolve(!this["isUserOptedOut"]());
                     }]);
-                Matomo.push([function () {
-                        resolve(!this["isUserOptedOut"]());
-                    }]);
             });
             return Matomo.isTrackingPromise;
         });
@@ -82,12 +80,12 @@ class Matomo {
     static setTrack(shouldTrack) {
         return __awaiter(this, void 0, void 0, function* () {
             Matomo.isTrackingPromise = Promise.resolve(shouldTrack);
-            localStorage.setItem(Matomo.LOCAL_STORAGE_KEY, (shouldTrack === true) ? "1" : "0");
+            yield NativeStoragePromise_1.NativeStoragePromise.setItem(Matomo.LOCAL_STORAGE_KEY, (shouldTrack === true) ? "1" : "0");
             if (shouldTrack) {
-                Matomo.push(["forgetUserOptOut"], true);
+                yield Matomo.push(["forgetUserOptOut"], true);
             }
             else {
-                Matomo.push(["optUserOut"], true);
+                yield Matomo.push(["optUserOut"], true);
             }
         });
     }

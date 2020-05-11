@@ -69,6 +69,7 @@ export declare class MenuAction {
      * @returns {boolean}
      */
     isShouldTranslate(): boolean;
+    setShouldTranslate(shouldTranslate: any): void;
     setVisibility(visibility: any): void;
     /**
      * Gibt an, ob die MenuAction sichtbar ist
@@ -98,6 +99,7 @@ export declare class MenuAction {
      * @returns {string|null}
      */
     getIcon(): any;
+    setIcon(icon: any): void;
     /**
      * Gibt die View-Klasse der Action zurück
      * @returns {string}

@@ -34,6 +34,8 @@ __export(require("./client/js/Dialog/ButtonChooseDialog"));
 __export(require("./client/js/Dialog/ChooseDialog"));
 __export(require("./client/js/Dialog/ConfirmDialog"));
 __export(require("./client/js/Dialog/Dialog"));
+__export(require("./client/js/Dialog/ElemChooseDialog"));
+__export(require("./client/js/Dialog/ImgChooseDialog"));
 __export(require("./client/js/Form"));
 __export(require("./client/js/HistoryManager"));
 __export(require("./client/js/Legacy/EventManager/EventManager"));

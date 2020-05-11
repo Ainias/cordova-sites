@@ -65,6 +65,11 @@ export declare class NavbarFragment extends AbstractFragment {
      */
     addAction(action: any): void;
     /**
+     * Funktion zum hinzufügen von Actions
+     * @param redraw
+     */
+    removeAllActions(redraw: any): void;
+    /**
      * Updatet das Title-Element
      * @param titleElement
      */

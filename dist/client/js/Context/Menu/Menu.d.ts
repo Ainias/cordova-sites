@@ -33,6 +33,7 @@ export declare class Menu {
      * @param redraw
      */
     addAction(action: any, redraw: any): void;
+    removeAllActions(redraw: any): void;
     /**
      * Sortiert die Actions und sagt danach den Renderern, dass diese das Menü zeuchnen sollen
      */

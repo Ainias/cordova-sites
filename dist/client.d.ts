@@ -29,6 +29,8 @@ export * from './client/js/Dialog/ButtonChooseDialog';
 export * from './client/js/Dialog/ChooseDialog';
 export * from './client/js/Dialog/ConfirmDialog';
 export * from './client/js/Dialog/Dialog';
+export * from './client/js/Dialog/ElemChooseDialog';
+export * from './client/js/Dialog/ImgChooseDialog';
 export * from './client/js/Form';
 export * from './client/js/HistoryManager';
 export * from './client/js/Legacy/EventManager/EventManager';
