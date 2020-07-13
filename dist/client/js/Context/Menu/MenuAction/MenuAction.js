@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MenuAction = void 0;
 const Helper_1 = require("../../../Legacy/Helper");
 /**
  * Container für verschiedene Eigenschaften

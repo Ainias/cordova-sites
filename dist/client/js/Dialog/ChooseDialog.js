@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChooseDialog = void 0;
 const Dialog_1 = require("./Dialog");
 const ViewInflater_1 = require("../ViewInflater");
 const view = require("../../html/Framework/Dialog/chooseDialog.html");

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ViewInflater = void 0;
 const client_1 = require("js-helper/dist/client");
 const shared_1 = require("js-helper/dist/shared");
 const DataManager_1 = require("./DataManager");

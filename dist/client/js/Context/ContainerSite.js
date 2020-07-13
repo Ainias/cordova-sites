@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ContainerSite = void 0;
 const TemplateSite_1 = require("./TemplateSite");
 const containerTemplate = require("../../html/siteTemplates/container.html");
 /**

@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Translator = void 0;
 const NativeStoragePromise_1 = require("./NativeStoragePromise");
 const Helper_1 = require("./Legacy/Helper");
 const Translator_1 = require("../../shared/Translator");

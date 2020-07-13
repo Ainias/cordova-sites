@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.App = void 0;
 /**
  * Eine Klasse, welche als Ursprung für die App genutzt wird
  */

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Translator = void 0;
 const shared_1 = require("js-helper/dist/shared");
 /**
  * Singleton-Klasse zum Übersetzen von Text-Inhalten

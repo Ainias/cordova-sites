@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.StartSiteMenuAction = void 0;
 const MenuAction_1 = require("./MenuAction");
 const App_1 = require("../../../App");
 class StartSiteMenuAction extends MenuAction_1.MenuAction {

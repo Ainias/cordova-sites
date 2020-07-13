@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AccordionRenderer = void 0;
 const OpenSubmenuAction_1 = require("../MenuAction/OpenSubmenuAction");
 const MenuRenderer_1 = require("./MenuRenderer");
 const Helper_1 = require("../../../Legacy/Helper");

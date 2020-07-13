@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ServerTranslator = void 0;
 const Translator_1 = require("../shared/Translator");
 const shared_1 = require("js-helper/dist/shared");
 class ServerTranslator {

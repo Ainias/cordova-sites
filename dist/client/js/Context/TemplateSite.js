@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TemplateSite = void 0;
 const ViewInflater_1 = require("../ViewInflater");
 const MasterSite_1 = require("./Delegate/MasterSite");
 /**

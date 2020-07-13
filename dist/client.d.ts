@@ -6,6 +6,7 @@ export * from './client/js/Context/ContainerSite';
 export * from './client/js/Context/Context';
 export * from './client/js/Context/Delegate/DelegateSite';
 export * from './client/js/Context/Delegate/MasterSite';
+export * from './client/js/Context/Fragment/AbstractWindowFragment';
 export * from './client/js/Context/Fragment/AlphabeticListFragment';
 export * from './client/js/Context/Fragment/TabFragment';
 export * from './client/js/Context/Menu/Menu';

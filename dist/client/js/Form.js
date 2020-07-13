@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Form = void 0;
 const DataManager_1 = require("./DataManager");
 const Helper_1 = require("./Legacy/Helper");
 const Translator_1 = require("./Translator");

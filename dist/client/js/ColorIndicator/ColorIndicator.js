@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ColorIndicator = void 0;
 const Singleton_1 = require("../Singleton");
 const Helper_1 = require("../Legacy/Helper");
 class ColorIndicator extends Singleton_1.Singleton {

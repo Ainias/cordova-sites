@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ErrorAction = void 0;
 const MenuAction_1 = require("./MenuAction");
 const Dialog_1 = require("../../../Dialog/Dialog");
 const Translator_1 = require("../../../Translator");

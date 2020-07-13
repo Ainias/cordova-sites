@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ShareManager = void 0;
 const ShareDialog_1 = require("./ShareDialog");
 class ShareManager {
     share(text) {

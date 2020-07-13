@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ShareDialog = void 0;
 const Dialog_1 = require("../Dialog/Dialog");
 const ViewInflater_1 = require("../ViewInflater");
 const view = require("../../html/Dialog/shareDialog.html");

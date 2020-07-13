@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Matomo = void 0;
 const js_helper_1 = require("js-helper");
 const NativeStoragePromise_1 = require("../NativeStoragePromise");
 class Matomo {

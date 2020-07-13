@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.DelegateSite = void 0;
 const AbstractSite_1 = require("../AbstractSite");
 class DelegateSite extends AbstractSite_1.AbstractSite {
     constructor(site) {

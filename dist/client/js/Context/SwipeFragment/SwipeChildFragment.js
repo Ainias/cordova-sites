@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SwipeChildFragment = void 0;
 const AbstractFragment_1 = require("../AbstractFragment");
 const Helper_1 = require("../../Legacy/Helper");
 class SwipeChildFragment extends AbstractFragment_1.AbstractFragment {

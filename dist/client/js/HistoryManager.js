@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.HistoryManager = void 0;
 const Helper_1 = require("./Legacy/Helper");
 /**
  * Manager, welcher sich um die Manipulation von der Historie kümmert

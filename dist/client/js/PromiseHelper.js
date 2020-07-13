@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PromiseHelper = void 0;
 const Helper_1 = require("./Legacy/Helper");
 class PromiseHelper {
     static delay(milliseconds) {

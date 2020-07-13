@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MenuSite = void 0;
 const TemplateSite_1 = require("./TemplateSite");
 const defaultMenuTemplate = require("../../html/siteTemplates/menuSite.html");
 const NavbarFragment_1 = require("./Menu/NavbarFragment");

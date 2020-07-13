@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Submenu = void 0;
 const Menu_1 = require("./Menu");
 const Helper_1 = require("../../Legacy/Helper");
 const OpenSubmenuAction_1 = require("./MenuAction/OpenSubmenuAction");

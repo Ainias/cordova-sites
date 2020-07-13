@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SiteManager = void 0;
 const Helper_1 = require("../Legacy/Helper");
 const AbstractSite_1 = require("./AbstractSite");
 const ViewInflater_1 = require("../ViewInflater");

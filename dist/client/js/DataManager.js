@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.DataManager = void 0;
 const Helper_1 = require("./Legacy/Helper");
 const NotOnlineError_1 = require("./DataManager/NotOnlineError");
 /**

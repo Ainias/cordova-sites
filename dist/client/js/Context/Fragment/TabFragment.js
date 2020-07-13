@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TabFragment = void 0;
 const AbstractFragment_1 = require("../AbstractFragment");
 const defaultTabView = require("../../../html/Framework/Fragment/tabFragment.html");
 const Helper_1 = require("../../Legacy/Helper");

@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ConfirmDialog = void 0;
 const Dialog_1 = require("./Dialog");
 const Helper_1 = require("../Legacy/Helper");
 class ConfirmDialog extends Dialog_1.Dialog {

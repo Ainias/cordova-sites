@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SoundManager = void 0;
 const AudioChain_1 = require("./AudioChain");
 const Helper_1 = require("js-helper/dist/shared/Helper");
 const App_1 = require("../App");

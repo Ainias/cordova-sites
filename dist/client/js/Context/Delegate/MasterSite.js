@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MasterSite = void 0;
 const AbstractSite_1 = require("../AbstractSite");
 const Helper_1 = require("../../Legacy/Helper");
 class MasterSite extends AbstractSite_1.AbstractSite {
