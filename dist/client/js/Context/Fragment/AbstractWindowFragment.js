@@ -21,7 +21,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         super(site, template);
         this._position = { x: 0, y: 0 };
         this._title = "";
-        this._margin = { x: 5, y: 5 };
+        this._margin = { x: 0, y: 0 };
         this._position = position;
         this._title = Helper_1.Helper.nonNull(title, "&nbsp;");
         this._viewPromise = Promise.all([this._viewPromise, ViewInflater_1.ViewInflater.getInstance().load(view)]).then(res => {
@@ -42,6 +42,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         let computedStyle = window.getComputedStyle(this._container);
         let width = parseFloat(computedStyle.getPropertyValue("width"));
         let height = parseFloat(computedStyle.getPropertyValue("height"));
+        console.log("dim", width, height);
         return { x: Math.ceil(width) - this._margin.x, y: Math.ceil(height) - this._margin.y };
     }
     setDimension(x, y) {
@@ -61,21 +62,23 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             let resizeStart = null;
             let multiplier;
             let dimension;
+            let resizeStartListener = (x, y, e) => {
+                if (e.target.classList.contains("window-resize")) {
+                    e.stopPropagation();
+                    resizeStart = { x: x, y: y };
+                    let direction = e.target.dataset["direction"].split(",");
+                    multiplier = { x: parseInt(direction[0]), y: parseInt(direction[1]) };
+                    dimension = this.getDimension();
+                }
+            };
             this.findBy(".window-resize", true).forEach(element => {
                 element.addEventListener("mousedown", (e) => {
-                    if (e.target.classList.contains("window-resize")) {
-                        e.stopPropagation();
-                        resizeStart = { x: e.clientX, y: e.clientY };
-                        let direction = e.target.dataset["direction"].split(",");
-                        multiplier = { x: parseInt(direction[0]), y: parseInt(direction[1]) };
-                        dimension = this.getDimension();
-                    }
+                    resizeStartListener(e.clientX, e.clientY, e);
                 });
             });
-            let mouseDownPos = null;
-            this._container.addEventListener("mousedown", (e) => {
+            let moveStartListener = (x, y, e) => {
                 if (e.target === this._container || e.target.closest("#title") === this._titleElement) {
-                    mouseDownPos = { x: e.clientX, y: e.clientY };
+                    mouseDownPos = { x: x, y: y };
                     this._container.classList.add("moving");
                 }
                 let activeWindow = document.querySelector(".window-container.active-window");
@@ -83,13 +86,22 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                     activeWindow.classList.remove("active-window");
                 }
                 this._container.classList.add("active-window");
+            };
+            let mouseDownPos = null;
+            this._container.addEventListener("mousedown", (e) => {
+                moveStartListener(e.clientX, e.clientY, e);
+            });
+            this._container.addEventListener("touchstart", (e) => {
+                if (e.touches.length === 1) {
+                    moveStartListener(e.touches[0].clientX, e.touches[0].clientY, e);
+                }
             });
             this._titleElement = this.findBy("#title");
-            window.addEventListener("mousemove", (e) => {
+            let moveListener = (x, y, e) => {
                 if (resizeStart !== null) {
                     let diff = {
-                        x: (e.clientX - resizeStart.x) * (multiplier.x),
-                        y: (e.clientY - resizeStart.y) * (multiplier.y)
+                        x: (x - resizeStart.x) * (multiplier.x),
+                        y: (y - resizeStart.y) * (multiplier.y)
                     };
                     dimension = { x: dimension.x + diff.x, y: dimension.y + diff.y };
                     this.setDimension(dimension.x, dimension.y);
@@ -101,21 +113,38 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                         moveDiff.y = -diff.y;
                     }
                     this.moveAt(moveDiff.x, moveDiff.y);
-                    resizeStart = { x: e.clientX, y: e.clientY };
+                    resizeStart = { x: x, y: y };
                 }
-                if (mouseDownPos !== null) {
+                else if (mouseDownPos !== null) {
                     let diff = {
-                        x: e.clientX - mouseDownPos.x,
-                        y: e.clientY - mouseDownPos.y,
+                        x: x - mouseDownPos.x,
+                        y: y - mouseDownPos.y,
                     };
-                    mouseDownPos = { x: e.clientX, y: e.clientY };
+                    mouseDownPos = { x: x, y: y };
                     this.moveAt(diff.x, diff.y);
                 }
+            };
+            window.addEventListener("mousemove", (e) => {
+                moveListener(e.clientX, e.clientY, e);
             });
-            window.addEventListener("mouseup", (e) => {
+            window.addEventListener("touchmove", (e) => {
+                if (e.touches.length === 1) {
+                    console.log("touchmove");
+                    moveListener(e.touches[0].clientX, e.touches[0].clientY, e);
+                }
+            });
+            let endListener = (x, y, e) => {
                 mouseDownPos = null;
                 resizeStart = null;
                 this._container.classList.remove("moving");
+            };
+            window.addEventListener("mouseup", (e) => {
+                endListener(e.clientX, e.clientY, e);
+            });
+            window.addEventListener("touchend", (e) => {
+                if (e.touches.length === 0 && e.changedTouches.length === 1) {
+                    moveListener(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e);
+                }
             });
             this._container.addEventListener("dblclick", (e) => {
                 if (e.target === this._container || e.target.closest("#title") === this._titleElement) {
@@ -152,13 +181,13 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             let dimension = this.getDimension();
             if (diff.x === 0) {
                 let sum = 0;
-                this._resizeElements.x.forEach(e => sum += e.offsetWidth);
-                diff.x = sum - dimension.x;
+                this._resizeElements.x.forEach(e => sum += parseFloat(window.getComputedStyle(e).getPropertyValue("width")));
+                diff.x = Math.ceil(sum) - dimension.x;
             }
             if (diff.y === 0) {
                 let sum = 0;
-                this._resizeElements.y.forEach(e => sum += e.offsetHeight);
-                diff.y = sum - dimension.y;
+                this._resizeElements.y.forEach(e => sum += parseFloat(window.getComputedStyle(e).getPropertyValue("height")));
+                diff.y = Math.ceil(sum) - dimension.y;
             }
             dimension.x += diff.x;
             dimension.y += diff.y;

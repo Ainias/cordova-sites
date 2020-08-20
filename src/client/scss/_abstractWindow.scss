@@ -8,6 +8,11 @@
   transition: none;
   min-width: 10rem;
   min-height: 3rem;
+  box-sizing: content-box;
+
+  * {
+    box-sizing: border-box;
+  }
 
   z-index: 1000;
 
@@ -19,11 +24,13 @@
   }
 
   .window-resize {
+    $resizeWidth: 4px;
+
     user-select: none;
 
     &.edge {
-      width: 0.2rem;
-      height: 0.2rem;
+      width: $resizeWidth;
+      height: $resizeWidth;
 
       &.nw{
         cursor: nw-resize;
@@ -40,13 +47,12 @@
     }
     &.bottom, &.top{
       cursor: ns-resize;
-      height: 0.2rem;
+      height: $resizeWidth;
     }
     &.left, &.right{
       cursor: ew-resize;
-      width: 0.2rem;
+      width: $resizeWidth;
     }
-
   }
 
   #title {
