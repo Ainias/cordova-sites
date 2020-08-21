@@ -101,7 +101,7 @@ class DataManager {
             if (useBasePath === true) {
                 useBasePath = DataManager._basePath;
             }
-            else {
+            else if (typeof useBasePath !== "string") {
                 useBasePath = "";
             }
             url = DataManager.basePath(url, useBasePath);

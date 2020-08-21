@@ -97,10 +97,9 @@ export class DataManager {
     static async load(url, asJson?, useBasePath?) {
         asJson = Helper.nonNull(asJson, true);
         useBasePath = Helper.nonNull(useBasePath, true);
-        if (useBasePath === true){
+        if (useBasePath === true) {
             useBasePath = DataManager._basePath;
-        }
-        else {
+        } else if (typeof useBasePath !== "string") {
             useBasePath = "";
         }
 
@@ -201,7 +200,7 @@ export class DataManager {
 
     static basePath(url, basePath?) {
         basePath = Helper.nonNull(basePath, DataManager._basePath);
-        return basePath + ((url)?url:"");
+        return basePath + ((url) ? url : "");
     }
 
     static setHeader(header, value) {

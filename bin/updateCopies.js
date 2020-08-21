@@ -8,6 +8,7 @@ let pathsToProjects = [
     // "/home/silas/Projekte/Web/project-echo",
     // "/home/silas/Projekte/web/wordRotator",
     "/home/silas/Projekte/web/dnd",
+    "/home/silas/Projekte/web/smd-mail",
     // "/home/silas/Projekte/web/crew",
     // "/home/silas/Projekte/Web/orgel",
     // "/home/silas/Projekte/Web/bible-lexicon",
