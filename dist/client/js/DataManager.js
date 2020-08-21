@@ -98,7 +98,13 @@ class DataManager {
         return __awaiter(this, void 0, void 0, function* () {
             asJson = Helper_1.Helper.nonNull(asJson, true);
             useBasePath = Helper_1.Helper.nonNull(useBasePath, true);
-            url = (useBasePath) ? DataManager.basePath(url) : url;
+            if (useBasePath === true) {
+                useBasePath = DataManager._basePath;
+            }
+            else {
+                useBasePath = "";
+            }
+            url = DataManager.basePath(url, useBasePath);
             return DataManager.fetch(url).catch(e => {
                 if (DataManager.onlineCallback) {
                     DataManager.onlineCallback(false);
@@ -124,7 +130,7 @@ class DataManager {
      */
     static loadAsset(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.load(url, false, false);
+            return this.load(url, false, DataManager._assetBasePath);
         });
     }
     /**
@@ -190,8 +196,9 @@ class DataManager {
             });
         });
     }
-    static basePath(url) {
-        return DataManager._basePath + ((url) ? url : "");
+    static basePath(url, basePath) {
+        basePath = Helper_1.Helper.nonNull(basePath, DataManager._basePath);
+        return basePath + ((url) ? url : "");
     }
     static setHeader(header, value) {
         DataManager._additionalHeaders[header] = value;
@@ -201,4 +208,5 @@ exports.DataManager = DataManager;
 DataManager.onlineCallback = null;
 DataManager._additionalHeaders = {};
 DataManager._basePath = "";
+DataManager._assetBasePath = "";
 //# sourceMappingURL=DataManager.js.map

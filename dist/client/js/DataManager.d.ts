@@ -4,6 +4,7 @@
 export declare class DataManager {
     static _additionalHeaders: any;
     static _basePath: string;
+    static _assetBasePath: string;
     static onlineCallback: any;
     /**
      * Diese Funktion sollte anstelle von dem nativen "fetch" verwendet werden!
@@ -48,6 +49,6 @@ export declare class DataManager {
      */
     static buildQueryWithoutNullValues(values: any): string;
     static send(url: any, params: any): Promise<any>;
-    static basePath(url: any): string;
+    static basePath(url: any, basePath?: any): any;
     static setHeader(header: any, value: any): void;
 }
