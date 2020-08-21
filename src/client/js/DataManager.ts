@@ -8,6 +8,7 @@ export class DataManager {
 
     static _additionalHeaders;
     static _basePath: string;
+    static _assetBasePath: string;
 
     static onlineCallback = null;
 
@@ -96,8 +97,14 @@ export class DataManager {
     static async load(url, asJson?, useBasePath?) {
         asJson = Helper.nonNull(asJson, true);
         useBasePath = Helper.nonNull(useBasePath, true);
+        if (useBasePath === true){
+            useBasePath = DataManager._basePath;
+        }
+        else {
+            useBasePath = "";
+        }
 
-        url = (useBasePath) ? DataManager.basePath(url) : url;
+        url = DataManager.basePath(url, useBasePath);
         return DataManager.fetch(url).catch(e => {
             if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(false);
@@ -122,7 +129,7 @@ export class DataManager {
      * @returns {Promise<*  | void>}
      */
     static async loadAsset(url) {
-        return this.load(url, false, false);
+        return this.load(url, false, DataManager._assetBasePath);
     }
 
     /**
@@ -192,8 +199,9 @@ export class DataManager {
         });
     }
 
-    static basePath(url) {
-        return DataManager._basePath + ((url)?url:"");
+    static basePath(url, basePath?) {
+        basePath = Helper.nonNull(basePath, DataManager._basePath);
+        return basePath + ((url)?url:"");
     }
 
     static setHeader(header, value) {
@@ -203,3 +211,4 @@ export class DataManager {
 
 DataManager._additionalHeaders = {};
 DataManager._basePath = "";
+DataManager._assetBasePath = "";
