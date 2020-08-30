@@ -41,7 +41,7 @@ export class AbstractWindowFragment extends AbstractFragment {
         let width = parseFloat(computedStyle.getPropertyValue("width"));
         let height = parseFloat(computedStyle.getPropertyValue("height"));
 
-        console.log("dim", width, height);
+        // console.log("dim", width, height);
 
         return {x: Math.ceil(width) - this._margin.x, y: Math.ceil(height) - this._margin.y};
     }
@@ -53,8 +53,6 @@ export class AbstractWindowFragment extends AbstractFragment {
         this._container.style.width = x + "px";
         this._container.style.height = y + "px";
     }
-
-
 
     async onViewLoaded(): Promise<unknown[]> {
         let res = super.onViewLoaded();

@@ -57,8 +57,13 @@
 
   #title {
     user-select: none;
+    //margin: 0 0 0.5rem;
     margin: 0;
     padding-bottom: 0.5rem;
+    font-size: 1rem;
+    letter-spacing: 0.2rem;
+    font-weight: bold;
+    //border-bottom: 1px solid #b6b6b6;
   }
 
   &.moving {
@@ -74,6 +79,11 @@
     }
     .window-resize{
       display: none;
+    }
+    #title{
+      border: 0;
+      margin: 0;
+      height: 100%;
     }
   }
 
