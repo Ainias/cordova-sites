@@ -12,28 +12,30 @@ export declare class DataManager {
      * Daher wird heir auf XMLHttpRequest zurückgegriffen
      *
      * @param url
+     * @param useArrayBuffer
      * @returns {Promise<*>}
      */
-    static fetch(url: any): Promise<unknown>;
+    static fetch(url: any, useArrayBuffer?: any): Promise<unknown>;
     static fetchBlob(url: any): Promise<unknown>;
     /**
      * Vereinfachung von Laden von Resourcen.
      * Lädt per GET die angegebene URL und gibt diese als JSON oder Text zurück
      *
      * @param url
-     * @param asJson
+     * @param format
      * @param useBasePath
      * @returns {Promise<*  | void>}
      */
-    static load(url: any, asJson?: any, useBasePath?: any): Promise<any>;
+    static load(url: any, format?: any, useBasePath?: any): Promise<any>;
     /**
      * Vereinfachung von Laden von Resourcen.
      * Lädt per GET das angegebene Asset und gibt diese als JSON oder Text zurück
      *
      * @param url
+     * @param format
      * @returns {Promise<*  | void>}
      */
-    static loadAsset(url: any): Promise<any>;
+    static loadAsset(url: any, format?: any): Promise<any>;
     /**
      * Wandelt ein Key-Value-Objekt in einen QueryString um
      *

@@ -13,6 +13,7 @@ exports.SoundManager = void 0;
 const AudioChain_1 = require("./AudioChain");
 const Helper_1 = require("js-helper/dist/shared/Helper");
 const App_1 = require("../App");
+const DataManager_1 = require("../DataManager");
 class SoundManager {
     constructor() {
         this.channels = {};
@@ -61,9 +62,12 @@ class SoundManager {
         }
         let audio = options.audio;
         if (Helper_1.Helper.isNotNull(audio)) {
-            audioObject.loadedPromise = fetch(audio).then(res => res.arrayBuffer()).then(arrayBuffer => {
-                return new Promise((r) => this.context.decodeAudioData(arrayBuffer, r));
+            audioObject.loadedPromise = DataManager_1.DataManager.loadAsset(audio, "raw").then(res => res.arrayBuffer()).then(arrayBuffer => {
+                return new Promise((r, reject) => this.context.decodeAudioData(arrayBuffer, r));
             }).catch(e => console.error(e));
+            // audioObject.loadedPromise = fetch(audio).then(res => res.arrayBuffer()).then(arrayBuffer => {
+            //     return new Promise((r, reject) => this.context.decodeAudioData(arrayBuffer, r));
+            // }).catch(e => console.error(e));
             this.stop(channel);
         }
         audioObject.muted = Helper_1.Helper.nonNull(options.muted, audioObject.muted, false);

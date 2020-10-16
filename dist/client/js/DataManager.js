@@ -22,17 +22,23 @@ class DataManager {
      * Daher wird heir auf XMLHttpRequest zurückgegriffen
      *
      * @param url
+     * @param useArrayBuffer
      * @returns {Promise<*>}
      */
-    static fetch(url) {
+    static fetch(url, useArrayBuffer) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise(function (resolve, reject) {
                 let xhr = new XMLHttpRequest();
+                useArrayBuffer = Helper_1.Helper.nonNull(useArrayBuffer, false);
+                if (useArrayBuffer) {
+                    xhr.responseType = "arraybuffer";
+                }
                 xhr.onload = function () {
-                    resolve(new Response(xhr.responseText, { status: (xhr.status === 0) ? 200 : xhr.status }));
+                    resolve(new Response(useArrayBuffer ? xhr.response : xhr.responseText, { status: (xhr.status === 0) ? 200 : xhr.status }));
                 };
                 xhr.onerror = function (e) {
                     console.error(e);
+                    debugger;
                     reject(new NotOnlineError_1.NotOnlineError("not-online", url));
                 };
                 xhr.open('GET', url);
@@ -63,6 +69,7 @@ class DataManager {
                 };
                 xhr.onerror = function (e) {
                     console.error(e);
+                    debugger;
                     reject(new NotOnlineError_1.NotOnlineError("not-online", url));
                 };
                 xhr.open('GET', url);
@@ -90,13 +97,22 @@ class DataManager {
      * Lädt per GET die angegebene URL und gibt diese als JSON oder Text zurück
      *
      * @param url
-     * @param asJson
+     * @param format
      * @param useBasePath
      * @returns {Promise<*  | void>}
      */
-    static load(url, asJson, useBasePath) {
+    static load(url, format, useBasePath) {
         return __awaiter(this, void 0, void 0, function* () {
-            asJson = Helper_1.Helper.nonNull(asJson, true);
+            format = Helper_1.Helper.nonNull(format, true);
+            if (format === true) {
+                format = "json";
+            }
+            else if (format === false) {
+                format = "text";
+            }
+            else if (format !== "json" && format !== "text") {
+                format = "raw";
+            }
             useBasePath = Helper_1.Helper.nonNull(useBasePath, true);
             if (useBasePath === true) {
                 useBasePath = DataManager._basePath;
@@ -105,7 +121,7 @@ class DataManager {
                 useBasePath = "";
             }
             url = DataManager.basePath(url, useBasePath);
-            return DataManager.fetch(url).catch(e => {
+            return DataManager.fetch(url, format === "raw").catch(e => {
                 if (DataManager.onlineCallback) {
                     DataManager.onlineCallback(false);
                 }
@@ -114,10 +130,15 @@ class DataManager {
                 if (DataManager.onlineCallback) {
                     DataManager.onlineCallback(true);
                 }
-                if (asJson) {
+                if (format === "json") {
                     return res.json();
                 }
-                return res.text();
+                else if (format === "text") {
+                    return res.text();
+                }
+                else {
+                    return res;
+                }
             });
         });
     }
@@ -126,11 +147,12 @@ class DataManager {
      * Lädt per GET das angegebene Asset und gibt diese als JSON oder Text zurück
      *
      * @param url
+     * @param format
      * @returns {Promise<*  | void>}
      */
-    static loadAsset(url) {
+    static loadAsset(url, format) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.load(url, false, DataManager._assetBasePath);
+            return this.load(url, Helper_1.Helper.nonNull(format, "text"), DataManager._assetBasePath);
         });
     }
     /**

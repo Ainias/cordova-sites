@@ -42,7 +42,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         let computedStyle = window.getComputedStyle(this._container);
         let width = parseFloat(computedStyle.getPropertyValue("width"));
         let height = parseFloat(computedStyle.getPropertyValue("height"));
-        console.log("dim", width, height);
+        // console.log("dim", width, height);
         return { x: Math.ceil(width) - this._margin.x, y: Math.ceil(height) - this._margin.y };
     }
     setDimension(x, y) {

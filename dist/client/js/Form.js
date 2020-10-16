@@ -147,11 +147,13 @@ class Form {
                     }
                     else {
                         this._formElem.elements[k].value = Helper_1.Helper.htmlspecialcharsDecode(values[k]);
-                        if (Helper_1.Helper.isNotNull(values[k]) && ("" + values[k]).trim() !== "") {
-                            this._formElem.elements[k].classList.add("notEmpty");
-                        }
-                        else {
-                            this._formElem.elements[k].classList.remove("notEmpty");
+                        if (this._formElem.elements[k].classList) {
+                            if (Helper_1.Helper.isNotNull(values[k]) && ("" + values[k]).trim() !== "") {
+                                this._formElem.elements[k].classList.add("notEmpty");
+                            }
+                            else {
+                                this._formElem.elements[k].classList.remove("notEmpty");
+                            }
                         }
                     }
                 }

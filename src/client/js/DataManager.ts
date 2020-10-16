@@ -18,16 +18,25 @@ export class DataManager {
      * Daher wird heir auf XMLHttpRequest zurückgegriffen
      *
      * @param url
+     * @param useArrayBuffer
      * @returns {Promise<*>}
      */
-    static async fetch(url) {
+    static async fetch(url, useArrayBuffer?) {
         return new Promise(function (resolve, reject) {
             let xhr = new XMLHttpRequest();
+
+            useArrayBuffer = Helper.nonNull(useArrayBuffer, false);
+
+            if (useArrayBuffer){
+                xhr.responseType = "arraybuffer";
+            }
+
             xhr.onload = function () {
-                resolve(new Response(xhr.responseText, {status: (xhr.status === 0) ? 200 : xhr.status}))
+                resolve(new Response(useArrayBuffer ? xhr.response : xhr.responseText, {status: (xhr.status === 0) ? 200 : xhr.status}))
             };
             xhr.onerror = function (e) {
                 console.error(e);
+                debugger;
                 reject(new NotOnlineError("not-online", url));
             };
 
@@ -60,6 +69,7 @@ export class DataManager {
             };
             xhr.onerror = function (e) {
                 console.error(e);
+                debugger;
                 reject(new NotOnlineError("not-online", url));
             };
 
@@ -90,12 +100,21 @@ export class DataManager {
      * Lädt per GET die angegebene URL und gibt diese als JSON oder Text zurück
      *
      * @param url
-     * @param asJson
+     * @param format
      * @param useBasePath
      * @returns {Promise<*  | void>}
      */
-    static async load(url, asJson?, useBasePath?) {
-        asJson = Helper.nonNull(asJson, true);
+    static async load(url, format?, useBasePath?) {
+        format = Helper.nonNull(format, true);
+
+        if (format === true) {
+            format = "json";
+        } else if (format === false) {
+            format = "text";
+        } else if (format !== "json" && format !== "text") {
+            format = "raw";
+        }
+
         useBasePath = Helper.nonNull(useBasePath, true);
         if (useBasePath === true) {
             useBasePath = DataManager._basePath;
@@ -104,7 +123,7 @@ export class DataManager {
         }
 
         url = DataManager.basePath(url, useBasePath);
-        return DataManager.fetch(url).catch(e => {
+        return DataManager.fetch(url, format === "raw").catch(e => {
             if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(false);
             }
@@ -113,10 +132,13 @@ export class DataManager {
             if (DataManager.onlineCallback) {
                 DataManager.onlineCallback(true);
             }
-            if (asJson) {
+            if (format === "json") {
                 return res.json();
+            } else if (format === "text") {
+                return res.text();
+            } else {
+                return res;
             }
-            return res.text();
         });
     }
 
@@ -125,10 +147,11 @@ export class DataManager {
      * Lädt per GET das angegebene Asset und gibt diese als JSON oder Text zurück
      *
      * @param url
+     * @param format
      * @returns {Promise<*  | void>}
      */
-    static async loadAsset(url) {
-        return this.load(url, false, DataManager._assetBasePath);
+    static async loadAsset(url, format?) {
+        return this.load(url, Helper.nonNull(format, "text"), DataManager._assetBasePath);
     }
 
     /**
