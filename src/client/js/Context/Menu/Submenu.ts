@@ -8,6 +8,7 @@ import {OpenSubmenuAction} from "./MenuAction/OpenSubmenuAction";
 export class Submenu extends Menu {
     private _parentAction: OpenSubmenuAction;
     private _isOpen: boolean;
+
     /**
      * Constructor für ein Submenu
      *
@@ -19,9 +20,10 @@ export class Submenu extends Menu {
      * @param showFor
      * @param order
      * @param icon
+     * @param renderers
      */
-    constructor(title?, showFor?, order?, icon?) {
-        super([]);
+    constructor(title?, showFor?, order?, icon?, renderers?) {
+        super(Helper.nonNull(renderers, []));
 
         this._parentAction = new OpenSubmenuAction(title, this, showFor, order, icon);
         this._isOpen = false;
@@ -120,7 +122,7 @@ export class Submenu extends Menu {
         }
     }
 
-    openSubmenu(submenu){
+    openSubmenu(submenu) {
         this.getParentMenu().openSubmenu(submenu);
     }
 
@@ -149,8 +151,18 @@ export class Submenu extends Menu {
      * @param action
      */
     updateAction(action) {
-        this.getParentMenu().updateAction(action);
-        // super.updateAction(action);
+        const parentMenu = this.getParentMenu();
+        if (parentMenu) {
+            parentMenu.updateAction(action);
+        }
+    }
+
+
+    redrawAction(action) {
+        const parentMenu = this.getParentMenu();
+        if (parentMenu) {
+            parentMenu.redrawAction(action);
+        }
     }
 
     /**

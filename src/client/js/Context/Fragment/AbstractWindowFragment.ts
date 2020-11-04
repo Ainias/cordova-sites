@@ -41,8 +41,6 @@ export class AbstractWindowFragment extends AbstractFragment {
         let width = parseFloat(computedStyle.getPropertyValue("width"));
         let height = parseFloat(computedStyle.getPropertyValue("height"));
 
-        // console.log("dim", width, height);
-
         return {x: Math.ceil(width) - this._margin.x, y: Math.ceil(height) - this._margin.y};
     }
 
@@ -142,7 +140,6 @@ export class AbstractWindowFragment extends AbstractFragment {
         });
         window.addEventListener("touchmove", (e) => {
             if (e.touches.length === 1){
-                console.log("touchmove");
                 moveListener(e.touches[0].clientX, e.touches[0].clientY, e);
             }
         });
@@ -189,7 +186,7 @@ export class AbstractWindowFragment extends AbstractFragment {
         return res;
     }
 
-    resizeToContent() {
+    public resizeToContent() {
         if (this._window) {
             let diff = {
                 x: this._window.scrollWidth - this._window.clientWidth,

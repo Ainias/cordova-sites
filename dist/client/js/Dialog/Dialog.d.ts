@@ -9,6 +9,8 @@ export declare class Dialog {
     protected _additionalClasses: string;
     protected _buttons: any[];
     protected _result: any;
+    protected _addedToDomePromise: any;
+    protected _addedToDomePromiseResolver: any;
     constructor(content: any, title: any);
     setTitle(title: any): this;
     setTranslatable(translatable: any): void;
@@ -18,5 +20,7 @@ export declare class Dialog {
     setContent(content: any): Promise<this>;
     addButton(elementOrText: any, listenerOrResult: any, shouldClose?: any): void;
     show(): Promise<unknown>;
+    createModalDialogElement(): any;
+    waitForAddedToDom(): Promise<any>;
     close(): void;
 }

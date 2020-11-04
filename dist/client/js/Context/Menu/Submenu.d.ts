@@ -17,8 +17,9 @@ export declare class Submenu extends Menu {
      * @param showFor
      * @param order
      * @param icon
+     * @param renderers
      */
-    constructor(title?: any, showFor?: any, order?: any, icon?: any);
+    constructor(title?: any, showFor?: any, order?: any, icon?: any, renderers?: any);
     /**
      * Erstellt ein neues Menu auf grundlage dieses Menüs. Alle Actions & Submenüs werden ebenfalls kopiert
      *
@@ -75,6 +76,7 @@ export declare class Submenu extends Menu {
      * @param action
      */
     updateAction(action: any): void;
+    redrawAction(action: any): void;
     /**
      * Gibt an, ob das Submenu offen ist oder nicht
      *

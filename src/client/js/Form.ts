@@ -112,16 +112,6 @@ export class Form {
         return false;
     }
 
-    // load(url, isCached) {
-    //     this.setValues(DataManager.load(url, isCached).then(function (values) {
-    //         if (values["success"]) {
-    //             return values["result"];
-    //         }
-    //         return {};
-    //     }));
-    //     return this;
-    // }
-
     async setValues(valuePromise) {
         this.setIsBusy(true);
         let values = await Promise.resolve(valuePromise);

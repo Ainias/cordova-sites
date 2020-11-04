@@ -13,6 +13,8 @@ export class Dialog {
     protected _additionalClasses: string;
     protected _buttons: any[];
     protected _result: any;
+    protected _addedToDomePromise;
+    protected _addedToDomePromiseResolver;
 
     constructor(content, title) {
         this._resolver = null;
@@ -25,6 +27,9 @@ export class Dialog {
         this._buttons = [];
         this._result = null;
         this._contentPromise = null;
+        this._addedToDomePromise = new Promise(r => {
+            this._addedToDomePromiseResolver = r;
+        })
 
         if (Helper.isNotNull(content)) {
             this.setContent(content);
@@ -54,7 +59,7 @@ export class Dialog {
     }
 
     async setContent(content) {
-        if (typeof content === "string" && content.endsWith(".html")){
+        if (typeof content === "string" && content.endsWith(".html")) {
             content = ViewInflater.getInstance().load(content);
         }
         this._contentPromise = Promise.resolve(content);
@@ -71,8 +76,7 @@ export class Dialog {
             button.classList.add("button");
             button.classList.add("right");
             button.appendChild(Translator.makePersistentTranslation(elementOrText));
-        }
-        else {
+        } else {
             button = elementOrText;
         }
 
@@ -92,8 +96,7 @@ export class Dialog {
                 }
                 self.close();
             }
-        }
-        else {
+        } else {
             callback = listenerOrResult;
         }
 
@@ -104,13 +107,25 @@ export class Dialog {
     }
 
     async show() {
+        await this._contentPromise;
 
+        this._backgroundElement = this.createModalDialogElement();
+        document.body.appendChild(this._backgroundElement);
+        await (<Translator>Translator.getInstance()).updateTranslations();
+
+        this._addedToDomePromiseResolver();
+
+        return new Promise((resolve) =>  {
+            this._resolver = resolve;
+        });
+    }
+
+    createModalDialogElement() {
         let titleElement = document.createElement("span");
         titleElement.classList.add("title");
         if (this._translatable && this._title !== "") {
             titleElement.appendChild(Translator.makePersistentTranslation(this._title));
-        }
-        else {
+        } else {
             titleElement.innerHTML = this._title;
         }
 
@@ -133,42 +148,39 @@ export class Dialog {
             buttonBar.appendChild(this._buttons[i]);
         }
 
-        await this._contentPromise;
         if (!(this._content instanceof Node)) {
             this._content = (this._translatable) ? Translator.makePersistentTranslation(this._content) : document.createTextNode(this._content);
         }
         contentContainer.appendChild(this._content);
 
+
         this._backgroundElement = document.createElement("div");
         this._backgroundElement.classList.add("background");
-        this._backgroundElement.appendChild(modalDialog);
-
-        this._backgroundElement.querySelector(".modal").appendChild(buttonBar);
         this._backgroundElement.style.display = "block";
 
-        let self = this;
+        this._backgroundElement.appendChild(modalDialog);
+        this._backgroundElement.querySelector(".modal").appendChild(buttonBar);
+
         if (this._cancelable) {
             let closeButton = document.createElement("span");
             closeButton.classList.add("close");
             closeButton.innerHTML = "&times;";
 
             titleBar.appendChild(closeButton);
-            closeButton.addEventListener("click", function () {
-                self.close();
+            closeButton.addEventListener("click", () => {
+                this.close();
             });
-            window.addEventListener("click", function (e) {
-                if (e.target === self._backgroundElement) {
-                    self.close();
+            window.addEventListener("click", (e) => {
+                if (e.target === this._backgroundElement) {
+                    this.close();
                 }
             });
         }
+        return this._backgroundElement;
+    }
 
-        document.body.appendChild(this._backgroundElement);
-        await (<Translator>Translator.getInstance()).updateTranslations();
-
-        return new Promise(function (resolve) {
-            self._resolver = resolve;
-        });
+    async waitForAddedToDom(){
+        return this._addedToDomePromise;
     }
 
     close() {

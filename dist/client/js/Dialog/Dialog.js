@@ -25,6 +25,9 @@ class Dialog {
         this._buttons = [];
         this._result = null;
         this._contentPromise = null;
+        this._addedToDomePromise = new Promise(r => {
+            this._addedToDomePromiseResolver = r;
+        });
         if (Helper_1.Helper.isNotNull(content)) {
             this.setContent(content);
         }
@@ -94,58 +97,67 @@ class Dialog {
     }
     show() {
         return __awaiter(this, void 0, void 0, function* () {
-            let titleElement = document.createElement("span");
-            titleElement.classList.add("title");
-            if (this._translatable && this._title !== "") {
-                titleElement.appendChild(Translator_1.Translator.makePersistentTranslation(this._title));
-            }
-            else {
-                titleElement.innerHTML = this._title;
-            }
-            let titleBar = document.createElement("div");
-            titleBar.appendChild(titleElement);
-            let contentContainer = document.createElement("div");
-            contentContainer.classList.add("content-container");
-            let modalDialog = document.createElement("div");
-            modalDialog.className = this._additionalClasses;
-            modalDialog.classList.add("modal");
-            modalDialog.appendChild(titleBar);
-            modalDialog.appendChild(contentContainer);
-            let buttonBar = document.createElement("div");
-            buttonBar.classList.add("modal-button-container");
-            for (let i = 0, n = this._buttons.length; i < n; i++) {
-                buttonBar.appendChild(this._buttons[i]);
-            }
             yield this._contentPromise;
-            if (!(this._content instanceof Node)) {
-                this._content = (this._translatable) ? Translator_1.Translator.makePersistentTranslation(this._content) : document.createTextNode(this._content);
-            }
-            contentContainer.appendChild(this._content);
-            this._backgroundElement = document.createElement("div");
-            this._backgroundElement.classList.add("background");
-            this._backgroundElement.appendChild(modalDialog);
-            this._backgroundElement.querySelector(".modal").appendChild(buttonBar);
-            this._backgroundElement.style.display = "block";
-            let self = this;
-            if (this._cancelable) {
-                let closeButton = document.createElement("span");
-                closeButton.classList.add("close");
-                closeButton.innerHTML = "&times;";
-                titleBar.appendChild(closeButton);
-                closeButton.addEventListener("click", function () {
-                    self.close();
-                });
-                window.addEventListener("click", function (e) {
-                    if (e.target === self._backgroundElement) {
-                        self.close();
-                    }
-                });
-            }
+            this._backgroundElement = this.createModalDialogElement();
             document.body.appendChild(this._backgroundElement);
             yield Translator_1.Translator.getInstance().updateTranslations();
-            return new Promise(function (resolve) {
-                self._resolver = resolve;
+            this._addedToDomePromiseResolver();
+            return new Promise((resolve) => {
+                this._resolver = resolve;
             });
+        });
+    }
+    createModalDialogElement() {
+        let titleElement = document.createElement("span");
+        titleElement.classList.add("title");
+        if (this._translatable && this._title !== "") {
+            titleElement.appendChild(Translator_1.Translator.makePersistentTranslation(this._title));
+        }
+        else {
+            titleElement.innerHTML = this._title;
+        }
+        let titleBar = document.createElement("div");
+        titleBar.appendChild(titleElement);
+        let contentContainer = document.createElement("div");
+        contentContainer.classList.add("content-container");
+        let modalDialog = document.createElement("div");
+        modalDialog.className = this._additionalClasses;
+        modalDialog.classList.add("modal");
+        modalDialog.appendChild(titleBar);
+        modalDialog.appendChild(contentContainer);
+        let buttonBar = document.createElement("div");
+        buttonBar.classList.add("modal-button-container");
+        for (let i = 0, n = this._buttons.length; i < n; i++) {
+            buttonBar.appendChild(this._buttons[i]);
+        }
+        if (!(this._content instanceof Node)) {
+            this._content = (this._translatable) ? Translator_1.Translator.makePersistentTranslation(this._content) : document.createTextNode(this._content);
+        }
+        contentContainer.appendChild(this._content);
+        this._backgroundElement = document.createElement("div");
+        this._backgroundElement.classList.add("background");
+        this._backgroundElement.style.display = "block";
+        this._backgroundElement.appendChild(modalDialog);
+        this._backgroundElement.querySelector(".modal").appendChild(buttonBar);
+        if (this._cancelable) {
+            let closeButton = document.createElement("span");
+            closeButton.classList.add("close");
+            closeButton.innerHTML = "&times;";
+            titleBar.appendChild(closeButton);
+            closeButton.addEventListener("click", () => {
+                this.close();
+            });
+            window.addEventListener("click", (e) => {
+                if (e.target === this._backgroundElement) {
+                    this.close();
+                }
+            });
+        }
+        return this._backgroundElement;
+    }
+    waitForAddedToDom() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this._addedToDomePromise;
         });
     }
     close() {

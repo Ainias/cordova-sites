@@ -220,6 +220,7 @@ export class MenuAction {
 
     setLiClass(cssClass){
         this._liClass = cssClass;
+        this._copies.forEach(c => c.setLiClass(cssClass));
         this.redraw();
     }
 

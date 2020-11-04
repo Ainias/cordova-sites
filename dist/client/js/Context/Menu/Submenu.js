@@ -19,9 +19,10 @@ class Submenu extends Menu_1.Menu {
      * @param showFor
      * @param order
      * @param icon
+     * @param renderers
      */
-    constructor(title, showFor, order, icon) {
-        super([]);
+    constructor(title, showFor, order, icon, renderers) {
+        super(Helper_1.Helper.nonNull(renderers, []));
         this._parentAction = new OpenSubmenuAction_1.OpenSubmenuAction(title, this, showFor, order, icon);
         this._isOpen = false;
     }
@@ -136,8 +137,16 @@ class Submenu extends Menu_1.Menu {
      * @param action
      */
     updateAction(action) {
-        this.getParentMenu().updateAction(action);
-        // super.updateAction(action);
+        const parentMenu = this.getParentMenu();
+        if (parentMenu) {
+            parentMenu.updateAction(action);
+        }
+    }
+    redrawAction(action) {
+        const parentMenu = this.getParentMenu();
+        if (parentMenu) {
+            parentMenu.redrawAction(action);
+        }
     }
     /**
      * Gibt an, ob das Submenu offen ist oder nicht

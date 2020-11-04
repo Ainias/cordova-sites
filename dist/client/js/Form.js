@@ -104,15 +104,6 @@ class Form {
             return false;
         });
     }
-    // load(url, isCached) {
-    //     this.setValues(DataManager.load(url, isCached).then(function (values) {
-    //         if (values["success"]) {
-    //             return values["result"];
-    //         }
-    //         return {};
-    //     }));
-    //     return this;
-    // }
     setValues(valuePromise) {
         return __awaiter(this, void 0, void 0, function* () {
             this.setIsBusy(true);
