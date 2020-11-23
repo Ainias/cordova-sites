@@ -8,6 +8,8 @@ export class Translator {
     static _translations;
     static instance : Translator;
 
+    _dynamicKey = 0;
+
     _translations;
     _fallbackLanguage: string;
     _markUntranslatedTranslations: boolean;
@@ -58,6 +60,11 @@ export class Translator {
 
         this._translationCallbacks = new Map();
         this._lastTranslationCallbackId = 0;
+    }
+
+    createDynamicKey(){
+        this._dynamicKey++;
+        return "translator-dynamic-"+new Date().getTime()+"-"+this._dynamicKey;
     }
 
     /**
@@ -163,7 +170,7 @@ export class Translator {
     /**
      * @returns {Translator|null}
      */
-    static getInstance() : any {
+    static getInstance() : Translator {
         return Translator.instance;
     }
 

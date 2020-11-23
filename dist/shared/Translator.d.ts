@@ -4,6 +4,7 @@
 export declare class Translator {
     static _translations: any;
     static instance: Translator;
+    _dynamicKey: number;
     _translations: any;
     _fallbackLanguage: string;
     _markUntranslatedTranslations: boolean;
@@ -22,6 +23,7 @@ export declare class Translator {
         markTranslations: boolean;
         logMissingTranslations: boolean;
     });
+    createDynamicKey(): string;
     /**
      * Übersetzt sofort einen Key in die aktuelle Sprache
      * @param key
@@ -38,12 +40,12 @@ export declare class Translator {
     getLanguages(): string[];
     getFallbackLanguage(): string;
     static translate(key: any, args?: any, language?: any): any;
-    static addDynamicTranslations(trans: any): any;
+    static addDynamicTranslations(trans: any): void;
     static init(config: any): void;
     /**
      * @returns {Translator|null}
      */
-    static getInstance(): any;
+    static getInstance(): Translator;
     static _isValid(translation: any): boolean;
     static _format(translation: any, args: any): any;
 }

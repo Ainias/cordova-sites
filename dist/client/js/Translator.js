@@ -99,7 +99,7 @@ class Translator extends Translator_1.Translator {
                 let elements = baseElement.getElementsByClassName(this._translationClass);
                 for (let i = 0, max = elements.length; i < max; i++) {
                     let key = (Translator._isValid(elements[i].dataset["translation"]) ? elements[i].dataset["translation"] : (elements[i].innerText || ""));
-                    if (key !== "") {
+                    if (key !== "" && !elements[i].dataset["onlyTranslateAttributes"]) {
                         try {
                             let translation = this.translate(key, (elements[i].dataset["translationArgs"] !== undefined) ? JSON.parse(elements[i].dataset["translationArgs"]) : undefined);
                             if (elements[i].dataset["translationUseText"] === "1") {
@@ -138,7 +138,6 @@ class Translator extends Translator_1.Translator {
      */
     loadUserLanguage() {
         return __awaiter(this, void 0, void 0, function* () {
-            // debugger;
             let userLanguage = yield NativeStoragePromise_1.NativeStoragePromise.getItem(this._nativeStorageKey);
             if (!Translator._isValid(userLanguage) || !(userLanguage in this._translations)) {
                 let userLanguages = [];
@@ -174,10 +173,6 @@ class Translator extends Translator_1.Translator {
     makePersistentTranslation(key, args, tag, useText) {
         useText = Helper_1.Helper.nonNull(useText, tag, args, false);
         tag = tag || "span";
-        // if (key === "church-description-1"){
-        //     debugger;
-        // }
-        // console.log("trans", key, useText);
         if (typeof document !== 'undefined') {
             let htmlElem = document.createElement(tag);
             htmlElem.dataset["translation"] = key;
@@ -200,6 +195,9 @@ class Translator extends Translator_1.Translator {
     }
     getCurrentLanguage() {
         return this._currentLanguage;
+    }
+    static getInstance() {
+        return Translator_1.Translator.getInstance();
     }
     static setLanguage(language) {
         return __awaiter(this, void 0, void 0, function* () {

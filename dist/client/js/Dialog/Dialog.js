@@ -99,6 +99,11 @@ class Dialog {
         return __awaiter(this, void 0, void 0, function* () {
             yield this._contentPromise;
             this._backgroundElement = this.createModalDialogElement();
+            this._backgroundElement.addEventListener("keyup", e => {
+                if (e.key === "Escape" && this._cancelable) {
+                    this.close();
+                }
+            });
             document.body.appendChild(this._backgroundElement);
             yield Translator_1.Translator.getInstance().updateTranslations();
             this._addedToDomePromiseResolver();
@@ -161,11 +166,13 @@ class Dialog {
         });
     }
     close() {
-        if (Helper_1.Helper.isNotNull(this._backgroundElement)) {
-            this._backgroundElement.style.display = "none";
-            this._backgroundElement.remove();
-            this._backgroundElement = null;
-        }
+        this.waitForAddedToDom().then(() => {
+            if (Helper_1.Helper.isNotNull(this._backgroundElement)) {
+                this._backgroundElement.style.display = "none";
+                this._backgroundElement.remove();
+                this._backgroundElement = null;
+            }
+        });
         if (Helper_1.Helper.isNotNull(this._resolver)) {
             this._resolver(this._result);
         }

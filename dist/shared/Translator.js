@@ -17,6 +17,7 @@ class Translator {
         markTranslations: false,
         logMissingTranslations: true
     }) {
+        this._dynamicKey = 0;
         this._translations = {};
         this.addDynamicTranslations(Translator._translations);
         this.addDynamicTranslations(config.translations);
@@ -41,6 +42,10 @@ class Translator {
         }
         this._translationCallbacks = new Map();
         this._lastTranslationCallbackId = 0;
+    }
+    createDynamicKey() {
+        this._dynamicKey++;
+        return "translator-dynamic-" + new Date().getTime() + "-" + this._dynamicKey;
     }
     /**
      * Übersetzt sofort einen Key in die aktuelle Sprache

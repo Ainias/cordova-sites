@@ -80,6 +80,14 @@ class SiteManager {
                 site.onSearchPressed();
             }
         }, false);
+        window.addEventListener("beforeunload", e => {
+            const returnMessage = this.beforeUnload(e);
+            if (returnMessage !== null) {
+                e.preventDefault();
+                e.returnValue = returnMessage;
+                return returnMessage;
+            }
+        });
         this._isInit = true;
     }
     setAppEndedListener(listener) {
@@ -325,6 +333,9 @@ class SiteManager {
             }
             document.title = Translator_1.Translator.translate(titleTemplate, [title]);
         });
+    }
+    beforeUnload(e) {
+        return this.getCurrentSite().onBeforeUnload(e);
     }
 }
 exports.SiteManager = SiteManager;

@@ -82,7 +82,6 @@ export class AbstractSite extends Context {
         });
     }
 
-
     async onViewLoaded() {
         let res = super.onViewLoaded();
         EventManager.trigger(AbstractSite.EVENT.ON_VIEW_LOADED, {
@@ -158,6 +157,10 @@ export class AbstractSite extends Context {
             this._loadingSymbol.remove();
             this._loadingSymbol = null;
         }
+    }
+
+    onBeforeUnload(e): null | string{
+        return null;
     }
 
     /**

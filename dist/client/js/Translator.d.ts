@@ -64,6 +64,7 @@ export declare class Translator extends SharedTranslator {
     makePersistentTranslation(key: any, args?: any, tag?: any, useText?: any): any;
     getTranslationClass(): string;
     getCurrentLanguage(): string;
+    static getInstance(): Translator;
     static setLanguage(language: any): Promise<void>;
     static makePersistentTranslation(key: any, args?: any, tag?: any, useText?: any): any;
     static addTranslationCallback(callback: any, callImmediately?: any): number;

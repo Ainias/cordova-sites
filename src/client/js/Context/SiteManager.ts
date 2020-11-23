@@ -23,8 +23,8 @@ export class SiteManager {
      *
      * @return {SiteManager}
      */
-    static getInstance(){
-        if (!this._instance){
+    static getInstance() {
+        if (!this._instance) {
             this._instance = new SiteManager();
         }
         return this._instance;
@@ -42,7 +42,7 @@ export class SiteManager {
      * @param deepLinks
      */
 
-    init(siteDivId, deepLinks){
+    init(siteDivId, deepLinks) {
         this._siteDiv = null;
         this._siteStack = [];
         this._siteDiv = document.getElementById(siteDivId);
@@ -85,6 +85,15 @@ export class SiteManager {
                 site.onSearchPressed();
             }
         }, false);
+
+        window.addEventListener("beforeunload", e => {
+            const returnMessage = this.beforeUnload(e);
+            if (returnMessage !== null) {
+                e.preventDefault();
+                e.returnValue = returnMessage;
+                return returnMessage;
+            }
+        })
 
         this._isInit = true;
     }
@@ -359,5 +368,9 @@ export class SiteManager {
 
             document.title = Translator.translate(titleTemplate, [title]);
         });
+    }
+
+    private beforeUnload(e: BeforeUnloadEvent) {
+        return this.getCurrentSite().onBeforeUnload(e);
     }
 }

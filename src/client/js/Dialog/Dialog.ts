@@ -110,12 +110,17 @@ export class Dialog {
         await this._contentPromise;
 
         this._backgroundElement = this.createModalDialogElement();
+        this._backgroundElement.addEventListener("keyup", e => {
+            if (e.key === "Escape" && this._cancelable){
+                this.close();
+            }
+        })
         document.body.appendChild(this._backgroundElement);
         await (<Translator>Translator.getInstance()).updateTranslations();
 
         this._addedToDomePromiseResolver();
 
-        return new Promise((resolve) =>  {
+        return new Promise((resolve) => {
             this._resolver = resolve;
         });
     }
@@ -179,16 +184,18 @@ export class Dialog {
         return this._backgroundElement;
     }
 
-    async waitForAddedToDom(){
+    async waitForAddedToDom() {
         return this._addedToDomePromise;
     }
 
     close() {
-        if (Helper.isNotNull(this._backgroundElement)) {
-            this._backgroundElement.style.display = "none";
-            this._backgroundElement.remove();
-            this._backgroundElement = null;
-        }
+        this.waitForAddedToDom().then(() => {
+            if (Helper.isNotNull(this._backgroundElement)) {
+                this._backgroundElement.style.display = "none";
+                this._backgroundElement.remove();
+                this._backgroundElement = null;
+            }
+        })
         if (Helper.isNotNull(this._resolver)) {
             this._resolver(this._result);
         }

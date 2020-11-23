@@ -96,4 +96,5 @@ export declare class SiteManager {
      * @param titleTemplate
      */
     updateTitle(title: any, args?: any, titleTemplate?: any): void;
+    private beforeUnload;
 }

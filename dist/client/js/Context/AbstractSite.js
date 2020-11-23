@@ -163,6 +163,9 @@ class AbstractSite extends Context_1.Context {
             }
         });
     }
+    onBeforeUnload(e) {
+        return null;
+    }
     /**
      * Updatet den Title der Webseite
      * @protected

@@ -39,6 +39,7 @@ export declare class AbstractSite extends Context {
     getParameters(): any;
     showLoadingSymbol(): Promise<void>;
     removeLoadingSymbol(): Promise<void>;
+    onBeforeUnload(e: any): null | string;
     /**
      * Updatet den Title der Webseite
      * @protected

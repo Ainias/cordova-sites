@@ -105,7 +105,7 @@ export class Translator extends SharedTranslator{
             let elements = baseElement.getElementsByClassName(this._translationClass);
             for (let i = 0, max = elements.length; i < max; i++) {
                 let key = (Translator._isValid(elements[i].dataset["translation"]) ? elements[i].dataset["translation"] : (elements[i].innerText || ""));
-                if (key !== "") {
+                if (key !== "" && !elements[i].dataset["onlyTranslateAttributes"]) {
                     try {
                         let translation = this.translate(key, (elements[i].dataset["translationArgs"] !== undefined) ? JSON.parse(elements[i].dataset["translationArgs"]) : undefined);
                         if (elements[i].dataset["translationUseText"] === "1") {
@@ -142,7 +142,6 @@ export class Translator extends SharedTranslator{
      * @returns {Promise<*>}
      */
     async loadUserLanguage() {
-        // debugger;
         let userLanguage = await NativeStoragePromise.getItem(this._nativeStorageKey);
         if (!Translator._isValid(userLanguage) || !(userLanguage in this._translations)) {
             let userLanguages = [];
@@ -183,12 +182,6 @@ export class Translator extends SharedTranslator{
         useText = Helper.nonNull(useText, tag, args, false);
         tag = tag || "span";
 
-        // if (key === "church-description-1"){
-        //     debugger;
-        // }
-        // console.log("trans", key, useText);
-
-
         if (typeof document !== 'undefined') {
             let htmlElem = document.createElement(tag);
             htmlElem.dataset["translation"] = key;
@@ -212,6 +205,10 @@ export class Translator extends SharedTranslator{
 
     getCurrentLanguage() {
         return this._currentLanguage;
+    }
+
+    static getInstance(): Translator{
+        return <Translator>SharedTranslator.getInstance();
     }
 
     static async setLanguage(language) {
