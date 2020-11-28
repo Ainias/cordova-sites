@@ -155,10 +155,9 @@ export class SiteManager {
             site._onConstructPromise = site.onConstruct(Helper.nonNull(params, {}));
             await Promise.all([site._onConstructPromise, site.getViewPromise()]);
 
-
             //If site is ended inside onConstruct, don't do anything
             if (site._state !== Context.STATE_DESTROYED && site._state !== Context.STATE_DESTROYING) {
-                await site.onViewLoaded();
+                await site.callOnViewLoaded();
                 site._viewLoadedPromise.resolve();
                 return this._show(site);
             }
@@ -231,7 +230,7 @@ export class SiteManager {
      */
     async _resumeSite(site?) {
         site = Helper.nonNull(site, this.getCurrentSite());
-        if (Helper.isNotNull(site) && (site._state === Context.STATE_PAUSED || site._state === Context.STATE_CONSTRUCTED)) {
+        if (Helper.isNotNull(site) && (site._state === Context.STATE_PAUSED || site._state === Context.STATE_VIEW_LOADED)) {
             await site.getViewPromise();
 
             Helper.removeAllChildren(this._siteDiv).appendChild(site._view);

@@ -10,7 +10,7 @@ export class Toast{
     private _id: number;
     private _toastElement: null;
     private static LAST_ID: number = 0;
-    private static DEFAULT_DURATION: number = 2500;
+    public static DEFAULT_DURATION: number = 2500;
 
     constructor(message, duration?, shouldTranslateOrTranslationArgs?){
         this._message = message;

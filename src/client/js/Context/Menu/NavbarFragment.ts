@@ -131,11 +131,31 @@ export class NavbarFragment extends AbstractFragment {
                 });
 
                 requestAnimationFrame(() => {
+
                     let heightElement = navbarElem.querySelector(".grid-container");
                     navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
+                    if ("ResizeObserver" in window) {
+                        // @ts-ignore
+                        const resizeObserver = new ResizeObserver(entries => {
+                            entries.forEach(entry => {
+                                console.log("entry", entry);
+                            })
+                        });
+                        resizeObserver.observe(heightElement);
+                    }
                     heightElement.addEventListener("resize", () => {
+                        console.log("resizing...");
                         navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
                     });
+                    setTimeout(() => {
+                        navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
+                    }, 500);
+                    setTimeout(() => {
+                        navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
+                    }, 1000);
+                    setTimeout(() => {
+                        navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
+                    }, 1500);
                 });
 
                 imgElem.src = this._backgroundImage;

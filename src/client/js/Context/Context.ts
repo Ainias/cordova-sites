@@ -6,19 +6,23 @@ import {ViewInflater} from "../ViewInflater";
  */
 export class Context {
 
-    static STATE_CREATED = 0;
-    static STATE_CONSTRUCTED = 1;
-    static STATE_RUNNING = 2;
-    static STATE_PAUSED = 3;
-    static STATE_DESTROYING = 4;
-    static STATE_DESTROYED = 5;
+    static readonly STATE_CREATED = 0;
+    static readonly STATE_CONSTRUCTED = 1;
+    static readonly STATE_VIEW_LOADED = 2;
+    static readonly STATE_RUNNING = 3;
+    static readonly STATE_PAUSED = 4;
+    static readonly STATE_DESTROYING = 5;
+    static readonly STATE_DESTROYED = 6;
 
     protected _pauseParameters;
     protected _view;
     protected _fragments;
     protected _state;
-    protected _viewLoadedPromise;
-    protected _viewPromise;
+    protected _viewLoadedPromise: Promise<any>;
+    protected _viewPromise: Promise<any>;
+    protected constructParameters;
+
+    private onViewLoadedCalled = false;
 
     /**
      * Erstellt einen neuen Context. Erwartet den Link zu einem HTML-File, welches vom ViewInflater geladen werden kann.
@@ -38,11 +42,12 @@ export class Context {
             this._view = siteContent;
             return siteContent;
         }).catch(e => {
+            // @ts-ignore
             this._viewLoadedPromise.reject(e);
         });
     }
 
-    getState(){
+    getState() {
         return this._state;
     }
 
@@ -55,6 +60,7 @@ export class Context {
      */
     async onConstruct(constructParameters) {
         this._state = Context.STATE_CONSTRUCTED;
+        this.constructParameters = constructParameters;
 
         let onConstructPromises = [];
         for (let k in this._fragments) {
@@ -64,6 +70,16 @@ export class Context {
         return Promise.all(onConstructPromises);
     }
 
+    async callOnViewLoaded() {
+        if (!this.onViewLoadedCalled) {
+            this.onViewLoadedCalled = true;
+            const res = await this.onViewLoaded();
+            // @ts-ignore
+            this._viewLoadedPromise.resolve(res);
+        }
+        return this._viewLoadedPromise;
+    }
+
     /**
      * Methode wird aufgerufen, sobald onConstruct-Promise und view-Promise fullfilled sind.
      * View ist hier noch nicht im Dokument hinzugefügt.
@@ -71,11 +87,11 @@ export class Context {
      * Benutze diese Methode, um die View beim starten zu manipulieren.
      */
     async onViewLoaded() {
-        this._state = Context.STATE_CONSTRUCTED;
+        this._state = Context.STATE_VIEW_LOADED;
 
         let onViewLoadedPromises = [];
         for (let k in this._fragments) {
-            onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].onViewLoaded()).then(
+            onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].callOnViewLoaded()).then(
                 () => this._fragments[k]._viewLoadedPromise.resolve()
             ));
         }
@@ -136,7 +152,7 @@ export class Context {
         }
     }
 
-    isShowing(){
+    isShowing() {
         return this._state === Context.STATE_RUNNING;
     }
 
@@ -153,6 +169,19 @@ export class Context {
             res[0].querySelector(viewQuery).appendChild(res[1]);
             return res[0];
         }).catch(e => console.error(e));
+        if (this._state >= Context.STATE_CONSTRUCTED) {
+            fragment.onConstruct(this.constructParameters);
+        }
+        if (this._state >= Context.STATE_VIEW_LOADED) {
+            Promise.all([this._viewLoadedPromise, fragment.getViewPromise()]).then(() => fragment.callOnViewLoaded());
+        }
+        if (this._state >= Context.STATE_RUNNING) {
+            fragment._viewLoadedPromise.then(() => {
+                if (this._state >= Context.STATE_RUNNING) {
+                    fragment.onStart();
+                }
+            });
+        }
     }
 
     /**
@@ -209,15 +238,7 @@ export class Context {
      * Gibt das ViewPromise zurück
      * @returns {*}
      */
-    getViewPromise(){
+    getViewPromise() {
         return this._viewPromise;
     }
 }
-
-// Die States für den Context
-Context.STATE_CREATED = 0;
-Context.STATE_CONSTRUCTED = 1;
-Context.STATE_RUNNING = 2;
-Context.STATE_PAUSED = 3;
-Context.STATE_DESTROYING = 4;
-Context.STATE_DESTROYED = 5;

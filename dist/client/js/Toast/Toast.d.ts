@@ -6,7 +6,7 @@ export declare class Toast {
     private _id;
     private _toastElement;
     private static LAST_ID;
-    private static DEFAULT_DURATION;
+    static DEFAULT_DURATION: number;
     constructor(message: any, duration?: any, shouldTranslateOrTranslationArgs?: any);
     getId(): number;
     getMessage(): any;

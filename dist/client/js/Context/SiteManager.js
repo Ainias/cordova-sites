@@ -141,7 +141,7 @@ class SiteManager {
                 yield Promise.all([site._onConstructPromise, site.getViewPromise()]);
                 //If site is ended inside onConstruct, don't do anything
                 if (site._state !== Context_1.Context.STATE_DESTROYED && site._state !== Context_1.Context.STATE_DESTROYING) {
-                    yield site.onViewLoaded();
+                    yield site.callOnViewLoaded();
                     site._viewLoadedPromise.resolve();
                     return this._show(site);
                 }
@@ -209,7 +209,7 @@ class SiteManager {
     _resumeSite(site) {
         return __awaiter(this, void 0, void 0, function* () {
             site = Helper_1.Helper.nonNull(site, this.getCurrentSite());
-            if (Helper_1.Helper.isNotNull(site) && (site._state === Context_1.Context.STATE_PAUSED || site._state === Context_1.Context.STATE_CONSTRUCTED)) {
+            if (Helper_1.Helper.isNotNull(site) && (site._state === Context_1.Context.STATE_PAUSED || site._state === Context_1.Context.STATE_VIEW_LOADED)) {
                 yield site.getViewPromise();
                 Helper_1.Helper.removeAllChildren(this._siteDiv).appendChild(site._view);
                 yield Translator_1.Translator.getInstance().updateTranslations();

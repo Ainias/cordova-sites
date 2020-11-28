@@ -2,18 +2,21 @@
  * Basis-Klasse für Seiten und Fragmente
  */
 export declare class Context {
-    static STATE_CREATED: number;
-    static STATE_CONSTRUCTED: number;
-    static STATE_RUNNING: number;
-    static STATE_PAUSED: number;
-    static STATE_DESTROYING: number;
-    static STATE_DESTROYED: number;
+    static readonly STATE_CREATED = 0;
+    static readonly STATE_CONSTRUCTED = 1;
+    static readonly STATE_VIEW_LOADED = 2;
+    static readonly STATE_RUNNING = 3;
+    static readonly STATE_PAUSED = 4;
+    static readonly STATE_DESTROYING = 5;
+    static readonly STATE_DESTROYED = 6;
     protected _pauseParameters: any;
     protected _view: any;
     protected _fragments: any;
     protected _state: any;
-    protected _viewLoadedPromise: any;
-    protected _viewPromise: any;
+    protected _viewLoadedPromise: Promise<any>;
+    protected _viewPromise: Promise<any>;
+    protected constructParameters: any;
+    private onViewLoadedCalled;
     /**
      * Erstellt einen neuen Context. Erwartet den Link zu einem HTML-File, welches vom ViewInflater geladen werden kann.
      * Im Constructor sollten fragmente hinzugefügt werden (nachdem super.constructor(<>) aufgerufen wurde)
@@ -30,6 +33,7 @@ export declare class Context {
      * @returns {Promise<any[]>}
      */
     onConstruct(constructParameters: any): Promise<any[]>;
+    callOnViewLoaded(): Promise<any>;
     /**
      * Methode wird aufgerufen, sobald onConstruct-Promise und view-Promise fullfilled sind.
      * View ist hier noch nicht im Dokument hinzugefügt.
@@ -94,5 +98,5 @@ export declare class Context {
      * Gibt das ViewPromise zurück
      * @returns {*}
      */
-    getViewPromise(): any;
+    getViewPromise(): Promise<any>;
 }

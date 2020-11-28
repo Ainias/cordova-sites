@@ -20,7 +20,7 @@ export declare class DelegateSite extends AbstractSite {
     addFragment(viewQuery: any, fragment: any): void;
     findBy(query: any, all: any, asPromise: any): any;
     setPauseParameters(pauseParameters: any): void;
-    getViewPromise(): any;
+    getViewPromise(): Promise<any>;
     getState(): any;
     getTitle(): any;
     isShowing(): boolean;

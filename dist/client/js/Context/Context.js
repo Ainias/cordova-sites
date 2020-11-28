@@ -23,6 +23,7 @@ class Context {
      * @param view
      */
     constructor(view) {
+        this.onViewLoadedCalled = false;
         this._pauseParameters = [];
         this._view = null;
         this._fragments = [];
@@ -32,6 +33,7 @@ class Context {
             this._view = siteContent;
             return siteContent;
         }).catch(e => {
+            // @ts-ignore
             this._viewLoadedPromise.reject(e);
         });
     }
@@ -48,12 +50,24 @@ class Context {
     onConstruct(constructParameters) {
         return __awaiter(this, void 0, void 0, function* () {
             this._state = Context.STATE_CONSTRUCTED;
+            this.constructParameters = constructParameters;
             let onConstructPromises = [];
             for (let k in this._fragments) {
                 onConstructPromises.push(this._fragments[k].onConstruct.apply(this._fragments[k], [constructParameters]));
                 onConstructPromises.push(this._fragments[k]._viewPromise);
             }
             return Promise.all(onConstructPromises);
+        });
+    }
+    callOnViewLoaded() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.onViewLoadedCalled) {
+                this.onViewLoadedCalled = true;
+                const res = yield this.onViewLoaded();
+                // @ts-ignore
+                this._viewLoadedPromise.resolve(res);
+            }
+            return this._viewLoadedPromise;
         });
     }
     /**
@@ -64,10 +78,10 @@ class Context {
      */
     onViewLoaded() {
         return __awaiter(this, void 0, void 0, function* () {
-            this._state = Context.STATE_CONSTRUCTED;
+            this._state = Context.STATE_VIEW_LOADED;
             let onViewLoadedPromises = [];
             for (let k in this._fragments) {
-                onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].onViewLoaded()).then(() => this._fragments[k]._viewLoadedPromise.resolve()));
+                onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].callOnViewLoaded()).then(() => this._fragments[k]._viewLoadedPromise.resolve()));
             }
             return Promise.all(onViewLoadedPromises);
         });
@@ -145,6 +159,19 @@ class Context {
             res[0].querySelector(viewQuery).appendChild(res[1]);
             return res[0];
         }).catch(e => console.error(e));
+        if (this._state >= Context.STATE_CONSTRUCTED) {
+            fragment.onConstruct(this.constructParameters);
+        }
+        if (this._state >= Context.STATE_VIEW_LOADED) {
+            Promise.all([this._viewLoadedPromise, fragment.getViewPromise()]).then(() => fragment.callOnViewLoaded());
+        }
+        if (this._state >= Context.STATE_RUNNING) {
+            fragment._viewLoadedPromise.then(() => {
+                if (this._state >= Context.STATE_RUNNING) {
+                    fragment.onStart();
+                }
+            });
+        }
     }
     /**
      * Findet ein Element anhand eines Selectors
@@ -205,15 +232,9 @@ class Context {
 exports.Context = Context;
 Context.STATE_CREATED = 0;
 Context.STATE_CONSTRUCTED = 1;
-Context.STATE_RUNNING = 2;
-Context.STATE_PAUSED = 3;
-Context.STATE_DESTROYING = 4;
-Context.STATE_DESTROYED = 5;
-// Die States für den Context
-Context.STATE_CREATED = 0;
-Context.STATE_CONSTRUCTED = 1;
-Context.STATE_RUNNING = 2;
-Context.STATE_PAUSED = 3;
-Context.STATE_DESTROYING = 4;
-Context.STATE_DESTROYED = 5;
+Context.STATE_VIEW_LOADED = 2;
+Context.STATE_RUNNING = 3;
+Context.STATE_PAUSED = 4;
+Context.STATE_DESTROYING = 5;
+Context.STATE_DESTROYED = 6;
 //# sourceMappingURL=Context.js.map
