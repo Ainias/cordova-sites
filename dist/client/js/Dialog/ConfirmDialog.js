@@ -13,16 +13,18 @@ exports.ConfirmDialog = void 0;
 const Dialog_1 = require("./Dialog");
 const Helper_1 = require("../Legacy/Helper");
 class ConfirmDialog extends Dialog_1.Dialog {
-    constructor(content, title) {
+    constructor(content, title, confirmButtonText, cancelButtonText) {
         super(content, title);
+        this.confirmButtonText = Helper_1.Helper.nonNull(confirmButtonText, "confirm-button");
+        this.cancelButtonText = Helper_1.Helper.nonNull(cancelButtonText, "cancel-button");
     }
     show() {
         const _super = Object.create(null, {
             show: { get: () => super.show }
         });
         return __awaiter(this, void 0, void 0, function* () {
-            this.addButton("confirm-button", true);
-            this.addButton("cancel-button", false);
+            this.addButton(this.confirmButtonText, true);
+            this.addButton(this.cancelButtonText, false);
             return _super.show.call(this);
         });
     }
