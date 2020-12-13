@@ -82,7 +82,7 @@ export class AlphabeticListFragment extends AbstractFragment {
         let currentLetter = 'A';
         let currentSegment = this.findBy(".alphabet-section.A");
         Object.keys(this._elements).forEach(key => {
-            let newLetter = key.substring(0, 1).toUpperCase();
+            let newLetter = key.trim().substring(0, 1).toUpperCase();
             if (newLetter !== currentLetter) {
                 currentLetter = newLetter;
                 let newSegment = this.findBy(".alphabet-section." + newLetter);
