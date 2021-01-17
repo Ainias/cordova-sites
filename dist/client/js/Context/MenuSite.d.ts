@@ -1,11 +1,12 @@
 import { TemplateSite } from "./TemplateSite";
+import { NavbarFragment } from "./Menu/NavbarFragment";
 /**
  * Seite benutzt das menuTemplate, welches das ContainerTemplate includiert.
  *
  * Außerdem beinhaltet die MenuSite ein NavbarFragment, wo Menüelemente hinzugefügt werden können
  */
 export declare class MenuSite extends TemplateSite {
-    private _navbarFragment;
+    private readonly _navbarFragment;
     /**
      * Constructor für eine MenuSite
      *
@@ -14,6 +15,7 @@ export declare class MenuSite extends TemplateSite {
      * @param menuTemplate
      */
     constructor(siteManager: any, view: any, menuTemplate?: any);
+    getNavbarFragment(): NavbarFragment;
     /**
      * Während des onConstructs werden die Menüelemente hinzugefügt => aufrufen des onCreateMenu
      *

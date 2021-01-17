@@ -7,7 +7,7 @@ export class Form {
 
     private _formElem: any;
     private _method: any;
-    private _elementChangeListener: any;
+    private _elementChangeListener: (element: HTMLElement, form: Form) => void;
     private _validators: any[];
     private _isBusy: boolean;
     private _submitHandler: any;
@@ -60,7 +60,7 @@ export class Form {
                 }
                 this.setCustomValidity("");
                 if (Helper.isNotNull(self._elementChangeListener)) {
-                    self._elementChangeListener();
+                    self._elementChangeListener(element, this);
                 }
                 this.setCustomValidity("");
 
@@ -130,9 +130,7 @@ export class Form {
                 }
 
                 if (this._formElem.elements[k].type && (this._formElem.elements[k].type === "checkbox" || this._formElem.elements[k].type === "radio")) {
-                    if (this._formElem.elements[k].value == values[k]) {
-                        this._formElem.elements[k].checked = true;
-                    }
+                    this._formElem.elements[k].checked = this._formElem.elements[k].value == values[k];
                 } else if (this._formElem.elements[k].type && this._formElem.elements[k].type === "file") {
                     if (this._formElem.elements[k + "-hidden"]) {
                         this._formElem.elements[k + "-hidden"].value = values[k];

@@ -49,7 +49,7 @@ export class NativeStoragePromise {
      * @param defaultValue?
      * @returns {Promise<*>}
      */
-    static async getItem(key, defaultValue?) {
+    static async getItem(key, defaultValue?): Promise<any> {
         return new Promise((res, rej) => {
             if (this._isElectron()) {
                 this.electronStorage.get(this.prefix + key, (e, data) => {

@@ -123,15 +123,11 @@ class NavbarFragment extends AbstractFragment_1.AbstractFragment {
                         // @ts-ignore
                         const resizeObserver = new ResizeObserver(entries => {
                             entries.forEach(entry => {
-                                console.log("entry", entry);
+                                navbarElem.style = "min-height:" + entry.borderBoxSize[0].blockSize + "px";
                             });
                         });
                         resizeObserver.observe(heightElement);
                     }
-                    heightElement.addEventListener("resize", () => {
-                        console.log("resizing...");
-                        navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
-                    });
                     setTimeout(() => {
                         navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
                     }, 500);

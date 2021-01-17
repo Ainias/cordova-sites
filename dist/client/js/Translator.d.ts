@@ -52,7 +52,7 @@ export declare class Translator extends SharedTranslator {
      * Lädt die im NativeStorage gespeicherte Sprache oder - falls diese nicht vorhanden ist - die vom User untersütze Sprache im Browser
      * @returns {Promise<*>}
      */
-    loadUserLanguage(): Promise<unknown>;
+    loadUserLanguage(): Promise<any>;
     /**
      * Erstellt eine neue Übersetzung, welche auch übersetzt wird, wenn die Sprache geändert wird
      * @param key

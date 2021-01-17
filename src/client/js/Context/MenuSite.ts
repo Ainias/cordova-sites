@@ -10,7 +10,7 @@ import {Helper} from "../Legacy/Helper";
  * Außerdem beinhaltet die MenuSite ein NavbarFragment, wo Menüelemente hinzugefügt werden können
  */
 export class MenuSite extends TemplateSite {
-    private _navbarFragment: NavbarFragment;
+    private readonly _navbarFragment: NavbarFragment;
 
     /**
      * Constructor für eine MenuSite
@@ -23,6 +23,10 @@ export class MenuSite extends TemplateSite {
         super(siteManager, view, Helper.nonNull(menuTemplate, defaultMenuTemplate), "#site-content");
         this._navbarFragment = new NavbarFragment(this);
         this.addFragment("#navbar-fragment", this._navbarFragment);
+    }
+
+    getNavbarFragment(){
+        return this._navbarFragment;
     }
 
     /**

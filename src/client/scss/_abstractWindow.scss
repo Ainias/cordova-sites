@@ -66,6 +66,15 @@
     //border-bottom: 1px solid #b6b6b6;
   }
 
+  #title-buttons {
+    .title-button {
+      max-height: 1rem;
+      cursor: pointer;
+      outline: none;
+      display: inline-block;
+    }
+  }
+
   &.moving {
     cursor: grabbing;
   }
@@ -74,6 +83,7 @@
     padding: 0.2rem;
     width: 0 !important;
     height: 0 !important;
+    min-width: fit-content;
     .window {
       display: none;
     }
@@ -84,6 +94,49 @@
       border: 0;
       margin: 0;
       height: 100%;
+    }
+    #title-buttons .title-button.hide-minimized{
+      display: none;
+    }
+  }
+
+  &.maximized {
+    $maximizedPadding: 0.2rem;
+
+    padding: $maximizedPadding;
+    border: 0;
+    margin:0;
+
+    width: calc(100vw - #{2*$maximizedPadding}) !important;
+    height: calc(100vh - #{2*$maximizedPadding}) !important;
+    left: 0 !important;
+    top: 0 !important;
+
+    .window-resize{
+      display: none;
+    }
+    #title-buttons .title-button.hide-maximized{
+      display: none;
+    }
+  }
+
+  &.popup {
+    $maximizedPadding: 0.2rem;
+
+    padding: $maximizedPadding;
+    border: 0;
+    margin:0;
+
+    width: calc(100vw - #{2*$maximizedPadding}) !important;
+    height: calc(100vh - #{2*$maximizedPadding}) !important;
+    left: 0 !important;
+    top: 0 !important;
+
+    .window-resize{
+      display: none;
+    }
+    #title-buttons .title-button.hide-popup{
+      display: none;
     }
   }
 

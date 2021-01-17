@@ -1,13 +1,17 @@
 import { AbstractFragment } from "../AbstractFragment";
 export declare class AbstractWindowFragment extends AbstractFragment {
-    _position: any;
-    _container: any;
-    _title: string;
-    _titleElement: any;
-    _window: any;
-    _margin: any;
-    _resizeElements: any;
-    constructor(site: any, view: any, position: any, title?: string);
+    private _position;
+    protected _container: any;
+    private _title;
+    private _titleElement;
+    private _window;
+    private _margin;
+    private _resizeElements;
+    private id;
+    private saveData;
+    private state;
+    private popupWindow;
+    constructor(site: any, view: any, position: any, title?: string, id?: string);
     setTitle(title: any): void;
     getDimension(): {
         x: number;
@@ -15,9 +19,16 @@ export declare class AbstractWindowFragment extends AbstractFragment {
     };
     setDimension(x: any, y: any): void;
     onViewLoaded(): Promise<unknown[]>;
+    private addListeners;
+    private load;
+    private save;
+    toggleMinimize(): void;
+    toggleMaximize(): void;
     resizeToContent(): void;
     _checkPositionAndDimension(): void;
     onStart(pauseArguments: any): Promise<void>;
     moveAt(x: any, y: any): void;
     moveTo(x: any, y: any): void;
+    onButtonClick(id: string, button: HTMLElement, e: MouseEvent): void;
+    openInNewWindow(): void;
 }

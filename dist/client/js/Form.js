@@ -57,7 +57,7 @@ class Form {
                 }
                 this.setCustomValidity("");
                 if (Helper_1.Helper.isNotNull(self._elementChangeListener)) {
-                    self._elementChangeListener();
+                    self._elementChangeListener(element, this);
                 }
                 this.setCustomValidity("");
                 if (element.accept && element.accept.indexOf("image") !== -1) {
@@ -121,9 +121,7 @@ class Form {
                         }
                     }
                     if (this._formElem.elements[k].type && (this._formElem.elements[k].type === "checkbox" || this._formElem.elements[k].type === "radio")) {
-                        if (this._formElem.elements[k].value == values[k]) {
-                            this._formElem.elements[k].checked = true;
-                        }
+                        this._formElem.elements[k].checked = this._formElem.elements[k].value == values[k];
                     }
                     else if (this._formElem.elements[k].type && this._formElem.elements[k].type === "file") {
                         if (this._formElem.elements[k + "-hidden"]) {

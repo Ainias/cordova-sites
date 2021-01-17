@@ -1,112 +1,184 @@
 import {AbstractFragment} from "../AbstractFragment";
 
-const defaultTabView = require( "../../../html/Framework/Fragment/tabFragment.html");
+const defaultTabView = require("../../../html/Framework/Fragment/tabFragment.html");
 import {Helper} from "../../Legacy/Helper";
 import {ViewInflater} from "../../ViewInflater";
 import {Translator} from "../../Translator";
+import {ViewHelper} from "js-helper/dist/client";
 
 export class TabFragment extends AbstractFragment {
 
-    _tabViews;
-    _tabViewPromise;
+    private tabs: Map<number, {
+        name: string,
+        nameIsTranslatable: boolean,
+        fragment: AbstractFragment,
+        button: HTMLElement,
+        view: HTMLElement,
+        id: number,
+    }>;
+    private lastTabId = 0;
+    private tabViewPromise;
+    private activeTab: number = null;
 
-    _nameContainer;
-    _nameButton;
-    _tabContent;
-    _tabSite;
+    private nameContainer;
+    private nameButton;
+    private tabContent;
+    private tabSite;
 
-    constructor(site, view) {
+    private onTabChangeListener: (newTab) => void = null;
+
+    constructor(site, view?) {
         super(site, Helper.nonNull(view, defaultTabView));
-        this._tabViews = [];
-        this._tabViewPromise = this._viewLoadedPromise;
-        if (Helper.isNotNull(view)) {
-            this._viewPromise.then(view => {
-                let views = view.querySelectorAll(".tab-site");
-                let buttons = view.querySelectorAll(".tab-button");
-
-                views.forEach((site, i) => {
-                    if (!site.classList.contains("tab-site-template")) {
-                        // site.remove();
-                        // buttons[i].remove();
-                        this.addTab(buttons[i], site);
-                    }
-                });
-            });
-        }
+        this.tabs = new Map<number, { id: number, name: string; nameIsTranslatable: boolean; fragment: AbstractFragment; button: HTMLElement; view: HTMLElement }>();
+        this.tabViewPromise = this._viewLoadedPromise;
+        // if (Helper.isNotNull(view)) {
+        //     this._viewPromise.then(view => {
+        //         let views = view.querySelectorAll(".tab-site");
+        //         let buttons = view.querySelectorAll(".tab-button");
+        //
+        //         // views.forEach((site, i) => {
+        //         //     if (!site.classList.contains("tab-site-template")) {
+        //         //         // site.remove();
+        //         //         // buttons[i].remove();
+        //         //         // this.addTab(buttons[i], site);
+        //         //     }
+        //         // });
+        //     });
+        // }
     }
 
     async onViewLoaded() {
         let res = super.onViewLoaded();
 
-        this._nameContainer = this.findBy(".tab-names");
-        this._nameButton = this.findBy(".tab-button-template");
-        this._nameButton.classList.remove("tab-button-template");
-        this._nameButton.remove();
+        this.nameContainer = this.findBy(".tab-names");
+        this.nameButton = this.findBy(".tab-button-template");
+        this.nameButton.classList.remove("tab-button-template");
+        this.nameButton.remove();
 
-        this._tabContent = this.findBy(".tab-content");
-        this._tabSite = this.findBy(".tab-site-template");
-        this._tabSite.classList.remove("tab-site-template");
-        this._tabSite.remove();
+        this.tabContent = this.findBy(".tab-content");
+        this.tabSite = this.findBy(".tab-site-template");
+        this.tabSite.classList.remove("tab-site-template");
+        this.tabSite.remove();
 
         return res;
     }
 
-    async addTab(name, origView, nameIsTranslatable?) {
-        nameIsTranslatable = Helper.nonNull(nameIsTranslatable, true);
-        let tabView = {
-            name: name,
-            nameIsTranslatable: nameIsTranslatable,
-            viewPromise: ViewInflater.getInstance().load(origView),
-            view: null,
-            button: null,
-        };
-        this._tabViews.push(tabView);
-        let isFirst = this._tabViews.length === 1;
 
-        this._tabViewPromise = this._tabViewPromise.then(() => tabView.viewPromise).then((view) => {
-            let tabViewElement = null;
-            if (view.classList.contains("tab-site")) {
-                tabViewElement = origView;
-                origView.remove();
-            } else {
-                tabViewElement = this._tabSite.cloneNode(true);
-                tabViewElement.appendChild(view);
-            }
-            tabView.view = tabViewElement;
-            this._tabContent.appendChild(tabViewElement);
+    addFragment(name, fragment, nameIsTranslatable?: boolean) {
+        super.addFragment(".tab-content", fragment);
+        fragment._viewLoadedPromise.then(() => {
+            const view = this.tabSite.cloneNode(true);
+            view.appendChild(fragment._view);
 
-            let nameElement = null;
-            if (name instanceof Element) {
-                nameElement = name;
-                nameElement.remove();
-            } else {
-                let nameElement = this._nameButton.cloneNode(true);
-                nameElement.appendChild((tabView.nameIsTranslatable) ? (<Translator>Translator.getInstance()).makePersistentTranslation(name) : document.createTextNode(tabView.name));
-            }
-            this._nameContainer.appendChild(nameElement);
+            this.lastTabId++;
+            const tab = {
+                name: name,
+                fragment: fragment,
+                view: view,
+                nameIsTranslatable: Helper.nonNull(nameIsTranslatable, true),
+                button: null,
+                id: this.lastTabId,
+            };
 
-            tabView.button = nameElement;
+            this.tabs.set(this.lastTabId, tab);
 
-            nameElement.addEventListener("click", () => {
-                this.setActiveTab(tabView);
-            });
-            if (isFirst) {
-                this.setActiveTab(tabView);
-            }
+            this._viewLoadedPromise.then(() => {
+                const nameElement = this.nameButton.cloneNode(true);
+                nameElement.appendChild(nameIsTranslatable ? Translator.makePersistentTranslation(name) : document.createTextNode(name));
+                this.nameContainer.appendChild(nameElement);
+
+                nameElement.addEventListener("click", () => {
+                    this.showTab(tab.id);
+                });
+                tab.button = nameElement;
+
+                if (Helper.isNull(this.activeTab)) {
+                    this.showTab(tab.id);
+                }
+            })
         });
-        await this._tabViewPromise;
     }
 
-    setActiveTab(tabView) {
-        let previousActive = this.findBy(".tab-site.active");
-        if (Helper.isNotNull(previousActive)) {
-            previousActive.classList.remove("active");
+    showTab(tabId: number) {
+        const tab = this.tabs.get(tabId);
+        if (tab && tabId !== this.activeTab) {
+            let previousActiveButton = this.findBy(".tab-button.active");
+            if (Helper.isNotNull(previousActiveButton)) {
+                previousActiveButton.classList.remove("active");
+            }
+
+            tab.button.classList.add("active");
+
+
+            ViewHelper.removeAllChildren(this.tabContent);
+            this.tabContent.appendChild(tab.view);
+            this.activeTab = tabId;
+
+            if (this.onTabChangeListener) {
+                this.onTabChangeListener(tab);
+            }
         }
-        let previousActiveButton = this.findBy(".tab-button.active");
-        if (Helper.isNotNull(previousActiveButton)) {
-            previousActiveButton.classList.remove("active");
-        }
-        tabView.view.classList.add("active");
-        tabView.button.classList.add("active");
     }
+
+    setOnTabChangeListener(listener: (newTab) => void) {
+        this.onTabChangeListener = listener;
+    }
+
+    // async addTab(name, origView, nameIsTranslatable?) {
+    //     nameIsTranslatable = Helper.nonNull(nameIsTranslatable, true);
+    //     let tabView = {
+    //         name: name,
+    //         nameIsTranslatable: nameIsTranslatable,
+    //         viewPromise: ViewInflater.getInstance().load(origView),
+    //         view: null,
+    //         button: null,
+    //     };
+    //     this.tabs.push(tabView);
+    //     let isFirst = this._tabViews.length === 1;
+    //
+    //     this._tabViewPromise = this._tabViewPromise.then(() => tabView.viewPromise).then((view) => {
+    //         let tabViewElement = null;
+    //         if (view.classList.contains("tab-site")) {
+    //             tabViewElement = origView;
+    //             origView.remove();
+    //         } else {
+    //
+    //         }
+    //         tabView.view = tabViewElement;
+    //         this._tabContent.appendChild(tabViewElement);
+    //
+    //         let nameElement = null;
+    //         if (name instanceof Element) {
+    //             nameElement = name;
+    //             nameElement.remove();
+    //         } else {
+    //             nameElement = this.nameButton.cloneNode(true);
+    //             nameElement.appendChild((tabView.nameIsTranslatable) ? (<Translator>Translator.getInstance()).makePersistentTranslation(name) : document.createTextNode(tabView.name));
+    //         }
+    //         this._nameContainer.appendChild(nameElement);
+    //
+    //         tabView.button = nameElement;
+    //
+    //         nameElement.addEventListener("click", () => {
+    //             this.setActiveTab(tabView);
+    //         });
+    //         if (isFirst) {
+    //             this.setActiveTab(tabView);
+    //         }
+    //     });
+    //     await this._tabViewPromise;
+    // }
+
+    // setActiveTab(tabView) {
+    //     let previousActive = this.findBy(".tab-site.active");
+    //     if (Helper.isNotNull(previousActive)) {
+    //         previousActive.classList.remove("active");
+    //     }
+    //     let previousActiveButton = this.findBy(".tab-button.active");
+    //     if (Helper.isNotNull(previousActiveButton)) {
+    //         previousActiveButton.classList.remove("active");
+    //     }
+    //     tabView.view.classList.add("active");
+    //     tabView.button.classList.add("active");
+    // }
 }

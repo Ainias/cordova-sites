@@ -74,7 +74,7 @@ export class Menu {
      * @param action
      * @param redraw
      */
-    addAction(action, redraw) {
+    addAction(action, redraw?) {
         //Überprüfung, ob es die richtige Klasse ist und ob die Action nicht schon hinzugefügt wurde
         if (action instanceof MenuAction && this._actions.indexOf(action) === -1) {
 

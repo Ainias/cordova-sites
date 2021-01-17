@@ -131,23 +131,17 @@ export class NavbarFragment extends AbstractFragment {
                 });
 
                 requestAnimationFrame(() => {
-
                     let heightElement = navbarElem.querySelector(".grid-container");
                     navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
                     if ("ResizeObserver" in window) {
                         // @ts-ignore
                         const resizeObserver = new ResizeObserver(entries => {
                             entries.forEach(entry => {
-
                                 navbarElem.style = "min-height:" + entry.borderBoxSize[0].blockSize + "px";
                             })
                         });
                         resizeObserver.observe(heightElement);
                     }
-                    // heightElement.addEventListener("resize", () => {
-                    //     console.log("resizing...");
-                    //     navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
-                    // });
                     setTimeout(() => {
                         navbarElem.style = "min-height:" + heightElement.getBoundingClientRect().height + "px";
                     }, 500);

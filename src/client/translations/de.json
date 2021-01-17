@@ -38,5 +38,7 @@
   "Sep": "Sep",
   "Oct": "Okt",
   "Nov": "Nov",
-  "Dec": "Dez"
+  "Dec": "Dez",
+
+  "cannot open popups": "Bitte erlaube Popups, um die Funktion nutzen zu können."
 }

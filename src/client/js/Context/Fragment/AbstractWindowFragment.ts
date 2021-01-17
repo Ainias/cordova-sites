@@ -3,22 +3,31 @@ import {ViewInflater} from "../../ViewInflater";
 import {Helper} from "js-helper/dist/shared/Helper";
 import {ViewHelper} from "js-helper/dist/client/ViewHelper";
 import {Translator} from "../../Translator";
+import {NativeStoragePromise} from "../../NativeStoragePromise";
+import {Toast} from "../../Toast/Toast";
 
 const template = require("../../../html/Framework/Fragment/abstractWindowTemplate.html");
 
 export class AbstractWindowFragment extends AbstractFragment {
-    _position: any = {x: 0, y: 0}
-    _container;
-    _title: string = "";
-    _titleElement: any;
-    _window;
-    _margin: any = {x: 0, y: 0}
-    _resizeElements: any;
+    private _position: any = {x: 0, y: 0}
+    protected _container;
+    private _title: string = "";
+    private _titleElement: any;
+    private _window;
+    private _margin: any = {x: 0, y: 0}
+    private _resizeElements: any;
+    private id: string;
+    private saveData: { [key: string]: any } = {};
+    private state: "minimized" | "maximized" | "popup" | "normal" = "normal";
+    private popupWindow: Window = null;
 
-    constructor(site, view, position: any, title?: string) {
+    constructor(site, view, position: any, title?: string, id?: string) {
         super(site, template);
         this._position = position;
         this._title = Helper.nonNull(title, "&nbsp;");
+        if (id) {
+            this.id = "window-" + id;
+        }
 
         this._viewPromise = Promise.all([this._viewPromise, ViewInflater.getInstance().load(view)]).then(res => {
             res[0].querySelector("#child-view").replaceWith(res[1]);
@@ -50,6 +59,12 @@ export class AbstractWindowFragment extends AbstractFragment {
 
         this._container.style.width = x + "px";
         this._container.style.height = y + "px";
+
+        this.saveData.dimension = {
+            x: x,
+            y: y,
+        };
+        this.save();
     }
 
     async onViewLoaded(): Promise<unknown[]> {
@@ -57,12 +72,50 @@ export class AbstractWindowFragment extends AbstractFragment {
 
         this._container = this.findBy(".window-container");
         this._window = this.findBy(".window");
+        this._titleElement = this.findBy("#title");
 
+        this._resizeElements = {
+            x: [
+                this._window,
+                this.findBy(".window-resize.left"),
+                this.findBy(".window-resize.right")
+            ],
+            y: [
+                this._window,
+                this._titleElement,
+                this.findBy(".window-resize.top"),
+                this.findBy(".window-resize.bottom")
+            ],
+        }
+        await this.load();
+
+        this.moveTo(this._position.x, this._position.y);
+        this.setTitle(this._title);
+
+        this.addListeners();
+
+        const buttonContainer = this.findBy("#title-buttons");
+        if (buttonContainer) {
+            buttonContainer.remove();
+            this._titleElement.parentNode.appendChild(buttonContainer);
+
+            buttonContainer.querySelectorAll(".title-button").forEach(button => {
+                button.addEventListener("click", e => {
+                    this.onButtonClick(button.id, button, e);
+                })
+            })
+        }
+
+
+        return res;
+    }
+
+    private async addListeners() {
         let resizeStart = null;
         let multiplier;
         let dimension;
 
-        let resizeStartListener =(x, y, e) => {
+        let resizeStartListener = (x, y, e) => {
             if (e.target.classList.contains("window-resize")) {
                 e.stopPropagation();
                 resizeStart = {x: x, y: y}
@@ -97,14 +150,12 @@ export class AbstractWindowFragment extends AbstractFragment {
             moveStartListener(e.clientX, e.clientY, e);
         });
         this._container.addEventListener("touchstart", (e) => {
-            if (e.touches.length === 1){
+            if (e.touches.length === 1) {
                 moveStartListener(e.touches[0].clientX, e.touches[0].clientY, e);
             }
         });
 
-        this._titleElement = this.findBy("#title");
-
-        let moveListener = (x,y,e) => {
+        let moveListener = (x, y, e) => {
             if (resizeStart !== null) {
                 let diff = {
                     x: (x - resizeStart.x) * (multiplier.x),
@@ -125,8 +176,7 @@ export class AbstractWindowFragment extends AbstractFragment {
                 this.moveAt(moveDiff.x, moveDiff.y);
 
                 resizeStart = {x: x, y: y};
-            }
-            else if (mouseDownPos !== null) {
+            } else if (mouseDownPos !== null) {
                 let diff = {
                     x: x - mouseDownPos.x,
                     y: y - mouseDownPos.y,
@@ -139,12 +189,12 @@ export class AbstractWindowFragment extends AbstractFragment {
             moveListener(e.clientX, e.clientY, e)
         });
         window.addEventListener("touchmove", (e) => {
-            if (e.touches.length === 1){
+            if (e.touches.length === 1) {
                 moveListener(e.touches[0].clientX, e.touches[0].clientY, e);
             }
         });
 
-        let endListener = (x,y,e) => {
+        let endListener = (x, y, e) => {
             mouseDownPos = null;
             resizeStart = null;
             this._container.classList.remove("moving")
@@ -153,13 +203,13 @@ export class AbstractWindowFragment extends AbstractFragment {
             endListener(e.clientX, e.clientY, e);
         });
         window.addEventListener("touchend", (e) => {
-            if (e.touches.length === 0 && e.changedTouches.length === 1){
+            if (e.touches.length === 0 && e.changedTouches.length === 1) {
                 moveListener(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e);
             }
         });
         this._container.addEventListener("dblclick", (e) => {
             if (e.target === this._container || e.target.closest("#title") === this._titleElement) {
-                this._container.classList.toggle("minimized");
+                this.toggleMinimize();
             }
         });
 
@@ -167,23 +217,82 @@ export class AbstractWindowFragment extends AbstractFragment {
             this._checkPositionAndDimension();
         });
 
-        this._resizeElements = {
-            x: [
-                this._window,
-                this.findBy(".window-resize.left"),
-                this.findBy(".window-resize.right")
-            ],
-            y: [
-                this._window,
-                this._titleElement,
-                this.findBy(".window-resize.top"),
-                this.findBy(".window-resize.bottom")
-            ],
-        }
+        window.addEventListener("beforeunload", () => {
+            console.log("beforeunload!");
+            if (this.popupWindow) {
+                this.id = null; //disable saving, since it should
+                this.popupWindow.close();
+            }
+        })
+    }
 
-        this.moveTo(this._position.x, this._position.y);
-        this.setTitle(this._title);
-        return res;
+    private async load() {
+        if (this.id) {
+            const saveData = await NativeStoragePromise.getItem(this.id);
+            if (saveData) {
+                if (saveData.dimension) {
+                    this.setDimension(saveData.dimension.x, saveData.dimension.y);
+                }
+                if (saveData.position) {
+                    this.moveTo(saveData.position.x, saveData.position.y);
+                }
+                if (saveData.state) {
+                    switch (saveData.state) {
+                        case "minimized": {
+                            this.toggleMinimize();
+                            break;
+                        }
+                        case "maximized": {
+                            this.toggleMaximize();
+                            break;
+                        }
+                        case "popup": {
+                            this._viewLoadedPromise.then(() => {
+                                this.openInNewWindow();
+                            })
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private async save() {
+        if (this.id) {
+            await NativeStoragePromise.setItem(this.id, this.saveData);
+        }
+    }
+
+    public toggleMinimize() {
+        if (this.state !== "popup") {
+            this._container.classList.toggle("minimized");
+            this._container.classList.remove("maximized");
+
+            if (!this._container.classList.contains("minimized")) {
+                this.resizeToContent();
+                this.state = "normal";
+            } else {
+                this.state = "minimized";
+            }
+            this.saveData.state = this.state;
+            this.save();
+        }
+    }
+
+    public toggleMaximize() {
+        if (this.state !== "popup") {
+            this._container.classList.toggle("maximized");
+            this._container.classList.remove("minimized");
+
+            if (!this._container.classList.contains("maximized")) {
+                this.resizeToContent();
+            } else {
+                this.state = "maximized";
+            }
+            this.saveData.state = this.state;
+            this.save();
+        }
     }
 
     public resizeToContent() {
@@ -209,7 +318,7 @@ export class AbstractWindowFragment extends AbstractFragment {
             dimension.x += diff.x;
             dimension.y += diff.y;
 
-            if (!this._container.classList.contains("minimized")) {
+            if (this.state === "normal") {
                 this.setDimension(dimension.x, dimension.y);
             }
 
@@ -267,5 +376,81 @@ export class AbstractWindowFragment extends AbstractFragment {
         this._container.style.top = y + "px";
 
         this._checkPositionAndDimension();
+
+        this.saveData.position = this._position;
+        this.save();
+    }
+
+    public onButtonClick(id: string, button: HTMLElement, e: MouseEvent) {
+        switch (id) {
+            case "minimize-button": {
+                this.toggleMinimize()
+                break;
+            }
+            case "maximize-button": {
+                this.toggleMaximize()
+                break;
+            }
+            case "new-window-button": {
+                this.openInNewWindow();
+                break;
+            }
+        }
+    }
+
+    openInNewWindow() {
+        if (this.state === "popup") {
+            return;
+        }
+        const windowProxy = window.open("", "", "modal=yes");
+        if (windowProxy === null) {
+            new Toast("cannot open popups").show();
+            return;
+        }
+
+        this.state = "popup";
+        this.saveData.state = this.state;
+        this.save();
+
+
+        const baseElement = document.createElement("base");
+        baseElement.href = window.location.href;
+        windowProxy.document.head.appendChild(baseElement);
+
+        const titleElement = document.createElement("title");
+        titleElement.innerText = this._title;
+        windowProxy.document.head.appendChild(titleElement);
+
+        document.querySelectorAll("link[rel='stylesheet']").forEach(styleElem => {
+            windowProxy.document.head.appendChild(styleElem.cloneNode());
+        });
+
+        const parent = this._container.parentNode;
+
+        this._container.remove();
+        this._container.classList.add("popup");
+        this._container.classList.remove("minimized");
+        this._container.classList.remove("maximized");
+
+        const translationCallback = Translator.getInstance().addTranslationCallback(() => {
+            Translator.getInstance().updateTranslations(this._container);
+        }, false);
+
+        windowProxy.document.body.appendChild(this._container);
+        windowProxy.addEventListener("beforeunload", () => {
+            this.state = "normal";
+            this.saveData.state = this.state;
+            this.save();
+
+            this._container.remove();
+            this._container.classList.remove("popup");
+            this._container.classList.remove("minimized");
+            this._container.classList.remove("maximized");
+            parent.appendChild(this._container);
+            this.popupWindow = null;
+
+            Translator.getInstance().removeTranslationCallback(translationCallback);
+        });
+        this.popupWindow = windowProxy;
     }
 }

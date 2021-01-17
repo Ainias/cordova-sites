@@ -19,7 +19,7 @@ export declare class NativeStoragePromise {
      * @param defaultValue?
      * @returns {Promise<*>}
      */
-    static getItem(key: any, defaultValue?: any): Promise<unknown>;
+    static getItem(key: any, defaultValue?: any): Promise<any>;
     /**
      * Bekomme die Keys vom NativeStorage
      *

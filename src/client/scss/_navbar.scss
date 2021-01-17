@@ -575,6 +575,9 @@ nav.top-bar {
 }
 
 .logo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   .logo-img {
     margin-left: 1rem;
     margin-right: 0.5rem;

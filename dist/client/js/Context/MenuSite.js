@@ -33,6 +33,9 @@ class MenuSite extends TemplateSite_1.TemplateSite {
         this._navbarFragment = new NavbarFragment_1.NavbarFragment(this);
         this.addFragment("#navbar-fragment", this._navbarFragment);
     }
+    getNavbarFragment() {
+        return this._navbarFragment;
+    }
     /**
      * Während des onConstructs werden die Menüelemente hinzugefügt => aufrufen des onCreateMenu
      *

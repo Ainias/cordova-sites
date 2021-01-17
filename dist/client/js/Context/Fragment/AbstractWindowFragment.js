@@ -15,15 +15,23 @@ const ViewInflater_1 = require("../../ViewInflater");
 const Helper_1 = require("js-helper/dist/shared/Helper");
 const ViewHelper_1 = require("js-helper/dist/client/ViewHelper");
 const Translator_1 = require("../../Translator");
+const NativeStoragePromise_1 = require("../../NativeStoragePromise");
+const Toast_1 = require("../../Toast/Toast");
 const template = require("../../../html/Framework/Fragment/abstractWindowTemplate.html");
 class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
-    constructor(site, view, position, title) {
+    constructor(site, view, position, title, id) {
         super(site, template);
         this._position = { x: 0, y: 0 };
         this._title = "";
         this._margin = { x: 0, y: 0 };
+        this.saveData = {};
+        this.state = "normal";
+        this.popupWindow = null;
         this._position = position;
         this._title = Helper_1.Helper.nonNull(title, "&nbsp;");
+        if (id) {
+            this.id = "window-" + id;
+        }
         this._viewPromise = Promise.all([this._viewPromise, ViewInflater_1.ViewInflater.getInstance().load(view)]).then(res => {
             res[0].querySelector("#child-view").replaceWith(res[1]);
             ViewInflater_1.ViewInflater.replaceWithChildren(res[1]);
@@ -49,6 +57,11 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         y += this._margin.y;
         this._container.style.width = x + "px";
         this._container.style.height = y + "px";
+        this.saveData.dimension = {
+            x: x,
+            y: y,
+        };
+        this.save();
     }
     onViewLoaded() {
         const _super = Object.create(null, {
@@ -58,6 +71,39 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             let res = _super.onViewLoaded.call(this);
             this._container = this.findBy(".window-container");
             this._window = this.findBy(".window");
+            this._titleElement = this.findBy("#title");
+            this._resizeElements = {
+                x: [
+                    this._window,
+                    this.findBy(".window-resize.left"),
+                    this.findBy(".window-resize.right")
+                ],
+                y: [
+                    this._window,
+                    this._titleElement,
+                    this.findBy(".window-resize.top"),
+                    this.findBy(".window-resize.bottom")
+                ],
+            };
+            yield this.load();
+            this.moveTo(this._position.x, this._position.y);
+            this.setTitle(this._title);
+            this.addListeners();
+            const buttonContainer = this.findBy("#title-buttons");
+            if (buttonContainer) {
+                buttonContainer.remove();
+                this._titleElement.parentNode.appendChild(buttonContainer);
+                buttonContainer.querySelectorAll(".title-button").forEach(button => {
+                    button.addEventListener("click", e => {
+                        this.onButtonClick(button.id, button, e);
+                    });
+                });
+            }
+            return res;
+        });
+    }
+    addListeners() {
+        return __awaiter(this, void 0, void 0, function* () {
             let resizeStart = null;
             let multiplier;
             let dimension;
@@ -95,7 +141,6 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                     moveStartListener(e.touches[0].clientX, e.touches[0].clientY, e);
                 }
             });
-            this._titleElement = this.findBy("#title");
             let moveListener = (x, y, e) => {
                 if (resizeStart !== null) {
                     let diff = {
@@ -146,29 +191,89 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             });
             this._container.addEventListener("dblclick", (e) => {
                 if (e.target === this._container || e.target.closest("#title") === this._titleElement) {
-                    this._container.classList.toggle("minimized");
+                    this.toggleMinimize();
                 }
             });
             window.addEventListener("resize", () => {
                 this._checkPositionAndDimension();
             });
-            this._resizeElements = {
-                x: [
-                    this._window,
-                    this.findBy(".window-resize.left"),
-                    this.findBy(".window-resize.right")
-                ],
-                y: [
-                    this._window,
-                    this._titleElement,
-                    this.findBy(".window-resize.top"),
-                    this.findBy(".window-resize.bottom")
-                ],
-            };
-            this.moveTo(this._position.x, this._position.y);
-            this.setTitle(this._title);
-            return res;
+            window.addEventListener("beforeunload", () => {
+                console.log("beforeunload!");
+                if (this.popupWindow) {
+                    this.id = null; //disable saving, since it should
+                    this.popupWindow.close();
+                }
+            });
         });
+    }
+    load() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.id) {
+                const saveData = yield NativeStoragePromise_1.NativeStoragePromise.getItem(this.id);
+                if (saveData) {
+                    if (saveData.dimension) {
+                        this.setDimension(saveData.dimension.x, saveData.dimension.y);
+                    }
+                    if (saveData.position) {
+                        this.moveTo(saveData.position.x, saveData.position.y);
+                    }
+                    if (saveData.state) {
+                        switch (saveData.state) {
+                            case "minimized": {
+                                this.toggleMinimize();
+                                break;
+                            }
+                            case "maximized": {
+                                this.toggleMaximize();
+                                break;
+                            }
+                            case "popup": {
+                                this._viewLoadedPromise.then(() => {
+                                    this.openInNewWindow();
+                                });
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    save() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.id) {
+                yield NativeStoragePromise_1.NativeStoragePromise.setItem(this.id, this.saveData);
+            }
+        });
+    }
+    toggleMinimize() {
+        if (this.state !== "popup") {
+            this._container.classList.toggle("minimized");
+            this._container.classList.remove("maximized");
+            if (!this._container.classList.contains("minimized")) {
+                this.resizeToContent();
+                this.state = "normal";
+            }
+            else {
+                this.state = "minimized";
+            }
+            this.saveData.state = this.state;
+            this.save();
+        }
+    }
+    toggleMaximize() {
+        if (this.state !== "popup") {
+            this._container.classList.toggle("maximized");
+            this._container.classList.remove("minimized");
+            if (!this._container.classList.contains("maximized")) {
+                this.resizeToContent();
+            }
+            else {
+                this.state = "maximized";
+            }
+            this.saveData.state = this.state;
+            this.save();
+        }
     }
     resizeToContent() {
         if (this._window) {
@@ -189,7 +294,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             }
             dimension.x += diff.x;
             dimension.y += diff.y;
-            if (!this._container.classList.contains("minimized")) {
+            if (this.state === "normal") {
                 this.setDimension(dimension.x, dimension.y);
             }
             this._checkPositionAndDimension();
@@ -237,6 +342,68 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         this._container.style.left = x + "px";
         this._container.style.top = y + "px";
         this._checkPositionAndDimension();
+        this.saveData.position = this._position;
+        this.save();
+    }
+    onButtonClick(id, button, e) {
+        switch (id) {
+            case "minimize-button": {
+                this.toggleMinimize();
+                break;
+            }
+            case "maximize-button": {
+                this.toggleMaximize();
+                break;
+            }
+            case "new-window-button": {
+                this.openInNewWindow();
+                break;
+            }
+        }
+    }
+    openInNewWindow() {
+        if (this.state === "popup") {
+            return;
+        }
+        const windowProxy = window.open("", "", "modal=yes");
+        if (windowProxy === null) {
+            new Toast_1.Toast("cannot open popups").show();
+            return;
+        }
+        this.state = "popup";
+        this.saveData.state = this.state;
+        this.save();
+        const baseElement = document.createElement("base");
+        baseElement.href = window.location.href;
+        windowProxy.document.head.appendChild(baseElement);
+        const titleElement = document.createElement("title");
+        titleElement.innerText = this._title;
+        windowProxy.document.head.appendChild(titleElement);
+        document.querySelectorAll("link[rel='stylesheet']").forEach(styleElem => {
+            windowProxy.document.head.appendChild(styleElem.cloneNode());
+        });
+        const parent = this._container.parentNode;
+        this._container.remove();
+        this._container.classList.add("popup");
+        this._container.classList.remove("minimized");
+        this._container.classList.remove("maximized");
+        const translationCallback = Translator_1.Translator.getInstance().addTranslationCallback(() => {
+            Translator_1.Translator.getInstance().updateTranslations(this._container);
+        }, false);
+        windowProxy.document.body.appendChild(this._container);
+        windowProxy.addEventListener("beforeunload", () => {
+            this.state = "normal";
+            this.saveData.state = this.state;
+            this.save();
+            this._container.remove();
+            this._container.classList.remove("popup");
+            this._container.classList.remove("minimized");
+            this._container.classList.remove("maximized");
+            parent.appendChild(this._container);
+            this.popupWindow = null;
+            Translator_1.Translator.getInstance().removeTranslationCallback(translationCallback);
+        });
+        this.popupWindow = windowProxy;
     }
 }
 exports.AbstractWindowFragment = AbstractWindowFragment;
