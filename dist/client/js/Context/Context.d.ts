@@ -1,3 +1,4 @@
+import { AbstractFragment } from "./AbstractFragment";
 /**
  * Basis-Klasse für Seiten und Fragmente
  */
@@ -75,6 +76,12 @@ export declare class Context {
      * @param fragment
      */
     addFragment(viewQuery: any, fragment: any): void;
+    /**
+     * Entfernt ein Fragment.
+     *
+     * @param fragment
+     */
+    removeFragment(fragment: AbstractFragment): void;
     /**
      * Findet ein Element anhand eines Selectors
      *

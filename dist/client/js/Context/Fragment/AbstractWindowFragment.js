@@ -27,6 +27,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         this.saveData = {};
         this.state = "normal";
         this.popupWindow = null;
+        this.translateTitle = true;
         this._position = position;
         this._title = Helper_1.Helper.nonNull(title, "&nbsp;");
         if (id) {
@@ -42,7 +43,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
     setTitle(title) {
         if (this._titleElement) {
             ViewHelper_1.ViewHelper.removeAllChildren(this._titleElement);
-            this._titleElement.appendChild(Translator_1.Translator.makePersistentTranslation(title));
+            this._titleElement.appendChild(this.translateTitle ? Translator_1.Translator.makePersistentTranslation(title) : document.createTextNode(title));
         }
         this._title = title;
     }
@@ -121,9 +122,12 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                     resizeStartListener(e.clientX, e.clientY, e);
                 });
             });
+            let mouseDownPos = null;
+            let pos = null;
             let moveStartListener = (x, y, e) => {
                 if (e.target === this._container || e.target.closest("#title") === this._titleElement) {
                     mouseDownPos = { x: x, y: y };
+                    pos = Object.assign({}, this.getPosition()); //Make copy
                     this._container.classList.add("moving");
                 }
                 let activeWindow = document.querySelector(".window-container.active-window");
@@ -132,7 +136,6 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                 }
                 this._container.classList.add("active-window");
             };
-            let mouseDownPos = null;
             this._container.addEventListener("mousedown", (e) => {
                 moveStartListener(e.clientX, e.clientY, e);
             });
@@ -164,8 +167,8 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                         x: x - mouseDownPos.x,
                         y: y - mouseDownPos.y,
                     };
-                    mouseDownPos = { x: x, y: y };
-                    this.moveAt(diff.x, diff.y);
+                    const newPos = { x: pos.x + diff.x, y: pos.y + diff.y };
+                    this.moveTo(newPos.x, newPos.y);
                 }
             };
             window.addEventListener("mousemove", (e) => {
@@ -198,7 +201,6 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                 this._checkPositionAndDimension();
             });
             window.addEventListener("beforeunload", () => {
-                console.log("beforeunload!");
                 if (this.popupWindow) {
                     this.id = null; //disable saving, since it should
                     this.popupWindow.close();
@@ -311,11 +313,15 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             y: Math.min(this._position.y, maxPosition.y)
         };
         if (this._position.x < 0) {
-            dimension.x += this._position.x;
+            if (maxPosition.x < 0) {
+                dimension.x += this._position.x;
+            }
             this._position.x = 0;
         }
         if (this._position.y < 0) {
-            dimension.y += this._position.y;
+            if (maxPosition.y < 0) {
+                dimension.y += this._position.y;
+            }
             this._position.y = 0;
         }
         this._container.style.left = this._position.x + "px";
@@ -404,6 +410,10 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             Translator_1.Translator.getInstance().removeTranslationCallback(translationCallback);
         });
         this.popupWindow = windowProxy;
+        document.body.classList.forEach(className => windowProxy.document.body.classList.add(className));
+    }
+    getPosition() {
+        return this._position;
     }
 }
 exports.AbstractWindowFragment = AbstractWindowFragment;

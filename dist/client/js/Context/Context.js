@@ -174,6 +174,25 @@ class Context {
         }
     }
     /**
+     * Entfernt ein Fragment.
+     *
+     * @param fragment
+     */
+    removeFragment(fragment) {
+        const index = this._fragments.indexOf(fragment);
+        if (index !== -1) {
+            this._fragments.splice(index, 1);
+        }
+        fragment._viewPromise.then(res => res.remove());
+        this._fragments.push(fragment);
+        if (this._state < Context.STATE_PAUSED) {
+            fragment.onPause();
+        }
+        if (this._state < Context.STATE_DESTROYING) {
+            fragment.onDestroy();
+        }
+    }
+    /**
      * Findet ein Element anhand eines Selectors
      *
      * Wenn all = true, werden alle gefundenen Elemente zurückgegeben

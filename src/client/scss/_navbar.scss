@@ -120,7 +120,7 @@ nav.top-bar {
         text-align: left;
         background: $navBackgroundDefault;
         margin-top: -1rem;
-        right: -100%;
+        right: -1000%; //für kleine Bildschirme, taucht es rechts wieder auf, falls nur 100%
 
         li {
           font-size: 1.15rem;

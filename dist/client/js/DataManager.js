@@ -152,7 +152,11 @@ class DataManager {
      */
     static loadAsset(url, format) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.load(url, Helper_1.Helper.nonNull(format, "text"), DataManager._assetBasePath);
+            let assetPath = DataManager._assetBasePath;
+            if (!url.startsWith("/") && assetPath.length > 0 && !assetPath.endsWith("/")) {
+                assetPath += "/";
+            }
+            return this.load(url, Helper_1.Helper.nonNull(format, "text"), assetPath);
         });
     }
     /**

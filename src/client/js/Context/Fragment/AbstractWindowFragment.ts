@@ -9,7 +9,7 @@ import {Toast} from "../../Toast/Toast";
 const template = require("../../../html/Framework/Fragment/abstractWindowTemplate.html");
 
 export class AbstractWindowFragment extends AbstractFragment {
-    private _position: any = {x: 0, y: 0}
+    private _position: { x: number, y: number } = {x: 0, y: 0}
     protected _container;
     private _title: string = "";
     private _titleElement: any;
@@ -20,6 +20,7 @@ export class AbstractWindowFragment extends AbstractFragment {
     private saveData: { [key: string]: any } = {};
     private state: "minimized" | "maximized" | "popup" | "normal" = "normal";
     private popupWindow: Window = null;
+    protected translateTitle: boolean = true;
 
     constructor(site, view, position: any, title?: string, id?: string) {
         super(site, template);
@@ -40,7 +41,7 @@ export class AbstractWindowFragment extends AbstractFragment {
     setTitle(title) {
         if (this._titleElement) {
             ViewHelper.removeAllChildren(this._titleElement);
-            this._titleElement.appendChild(Translator.makePersistentTranslation(title))
+            this._titleElement.appendChild(this.translateTitle ? Translator.makePersistentTranslation(title) : document.createTextNode(title))
         }
         this._title = title;
     }
@@ -106,7 +107,6 @@ export class AbstractWindowFragment extends AbstractFragment {
             })
         }
 
-
         return res;
     }
 
@@ -133,9 +133,12 @@ export class AbstractWindowFragment extends AbstractFragment {
             });
         });
 
+        let mouseDownPos = null;
+        let pos = null;
         let moveStartListener = (x, y, e) => {
             if (e.target === this._container || e.target.closest("#title") === this._titleElement) {
                 mouseDownPos = {x: x, y: y};
+                pos = Object.assign({}, this.getPosition()); //Make copy
                 this._container.classList.add("moving")
             }
             let activeWindow = document.querySelector(".window-container.active-window");
@@ -145,7 +148,6 @@ export class AbstractWindowFragment extends AbstractFragment {
             this._container.classList.add("active-window");
         }
 
-        let mouseDownPos = null;
         this._container.addEventListener("mousedown", (e) => {
             moveStartListener(e.clientX, e.clientY, e);
         });
@@ -181,8 +183,8 @@ export class AbstractWindowFragment extends AbstractFragment {
                     x: x - mouseDownPos.x,
                     y: y - mouseDownPos.y,
                 }
-                mouseDownPos = {x: x, y: y};
-                this.moveAt(diff.x, diff.y);
+                const newPos = {x: pos.x + diff.x, y: pos.y + diff.y};
+                this.moveTo(newPos.x, newPos.y);
             }
         }
         window.addEventListener("mousemove", (e) => {
@@ -218,7 +220,6 @@ export class AbstractWindowFragment extends AbstractFragment {
         });
 
         window.addEventListener("beforeunload", () => {
-            console.log("beforeunload!");
             if (this.popupWindow) {
                 this.id = null; //disable saving, since it should
                 this.popupWindow.close();
@@ -327,7 +328,6 @@ export class AbstractWindowFragment extends AbstractFragment {
     }
 
     _checkPositionAndDimension() {
-
         let dimension = this.getDimension();
 
         if (isNaN(dimension.x) || isNaN(dimension.y)) {
@@ -342,11 +342,15 @@ export class AbstractWindowFragment extends AbstractFragment {
         };
 
         if (this._position.x < 0) {
-            dimension.x += this._position.x;
+            if (maxPosition.x < 0) {
+                dimension.x += this._position.x;
+            }
             this._position.x = 0;
         }
         if (this._position.y < 0) {
-            dimension.y += this._position.y;
+            if (maxPosition.y < 0) {
+                dimension.y += this._position.y;
+            }
             this._position.y = 0;
         }
 
@@ -452,5 +456,11 @@ export class AbstractWindowFragment extends AbstractFragment {
             Translator.getInstance().removeTranslationCallback(translationCallback);
         });
         this.popupWindow = windowProxy;
+
+        document.body.classList.forEach(className => windowProxy.document.body.classList.add(className));
+    }
+
+    private getPosition() {
+        return this._position;
     }
 }

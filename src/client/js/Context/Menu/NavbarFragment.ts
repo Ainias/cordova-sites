@@ -137,7 +137,15 @@ export class NavbarFragment extends AbstractFragment {
                         // @ts-ignore
                         const resizeObserver = new ResizeObserver(entries => {
                             entries.forEach(entry => {
-                                navbarElem.style = "min-height:" + entry.borderBoxSize[0].blockSize + "px";
+                                if (entry.borderBoxSize) {
+                                    navbarElem.style = "min-height:" + entry.borderBoxSize[0].blockSize + "px";
+                                }
+                                else if (entry.contentRect){
+                                    navbarElem.style = "min-height:" + entry.contentRect.height + "px";
+                                }
+                                else {
+                                    console.log("entry", entry)
+                                }
                             })
                         });
                         resizeObserver.observe(heightElement);

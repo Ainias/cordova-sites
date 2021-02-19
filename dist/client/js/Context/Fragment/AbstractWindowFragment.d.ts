@@ -11,6 +11,7 @@ export declare class AbstractWindowFragment extends AbstractFragment {
     private saveData;
     private state;
     private popupWindow;
+    protected translateTitle: boolean;
     constructor(site: any, view: any, position: any, title?: string, id?: string);
     setTitle(title: any): void;
     getDimension(): {
@@ -31,4 +32,5 @@ export declare class AbstractWindowFragment extends AbstractFragment {
     moveTo(x: any, y: any): void;
     onButtonClick(id: string, button: HTMLElement, e: MouseEvent): void;
     openInNewWindow(): void;
+    private getPosition;
 }

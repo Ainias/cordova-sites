@@ -151,7 +151,11 @@ export class DataManager {
      * @returns {Promise<*  | void>}
      */
     static async loadAsset(url, format?) {
-        return this.load(url, Helper.nonNull(format, "text"), DataManager._assetBasePath);
+        let assetPath = DataManager._assetBasePath;
+        if (!url.startsWith("/") && assetPath.length > 0 && !assetPath.endsWith("/")){
+            assetPath+= "/";
+        }
+        return this.load(url, Helper.nonNull(format, "text"), assetPath);
     }
 
     /**

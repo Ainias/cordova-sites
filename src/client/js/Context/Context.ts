@@ -1,5 +1,6 @@
 import {Helper} from "../Legacy/Helper";
 import {ViewInflater} from "../ViewInflater";
+import {AbstractFragment} from "./AbstractFragment";
 
 /**
  * Basis-Klasse für Seiten und Fragmente
@@ -181,6 +182,26 @@ export class Context {
                     fragment.onStart();
                 }
             });
+        }
+    }
+
+    /**
+     * Entfernt ein Fragment.
+     *
+     * @param fragment
+     */
+    removeFragment(fragment: AbstractFragment) {
+        const index = this._fragments.indexOf(fragment);
+        if (index !== -1){
+            this._fragments.splice(index, 1);
+        }
+        fragment._viewPromise.then(res => res.remove());
+        this._fragments.push(fragment);
+        if (this._state < Context.STATE_PAUSED) {
+            fragment.onPause();
+        }
+        if (this._state < Context.STATE_DESTROYING) {
+            fragment.onDestroy();
         }
     }
 
