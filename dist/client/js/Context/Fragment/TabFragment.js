@@ -23,20 +23,6 @@ class TabFragment extends AbstractFragment_1.AbstractFragment {
         this.onTabChangeListener = null;
         this.tabs = new Map();
         this.tabViewPromise = this._viewLoadedPromise;
-        // if (Helper.isNotNull(view)) {
-        //     this._viewPromise.then(view => {
-        //         let views = view.querySelectorAll(".tab-site");
-        //         let buttons = view.querySelectorAll(".tab-button");
-        //
-        //         // views.forEach((site, i) => {
-        //         //     if (!site.classList.contains("tab-site-template")) {
-        //         //         // site.remove();
-        //         //         // buttons[i].remove();
-        //         //         // this.addTab(buttons[i], site);
-        //         //     }
-        //         // });
-        //     });
-        // }
     }
     onViewLoaded() {
         const _super = Object.create(null, {
@@ -72,7 +58,7 @@ class TabFragment extends AbstractFragment_1.AbstractFragment {
             this.tabs.set(this.lastTabId, tab);
             this._viewLoadedPromise.then(() => {
                 const nameElement = this.nameButton.cloneNode(true);
-                nameElement.appendChild(nameIsTranslatable ? Translator_1.Translator.makePersistentTranslation(name) : document.createTextNode(name));
+                nameElement.appendChild(tab.nameIsTranslatable ? Translator_1.Translator.makePersistentTranslation(name) : document.createTextNode(name));
                 this.nameContainer.appendChild(nameElement);
                 nameElement.addEventListener("click", () => {
                     this.showTab(tab.id);
