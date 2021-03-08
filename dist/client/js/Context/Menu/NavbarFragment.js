@@ -252,6 +252,7 @@ class NavbarFragment extends AbstractFragment_1.AbstractFragment {
     closeMenu() {
         if (Helper_1.Helper.isNotNull(this._responsiveMenu)) {
             this._responsiveMenu.classList.remove("visible");
+            this._view.classList.remove("navbar-is-open");
         }
         if (this._closeListenerContainer) {
             this._closeListenerContainer.style.display = 'none';
@@ -267,6 +268,7 @@ class NavbarFragment extends AbstractFragment_1.AbstractFragment {
         if (Helper_1.Helper.isNotNull(this._responsiveMenu)) {
             // this._responsiveMenu.style.display = 'block';
             this._responsiveMenu.classList.add("visible");
+            this._view.classList.add("navbar-is-open");
         }
         this._showCloseListener();
     }
