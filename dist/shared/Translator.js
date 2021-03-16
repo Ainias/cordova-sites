@@ -30,7 +30,7 @@ class Translator {
                     console.error("missing base translation for key " + missingTranslation);
                 }
                 else {
-                    console.warn("missing translation for language " + language + " and key " + missingTranslation);
+                    console.warn("missing translation for language >" + language + "< and key >" + missingTranslation + "<");
                 }
             };
         }

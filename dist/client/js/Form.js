@@ -64,7 +64,10 @@ class Form {
                     if (element.files && element.files[0]) {
                         let reader = new FileReader();
                         reader.onload = e => {
-                            formElem.querySelector("." + element.name + "-preview").src = e.target["result"];
+                            const previewElem = formElem.querySelector("." + element.name + "-preview");
+                            if (previewElem) {
+                                previewElem.src = e.target["result"];
+                            }
                         };
                         reader.readAsDataURL(element.files[0]);
                     }

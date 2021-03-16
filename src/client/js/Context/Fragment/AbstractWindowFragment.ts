@@ -9,7 +9,7 @@ import {Toast} from "../../Toast/Toast";
 const template = require("../../../html/Framework/Fragment/abstractWindowTemplate.html");
 
 export class AbstractWindowFragment extends AbstractFragment {
-    private _position: { x: number, y: number } = {x: 0, y: 0}
+    private _position: { x: number, y: number, width?: number, height?: number } = {x: 0, y: 0}
     protected _container;
     private _title: string = "";
     private _titleElement: any;
@@ -22,7 +22,7 @@ export class AbstractWindowFragment extends AbstractFragment {
     private popupWindow: Window = null;
     protected translateTitle: boolean = true;
 
-    constructor(site, view, position: any, title?: string, id?: string) {
+    constructor(site, view, position: { x: number, y: number, width?: number, height?: number }, title?: string, id?: string) {
         super(site, template);
         this._position = position;
         this._title = Helper.nonNull(title, "&nbsp;");
@@ -72,6 +72,12 @@ export class AbstractWindowFragment extends AbstractFragment {
         let res = super.onViewLoaded();
 
         this._container = this.findBy(".window-container");
+
+        if (this._position.width || this._position.height) {
+            this._container.style.width = this._position.width + "px";
+            this._container.style.height = this._position.height + "px";
+        }
+
         this._window = this.findBy(".window");
         this._titleElement = this.findBy("#title");
 
@@ -288,6 +294,7 @@ export class AbstractWindowFragment extends AbstractFragment {
 
             if (!this._container.classList.contains("maximized")) {
                 this.resizeToContent();
+                this.state = "normal";
             } else {
                 this.state = "maximized";
             }
@@ -429,35 +436,40 @@ export class AbstractWindowFragment extends AbstractFragment {
             windowProxy.document.head.appendChild(styleElem.cloneNode());
         });
 
-        const parent = this._container.parentNode;
+        const parent = this._view.parentNode;
 
-        this._container.remove();
+        this._view.remove();
         this._container.classList.add("popup");
         this._container.classList.remove("minimized");
         this._container.classList.remove("maximized");
 
-        const translationCallback = Translator.getInstance().addTranslationCallback(() => {
-            Translator.getInstance().updateTranslations(this._container);
+        const translationCallback = Translator.getInstance().addTranslationCallback((baseElement) => {
+            if (baseElement !== this._container) {
+                Translator.getInstance().updateTranslations(this._container);
+            }
         }, false);
 
-        windowProxy.document.body.appendChild(this._container);
+        windowProxy.document.body.appendChild(this._view);
         windowProxy.addEventListener("beforeunload", () => {
             this.state = "normal";
             this.saveData.state = this.state;
             this.save();
 
-            this._container.remove();
+            this._view.remove();
             this._container.classList.remove("popup");
             this._container.classList.remove("minimized");
             this._container.classList.remove("maximized");
-            parent.appendChild(this._container);
+            parent.appendChild(this._view);
             this.popupWindow = null;
 
             Translator.getInstance().removeTranslationCallback(translationCallback);
         });
         this.popupWindow = windowProxy;
 
-        document.body.classList.forEach(className => windowProxy.document.body.classList.add(className));
+        document.body.classList.forEach(className => {
+            console.log("adding class", className);
+            windowProxy.document.body.classList.add(className)
+        });
     }
 
     private getPosition() {

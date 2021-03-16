@@ -1,17 +1,20 @@
 import {AbstractFragment} from "../AbstractFragment";
-import {Helper} from "../../Legacy/Helper";
+import {ViewHelper} from "js-helper/dist/client";
+import {Helper} from "js-helper/dist/shared";
 
 const defaultView = require("../../../html/Framework/Fragment/alphabeticListFragment.html");
 
 export class AlphabeticListFragment extends AbstractFragment {
 
-    _elements;
-    _sideScrolling;
+    private elements: { [key: string]: any[] };
+    private sideScrolling: boolean;
+    private heading: HTMLElement;
+    private headingElement: HTMLElement;
 
     constructor(site, view) {
         super(site, Helper.nonNull(view, defaultView));
-        this._elements = {};
-        this._sideScrolling = false;
+        this.elements = {};
+        this.sideScrolling = false;
     }
 
     async onViewLoaded() {
@@ -21,21 +24,21 @@ export class AlphabeticListFragment extends AbstractFragment {
 
         let sideAlphabet = this.findBy(".alphabetic-list-sidealphabet");
         sideAlphabet.addEventListener("mousedown", () => {
-            this._sideScrolling = true;
+            this.sideScrolling = true;
         });
         window.addEventListener("touchstart", (e) => {
-            this._sideScrolling = true;
+            this.sideScrolling = true;
         });
         window.addEventListener("mouseup", () => {
-            this._sideScrolling = false;
+            this.sideScrolling = false;
         });
         window.addEventListener("touchend", () => {
-            this._sideScrolling = false;
+            this.sideScrolling = false;
         });
 
         this.findBy(".alphabet-scroll-to", true).forEach(elem => {
             let listener = (e) => {
-                if (this._sideScrolling) {
+                if (this.sideScrolling) {
                     this.findBy(".alphabet-section." + elem.dataset.letter).scrollIntoView({
                         behavior: "smooth",
                         block: "start"
@@ -43,31 +46,41 @@ export class AlphabeticListFragment extends AbstractFragment {
                 }
             };
             elem.addEventListener("mousedown", (e) => {
-                this._sideScrolling = true;
+                this.sideScrolling = true;
                 listener(e);
             });
             elem.addEventListener("mousemove", listener);
             elem.addEventListener("touchstart", (e) => {
-                this._sideScrolling = true;
+                this.sideScrolling = true;
                 listener(e);
             });
             elem.addEventListener("touchmove", listener);
         });
+
+        this.headingElement = this.findBy("#alphabetic-list-heading");
 
         this.renderList();
         return res;
     }
 
     setElements(elements) {
-        this._elements = {};
+        this.elements = {};
         Object.keys(elements).sort(function (a, b) {
             return a.toLowerCase().localeCompare(b.toLowerCase());
         }).forEach(key => {
-            this._elements[key] = elements[key];
+            this.elements[key] = elements[key];
         });
     }
 
-    renderElement(element) {
+    setHeading(headingElement: HTMLElement){
+        this.heading = headingElement;
+        if (this.headingElement && this.heading){
+            ViewHelper.removeAllChildren(this.headingElement);
+            this.headingElement.appendChild(this.heading);
+        }
+    }
+
+    renderElement(element): HTMLElement {
         console.warn("should be overloaded?");
         let elem = document.createElement("div");
         elem.innerText = element;
@@ -75,13 +88,18 @@ export class AlphabeticListFragment extends AbstractFragment {
     }
 
     renderList() {
+        ViewHelper.removeAllChildren(this.headingElement);
+        if (this.heading) {
+            this.headingElement.appendChild(this.heading);
+        }
+
         this.findBy(".alphabet-section", true).forEach(section => {
-            Helper.removeAllChildren(section);
+            ViewHelper.removeAllChildren(section);
         });
 
         let currentLetter = 'A';
         let currentSegment = this.findBy(".alphabet-section.A");
-        Object.keys(this._elements).forEach(key => {
+        Object.keys(this.elements).forEach(key => {
             let newLetter = key.trim().substring(0, 1).toUpperCase();
             if (newLetter !== currentLetter) {
                 currentLetter = newLetter;
@@ -90,7 +108,7 @@ export class AlphabeticListFragment extends AbstractFragment {
                     currentSegment = newSegment;
                 }
             }
-            let element = this.renderElement(this._elements[key]);
+            let element = this.renderElement(this.elements[key]);
             currentSegment.appendChild(element);
         });
     }

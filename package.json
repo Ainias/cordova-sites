@@ -15,14 +15,14 @@
     "cordova-plugin-whitelist": "^1.3.4",
     "cordova-sqlite-storage": "^5.1.0",
     "foundation-sites": "^6.6.3",
-    "js-helper": "git+https://github.com/Ainias/js-helper#0.6.0",
+    "js-helper": "git+https://github.com/Ainias/js-helper#0.6.6",
     "event-manager": "git@github.com:Ainias/event-manager.git#0.2",
     "serialize-javascript": ">=2.1.1",
     "cordova-plugin-share": "^0.1.3",
     "electron-json-storage": "^4.1.8"
   },
   "devDependencies": {
-    "js-helper": "git+https://github.com/Ainias/js-helper#0.6.0",
+    "js-helper": "git+https://github.com/Ainias/js-helper#0.6.6",
     "cs-event-manager": "git@github.com:Ainias/event-manager.git#0.2",
     "cordova-plugin-nativestorage": "^2.3.2",
     "cordova-plugin-webpack": "^0.0.2",

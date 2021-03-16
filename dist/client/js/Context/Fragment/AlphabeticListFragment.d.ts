@@ -1,10 +1,13 @@
 import { AbstractFragment } from "../AbstractFragment";
 export declare class AlphabeticListFragment extends AbstractFragment {
-    _elements: any;
-    _sideScrolling: any;
+    private elements;
+    private sideScrolling;
+    private heading;
+    private headingElement;
     constructor(site: any, view: any);
     onViewLoaded(): Promise<any[]>;
     setElements(elements: any): void;
-    renderElement(element: any): HTMLDivElement;
+    setHeading(headingElement: HTMLElement): void;
+    renderElement(element: any): HTMLElement;
     renderList(): void;
 }

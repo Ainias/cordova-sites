@@ -12,7 +12,12 @@ export declare class AbstractWindowFragment extends AbstractFragment {
     private state;
     private popupWindow;
     protected translateTitle: boolean;
-    constructor(site: any, view: any, position: any, title?: string, id?: string);
+    constructor(site: any, view: any, position: {
+        x: number;
+        y: number;
+        width?: number;
+        height?: number;
+    }, title?: string, id?: string);
     setTitle(title: any): void;
     getDimension(): {
         x: number;

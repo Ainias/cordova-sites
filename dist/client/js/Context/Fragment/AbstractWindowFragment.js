@@ -71,6 +71,10 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         return __awaiter(this, void 0, void 0, function* () {
             let res = _super.onViewLoaded.call(this);
             this._container = this.findBy(".window-container");
+            if (this._position.width || this._position.height) {
+                this._container.style.width = this._position.width + "px";
+                this._container.style.height = this._position.height + "px";
+            }
             this._window = this.findBy(".window");
             this._titleElement = this.findBy("#title");
             this._resizeElements = {
@@ -269,6 +273,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             this._container.classList.remove("minimized");
             if (!this._container.classList.contains("maximized")) {
                 this.resizeToContent();
+                this.state = "normal";
             }
             else {
                 this.state = "maximized";
@@ -388,29 +393,34 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         document.querySelectorAll("link[rel='stylesheet']").forEach(styleElem => {
             windowProxy.document.head.appendChild(styleElem.cloneNode());
         });
-        const parent = this._container.parentNode;
-        this._container.remove();
+        const parent = this._view.parentNode;
+        this._view.remove();
         this._container.classList.add("popup");
         this._container.classList.remove("minimized");
         this._container.classList.remove("maximized");
-        const translationCallback = Translator_1.Translator.getInstance().addTranslationCallback(() => {
-            Translator_1.Translator.getInstance().updateTranslations(this._container);
+        const translationCallback = Translator_1.Translator.getInstance().addTranslationCallback((baseElement) => {
+            if (baseElement !== this._container) {
+                Translator_1.Translator.getInstance().updateTranslations(this._container);
+            }
         }, false);
-        windowProxy.document.body.appendChild(this._container);
+        windowProxy.document.body.appendChild(this._view);
         windowProxy.addEventListener("beforeunload", () => {
             this.state = "normal";
             this.saveData.state = this.state;
             this.save();
-            this._container.remove();
+            this._view.remove();
             this._container.classList.remove("popup");
             this._container.classList.remove("minimized");
             this._container.classList.remove("maximized");
-            parent.appendChild(this._container);
+            parent.appendChild(this._view);
             this.popupWindow = null;
             Translator_1.Translator.getInstance().removeTranslationCallback(translationCallback);
         });
         this.popupWindow = windowProxy;
-        document.body.classList.forEach(className => windowProxy.document.body.classList.add(className));
+        document.body.classList.forEach(className => {
+            console.log("adding class", className);
+            windowProxy.document.body.classList.add(className);
+        });
     }
     getPosition() {
         return this._position;
