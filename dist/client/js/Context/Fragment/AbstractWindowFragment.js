@@ -21,15 +21,20 @@ const template = require("../../../html/Framework/Fragment/abstractWindowTemplat
 class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
     constructor(site, view, position, title, id) {
         super(site, template);
-        this._position = { x: 0, y: 0 };
-        this._title = "";
+        this.position = {
+            x: 0,
+            y: 0,
+            fromTop: true,
+            fromLeft: true
+        };
+        this.title = "";
         this._margin = { x: 0, y: 0 };
         this.saveData = {};
         this.state = "normal";
         this.popupWindow = null;
         this.translateTitle = true;
-        this._position = position;
-        this._title = Helper_1.Helper.nonNull(title, "&nbsp;");
+        this.position = Object.assign({ fromTop: true, fromLeft: true }, position);
+        this.title = Helper_1.Helper.nonNull(title, "&nbsp;");
         if (id) {
             this.id = "window-" + id;
         }
@@ -45,7 +50,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             ViewHelper_1.ViewHelper.removeAllChildren(this._titleElement);
             this._titleElement.appendChild(this.translateTitle ? Translator_1.Translator.makePersistentTranslation(title) : document.createTextNode(title));
         }
-        this._title = title;
+        this.title = title;
     }
     getDimension() {
         let computedStyle = window.getComputedStyle(this._container);
@@ -71,9 +76,9 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         return __awaiter(this, void 0, void 0, function* () {
             let res = _super.onViewLoaded.call(this);
             this._container = this.findBy(".window-container");
-            if (this._position.width || this._position.height) {
-                this._container.style.width = this._position.width + "px";
-                this._container.style.height = this._position.height + "px";
+            if (this.position.width || this.position.height) {
+                this._container.style.width = this.position.width + "px";
+                this._container.style.height = this.position.height + "px";
             }
             this._window = this.findBy(".window");
             this._titleElement = this.findBy("#title");
@@ -91,8 +96,9 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                 ],
             };
             yield this.load();
-            this.moveTo(this._position.x, this._position.y);
-            this.setTitle(this._title);
+            this._checkPositionAndDimension();
+            // this.moveTo(this.position.x, this.position.y);
+            this.setTitle(this.title);
             this.addListeners();
             const buttonContainer = this.findBy("#title-buttons");
             if (buttonContainer) {
@@ -134,11 +140,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                     pos = Object.assign({}, this.getPosition()); //Make copy
                     this._container.classList.add("moving");
                 }
-                let activeWindow = document.querySelector(".window-container.active-window");
-                if (activeWindow && activeWindow !== this._container) {
-                    activeWindow.classList.remove("active-window");
-                }
-                this._container.classList.add("active-window");
+                this.makeActiveWindow();
             };
             this._container.addEventListener("mousedown", (e) => {
                 moveStartListener(e.clientX, e.clientY, e);
@@ -148,7 +150,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                     moveStartListener(e.touches[0].clientX, e.touches[0].clientY, e);
                 }
             });
-            let moveListener = (x, y, e) => {
+            let moveListener = (x, y) => {
                 if (resizeStart !== null) {
                     let diff = {
                         x: (x - resizeStart.x) * (multiplier.x),
@@ -157,11 +159,11 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                     dimension = { x: dimension.x + diff.x, y: dimension.y + diff.y };
                     this.setDimension(dimension.x, dimension.y);
                     let moveDiff = { x: 0, y: 0 };
-                    if (multiplier.x < 0) {
-                        moveDiff.x = -diff.x;
+                    if (multiplier.x * (this.position.fromLeft ? 1 : -1) < 0) {
+                        moveDiff.x = diff.x * (this.position.fromLeft ? -1 : 1);
                     }
-                    if (multiplier.y < 0) {
-                        moveDiff.y = -diff.y;
+                    if (multiplier.y * (this.position.fromTop ? 1 : -1) < 0) {
+                        moveDiff.y = diff.y * (this.position.fromTop ? -1 : 1);
                     }
                     this.moveAt(moveDiff.x, moveDiff.y);
                     resizeStart = { x: x, y: y };
@@ -171,16 +173,17 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                         x: x - mouseDownPos.x,
                         y: y - mouseDownPos.y,
                     };
-                    const newPos = { x: pos.x + diff.x, y: pos.y + diff.y };
-                    this.moveTo(newPos.x, newPos.y);
+                    mouseDownPos = { x, y };
+                    // const newPos = {x: pos.x + diff.x, y: pos.y + diff.y};
+                    this.moveAt(diff.x, diff.y);
                 }
             };
             window.addEventListener("mousemove", (e) => {
-                moveListener(e.clientX, e.clientY, e);
+                moveListener(e.clientX, e.clientY);
             });
             window.addEventListener("touchmove", (e) => {
                 if (e.touches.length === 1) {
-                    moveListener(e.touches[0].clientX, e.touches[0].clientY, e);
+                    moveListener(e.touches[0].clientX, e.touches[0].clientY);
                 }
             });
             let endListener = (x, y, e) => {
@@ -193,7 +196,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             });
             window.addEventListener("touchend", (e) => {
                 if (e.touches.length === 0 && e.changedTouches.length === 1) {
-                    moveListener(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e);
+                    endListener(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e);
                 }
             });
             this._container.addEventListener("dblclick", (e) => {
@@ -212,6 +215,13 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             });
         });
     }
+    makeActiveWindow() {
+        let activeWindow = document.querySelector(".window-container.active-window");
+        if (activeWindow && activeWindow !== this._container) {
+            activeWindow.classList.remove("active-window");
+        }
+        this._container.classList.add("active-window");
+    }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.id) {
@@ -221,7 +231,8 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                         this.setDimension(saveData.dimension.x, saveData.dimension.y);
                     }
                     if (saveData.position) {
-                        this.moveTo(saveData.position.x, saveData.position.y);
+                        this.position = saveData.position;
+                        this._checkPositionAndDimension();
                     }
                     if (saveData.state) {
                         switch (saveData.state) {
@@ -309,29 +320,59 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
     }
     _checkPositionAndDimension() {
         let dimension = this.getDimension();
-        if (isNaN(dimension.x) || isNaN(dimension.y)) {
-            return;
+        let setDimension = true;
+        if (isNaN(dimension.x)) {
+            dimension.x = 0;
+            setDimension = false;
+        }
+        if (isNaN(dimension.y)) {
+            dimension.y = 0;
+            setDimension = false;
         }
         let maxPosition = { x: window.innerWidth - dimension.x, y: window.innerHeight - dimension.y };
-        this._position = {
-            x: Math.min(this._position.x, maxPosition.x),
-            y: Math.min(this._position.y, maxPosition.y)
+        this.position = {
+            x: Math.min(this.position.x, maxPosition.x),
+            y: Math.min(this.position.y, maxPosition.y),
+            fromTop: this.position.fromTop,
+            fromLeft: this.position.fromLeft
         };
-        if (this._position.x < 0) {
+        if (this.position.x < 0) {
             if (maxPosition.x < 0) {
-                dimension.x += this._position.x;
+                dimension.x += this.position.x;
             }
-            this._position.x = 0;
+            this.position.x = 0;
         }
-        if (this._position.y < 0) {
+        else if (maxPosition.x < 2 * this.position.x) {
+            this.position.x = maxPosition.x - this.position.x;
+            this.position.fromLeft = !this.position.fromLeft;
+        }
+        if (this.position.y < 0) {
             if (maxPosition.y < 0) {
-                dimension.y += this._position.y;
+                dimension.y += this.position.y;
             }
-            this._position.y = 0;
+            this.position.y = 0;
         }
-        this._container.style.left = this._position.x + "px";
-        this._container.style.top = this._position.y + "px";
-        if (!this._container.classList.contains("minimized")) {
+        else if (maxPosition.y < 2 * this.position.y) {
+            this.position.y = maxPosition.y - this.position.y;
+            this.position.fromTop = !this.position.fromTop;
+        }
+        if (this.position.fromTop) {
+            this._container.style.top = this.position.y + "px";
+            this._container.style.removeProperty("bottom");
+        }
+        else {
+            this._container.style.bottom = this.position.y + "px";
+            this._container.style.removeProperty("top");
+        }
+        if (this.position.fromLeft) {
+            this._container.style.left = this.position.x + "px";
+            this._container.style.removeProperty("right");
+        }
+        else {
+            this._container.style.right = this.position.x + "px";
+            this._container.style.removeProperty("left");
+        }
+        if (!this._container.classList.contains("minimized") && setDimension) {
             this.setDimension(dimension.x, dimension.y);
         }
     }
@@ -346,14 +387,25 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         });
     }
     moveAt(x, y) {
-        return this.moveTo(this._position.x + x, this._position.y + y);
+        const dimension = this.getDimension();
+        if (this.position.fromTop) {
+            y += this.position.y;
+        }
+        else {
+            y += window.innerHeight - this.position.y - dimension.y;
+        }
+        if (this.position.fromLeft) {
+            x += this.position.x;
+        }
+        else {
+            x += window.innerWidth - this.position.x - dimension.x;
+        }
+        return this.moveTo(x, y);
     }
     moveTo(x, y) {
-        this._position = { x: x, y: y };
-        this._container.style.left = x + "px";
-        this._container.style.top = y + "px";
+        this.position = { x: x, y: y, fromLeft: true, fromTop: true };
         this._checkPositionAndDimension();
-        this.saveData.position = this._position;
+        this.saveData.position = this.position;
         this.save();
     }
     onButtonClick(id, button, e) {
@@ -388,7 +440,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         baseElement.href = window.location.href;
         windowProxy.document.head.appendChild(baseElement);
         const titleElement = document.createElement("title");
-        titleElement.innerText = this._title;
+        titleElement.innerText = this.title;
         windowProxy.document.head.appendChild(titleElement);
         document.querySelectorAll("link[rel='stylesheet']").forEach(styleElem => {
             windowProxy.document.head.appendChild(styleElem.cloneNode());
@@ -423,7 +475,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         });
     }
     getPosition() {
-        return this._position;
+        return this.position;
     }
 }
 exports.AbstractWindowFragment = AbstractWindowFragment;

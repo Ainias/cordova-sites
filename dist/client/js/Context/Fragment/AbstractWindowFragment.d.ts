@@ -1,8 +1,8 @@
 import { AbstractFragment } from "../AbstractFragment";
 export declare class AbstractWindowFragment extends AbstractFragment {
-    private _position;
+    private position;
     protected _container: any;
-    private _title;
+    private title;
     private _titleElement;
     private _window;
     private _margin;
@@ -17,6 +17,8 @@ export declare class AbstractWindowFragment extends AbstractFragment {
         y: number;
         width?: number;
         height?: number;
+        fromTop?: boolean;
+        fromLeft?: boolean;
     }, title?: string, id?: string);
     setTitle(title: any): void;
     getDimension(): {
@@ -26,6 +28,7 @@ export declare class AbstractWindowFragment extends AbstractFragment {
     setDimension(x: any, y: any): void;
     onViewLoaded(): Promise<unknown[]>;
     private addListeners;
+    makeActiveWindow(): void;
     private load;
     private save;
     toggleMinimize(): void;
