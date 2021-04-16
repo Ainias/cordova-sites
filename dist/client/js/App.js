@@ -44,20 +44,32 @@ class App {
     start(startSiteConstructor) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.ready();
-            let initalSiteConstructor = startSiteConstructor;
+            let initialSiteConstructor = startSiteConstructor;
             let params = App._getStartParams();
+            this.startingSite = initialSiteConstructor;
+            this.startingSiteParameters = params;
             if (Helper_1.Helper.isNotNull(params["s"])) {
                 startSiteConstructor = Helper_1.Helper.nonNull(this._deepLinks[params["s"]], startSiteConstructor);
                 delete params["s"];
             }
+            this.startingSiteParameters = null;
             let siteManager = this._siteManager;
             siteManager.init("site", this._deepLinks);
             Helper_1.Helper.removeAllChildren(document.getElementById("site"));
             siteManager.startSite(startSiteConstructor, params);
             siteManager.setAppEndedListener(manager => {
-                manager.startSite(initalSiteConstructor);
+                manager.startSite(initialSiteConstructor);
             });
-            // this._siteManager = siteManager;
+        });
+    }
+    /**
+     * Startet die erste Seite
+     */
+    startStartingSite() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.startingSite) {
+                return this.startSite(this.startingSite, this.startingSiteParameters);
+            }
         });
     }
     /**

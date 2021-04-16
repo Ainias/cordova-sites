@@ -214,6 +214,11 @@ class NavbarFragment extends AbstractFragment_1.AbstractFragment {
             this.findBy(".back-button").addEventListener("click", () => {
                 this.goBack();
             });
+            this.findBy(".logo").addEventListener("click", () => {
+                if (NavbarFragment.onLogoClickListener) {
+                    NavbarFragment.onLogoClickListener(this.getSite());
+                }
+            });
             this.setCanGoBack(this._canGoBack);
             this.setBackgroundImage(this._backgroundImage);
             this.setScrollWidget(this._scrollWidget);
@@ -433,9 +438,18 @@ class NavbarFragment extends AbstractFragment_1.AbstractFragment {
         }
         return queries;
     }
+    /**
+     * Setzt den Listener, welcher ausgeführt wird, wenn auf das Logo geklickt wird
+     *
+     * @param listener
+     */
+    static setOnLogoClickListener(listener) {
+        this.onLogoClickListener = listener;
+    }
 }
 exports.NavbarFragment = NavbarFragment;
 NavbarFragment.queries = [];
+NavbarFragment.onLogoClickListener = () => App_1.App.addInitialization(app => app.startStartingSite());
 NavbarFragment.title = "MeinBerufBau";
 NavbarFragment.defaultActions = [];
 //# sourceMappingURL=NavbarFragment.js.map

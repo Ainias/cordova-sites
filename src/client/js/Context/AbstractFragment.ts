@@ -1,12 +1,13 @@
 import {Context} from "./Context";
 import {Helper} from "../Legacy/Helper";
+import {AbstractSite} from "./AbstractSite";
 
 /**
  * Ein Fragment ist ein TeilView einer Ansicht.
  */
 export class AbstractFragment extends Context {
 
-    _site;
+    _site: AbstractFragment | AbstractSite;
     _viewQuery;
     _active: boolean;
 
@@ -28,16 +29,16 @@ export class AbstractFragment extends Context {
     /**
      * Gibt die zugehörige Seite zurück
      *
-     * @returns {*}
+     * @returns
      */
-    getSite() {
-        if (this._site instanceof AbstractFragment){
+    getSite(): AbstractSite {
+        if (this._site instanceof AbstractFragment) {
             return this._site.getSite();
         }
         return this._site;
     }
 
-    async startSite(site, args){
+    async startSite(site, args) {
         return this._site.startSite(site, args);
     }
 
@@ -50,12 +51,11 @@ export class AbstractFragment extends Context {
         return this._active;
     }
 
-    setViewQuery(query)
-    {
+    setViewQuery(query) {
         this._viewQuery = query;
     }
 
-    getViewQuery(){
+    getViewQuery() {
         return this._viewQuery;
     }
 

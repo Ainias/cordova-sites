@@ -3,6 +3,8 @@ export declare class App {
     private _readyPromise;
     private _deepLinks;
     private _siteManager;
+    private startingSite;
+    private startingSiteParameters;
     private static _logo;
     static _resolver: {
         resolve: any;
@@ -20,6 +22,10 @@ export declare class App {
     static setLogo(logo: any): void;
     static getLogo(): string;
     start(startSiteConstructor: any): Promise<void>;
+    /**
+     * Startet die erste Seite
+     */
+    startStartingSite(): Promise<any>;
     /**
      * Führt die Callback aus, sobald das interne Promise aufgelöst wird und App._promises fertig sind oder gibt das interne Promise zurück
      *

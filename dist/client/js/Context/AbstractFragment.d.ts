@@ -1,9 +1,10 @@
 import { Context } from "./Context";
+import { AbstractSite } from "./AbstractSite";
 /**
  * Ein Fragment ist ein TeilView einer Ansicht.
  */
 export declare class AbstractFragment extends Context {
-    _site: any;
+    _site: AbstractFragment | AbstractSite;
     _viewQuery: any;
     _active: boolean;
     /**
@@ -16,10 +17,10 @@ export declare class AbstractFragment extends Context {
     /**
      * Gibt die zugehörige Seite zurück
      *
-     * @returns {*}
+     * @returns
      */
-    getSite(): any;
-    startSite(site: any, args: any): Promise<any>;
+    getSite(): AbstractSite;
+    startSite(site: any, args: any): any;
     /**
      * Gibt zurück, ob das Fragment aktiv ist. Wenn nicht, wird es in der Seite nicht angezeigt
      *

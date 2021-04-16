@@ -11,31 +11,31 @@
   "license": "MIT",
   "peerDependencies": {
     "cordova-plugin-nativestorage": "^2.3.2",
+    "cordova-plugin-share": "^0.1.3",
     "cordova-plugin-webpack": "^1.0.5",
     "cordova-plugin-whitelist": "^1.3.4",
     "cordova-sqlite-storage": "^5.1.0",
+    "electron-json-storage": "^4.1.8",
+    "event-manager": "git@github.com:Ainias/event-manager.git#0.2",
     "foundation-sites": "^6.6.3",
     "js-helper": "git+https://github.com/Ainias/js-helper#0.6.6",
-    "event-manager": "git@github.com:Ainias/event-manager.git#0.2",
-    "serialize-javascript": ">=2.1.1",
-    "cordova-plugin-share": "^0.1.3",
-    "electron-json-storage": "^4.1.8"
+    "serialize-javascript": ">=2.1.1"
   },
   "devDependencies": {
-    "js-helper": "git+https://github.com/Ainias/js-helper#0.6.6",
-    "cs-event-manager": "git@github.com:Ainias/event-manager.git#0.2",
+    "@types/node": "^12.12.14",
     "cordova-plugin-nativestorage": "^2.3.2",
+    "cordova-plugin-share": "^0.1.3",
     "cordova-plugin-webpack": "^0.0.2",
     "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-x-toast": "^2.7.2",
     "cordova-sqlite-storage": "^3.2.0",
+    "cs-event-manager": "git@github.com:Ainias/event-manager.git#0.2",
+    "electron-json-storage": "^4.1.8",
     "foundation-sites": "^6.5.1",
+    "js-helper": "git+https://github.com/Ainias/js-helper#0.6.6",
     "serialize-javascript": ">=2.1.1",
-    "@types/node": "^12.12.14",
     "typeorm": "^0.2.20",
-    "typescript": "^3.7.2",
-    "cordova-plugin-share": "^0.1.3",
-    "electron-json-storage": "^4.1.8"
+    "typescript": "^3.7.2"
   },
   "cordova": {
     "plugins": {

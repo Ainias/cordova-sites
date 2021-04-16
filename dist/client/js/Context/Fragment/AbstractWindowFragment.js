@@ -227,6 +227,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             if (this.id) {
                 const saveData = yield NativeStoragePromise_1.NativeStoragePromise.getItem(this.id);
                 if (saveData) {
+                    this.saveData = saveData;
                     if (saveData.dimension) {
                         this.setDimension(saveData.dimension.x, saveData.dimension.y);
                     }
@@ -356,6 +357,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             this.position.y = maxPosition.y - this.position.y;
             this.position.fromTop = !this.position.fromTop;
         }
+        this.saveData.position = this.position;
         if (this.position.fromTop) {
             this._container.style.top = this.position.y + "px";
             this._container.style.removeProperty("bottom");

@@ -249,6 +249,7 @@ export class AbstractWindowFragment extends AbstractFragment {
         if (this.id) {
             const saveData = await NativeStoragePromise.getItem(this.id);
             if (saveData) {
+                this.saveData = saveData;
                 if (saveData.dimension) {
                     this.setDimension(saveData.dimension.x, saveData.dimension.y);
                 }
@@ -388,6 +389,7 @@ export class AbstractWindowFragment extends AbstractFragment {
             this.position.y = maxPosition.y - this.position.y;
             this.position.fromTop = !this.position.fromTop;
         }
+        this.saveData.position = this.position;
 
         if (this.position.fromTop) {
             this._container.style.top = this.position.y + "px";

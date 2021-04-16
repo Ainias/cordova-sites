@@ -3,6 +3,7 @@
  */
 import {Helper} from "./Legacy/Helper";
 import {SiteManager} from "./Context/SiteManager";
+import {AbstractSite} from "./Context/AbstractSite";
 
 
 export class App {
@@ -10,6 +11,9 @@ export class App {
     private _readyPromise: Promise<unknown>;
     private _deepLinks: {};
     private _siteManager: any;
+    private startingSite: AbstractSite;
+    private startingSiteParameters: {[key: string]: any};
+
     private static _logo: string;
     public static _resolver: { resolve: any; reject: any };
     private static _promises: Promise<any>[] = [];
@@ -47,24 +51,34 @@ export class App {
 
     async start(startSiteConstructor) {
         await this.ready();
-        let initalSiteConstructor = startSiteConstructor;
+        let initialSiteConstructor = startSiteConstructor;
 
         let params = App._getStartParams();
 
+        this.startingSite = initialSiteConstructor;
+        this.startingSiteParameters = params;
         if (Helper.isNotNull(params["s"])) {
             startSiteConstructor = Helper.nonNull(this._deepLinks[params["s"]], startSiteConstructor);
             delete params["s"];
         }
+        this.startingSiteParameters = null;
 
         let siteManager = this._siteManager;
         siteManager.init("site", this._deepLinks);
         Helper.removeAllChildren(document.getElementById("site"));
         siteManager.startSite(startSiteConstructor, params);
         siteManager.setAppEndedListener(manager => {
-            manager.startSite(initalSiteConstructor);
+            manager.startSite(initialSiteConstructor);
         });
+    }
 
-        // this._siteManager = siteManager;
+    /**
+     * Startet die erste Seite
+     */
+    async startStartingSite(){
+        if (this.startingSite){
+            return this.startSite(this.startingSite, this.startingSiteParameters);
+        }
     }
 
     /**

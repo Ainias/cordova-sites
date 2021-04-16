@@ -31,7 +31,7 @@ class AbstractFragment extends Context_1.Context {
     /**
      * Gibt die zugehörige Seite zurück
      *
-     * @returns {*}
+     * @returns
      */
     getSite() {
         if (this._site instanceof AbstractFragment) {

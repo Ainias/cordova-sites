@@ -1,4 +1,5 @@
 import { AbstractFragment } from "../AbstractFragment";
+import { AbstractSite } from "../AbstractSite";
 /**
  * Fragment, welches ein Menü in der Navbar anzeigt und hinzufügt.
  *
@@ -19,6 +20,7 @@ export declare class NavbarFragment extends AbstractFragment {
     private _canGoBack;
     private _closeListenerContainer;
     private static queries;
+    private static onLogoClickListener;
     /**
      * Erstellt das Fragment
      * @param site
@@ -96,4 +98,10 @@ export declare class NavbarFragment extends AbstractFragment {
      * @private
      */
     static _calculateViewQueries(): any[];
+    /**
+     * Setzt den Listener, welcher ausgeführt wird, wenn auf das Logo geklickt wird
+     *
+     * @param listener
+     */
+    static setOnLogoClickListener(listener: (site: AbstractSite) => void): void;
 }

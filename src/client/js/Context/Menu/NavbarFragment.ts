@@ -10,6 +10,7 @@ import {DropdownRenderer} from "./Renderer/DropdownRenderer";
 import {AccordionRenderer} from "./Renderer/AccordionRenderer";
 import {ColorIndicator} from "../../ColorIndicator/ColorIndicator";
 import {App} from "../../App";
+import {AbstractSite} from "../AbstractSite";
 
 /**
  * Fragment, welches ein Menü in der Navbar anzeigt und hinzufügt.
@@ -33,6 +34,7 @@ export class NavbarFragment extends AbstractFragment {
     private _canGoBack: boolean;
     private _closeListenerContainer: any;
     private static queries: any = [];
+    private static onLogoClickListener: (currentSite: AbstractSite) => void = () => App.addInitialization(app => app.startStartingSite());
 
     /**
      * Erstellt das Fragment
@@ -235,6 +237,12 @@ export class NavbarFragment extends AbstractFragment {
         this.findBy(".back-button").addEventListener("click", () => {
             this.goBack();
         });
+
+        this.findBy(".logo").addEventListener("click", () => {
+            if (NavbarFragment.onLogoClickListener){
+                NavbarFragment.onLogoClickListener(this.getSite());
+            }
+        })
 
         this.setCanGoBack(this._canGoBack);
         this.setBackgroundImage(this._backgroundImage);
@@ -483,6 +491,15 @@ export class NavbarFragment extends AbstractFragment {
             }
         }
         return queries;
+    }
+
+    /**
+     * Setzt den Listener, welcher ausgeführt wird, wenn auf das Logo geklickt wird
+     *
+     * @param listener
+     */
+    static setOnLogoClickListener(listener: (site: AbstractSite) => void){
+        this.onLogoClickListener = listener;
     }
 }
 
