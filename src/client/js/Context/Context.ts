@@ -192,7 +192,7 @@ export class Context {
      */
     removeFragment(fragment: AbstractFragment) {
         const index = this._fragments.indexOf(fragment);
-        if (index !== -1){
+        if (index !== -1) {
             this._fragments.splice(index, 1);
         }
         fragment._viewPromise.then(res => res.remove());
@@ -245,6 +245,23 @@ export class Context {
             });
         }
         return getVal(this._view);
+    }
+
+    find(selector: string): HTMLElement {
+        if (this._view.matches(selector)){
+            return this._view;
+        }
+        else {
+            return this._view.querySelector(selector)
+        }
+    }
+
+    findAll(selector: string): NodeListOf<HTMLElement> {
+        const res = this._view.querySelectorAll(selector);
+        if (this._view.matches(selector)){
+            res.push(this._view);
+        }
+        return res;
     }
 
     /**

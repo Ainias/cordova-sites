@@ -112,7 +112,7 @@ export class AbstractSite extends Context {
      * @param titleElement
      * @param title
      */
-    setTitle(titleElement, title) {
+    setTitle(titleElement: HTMLElement | string, title?) {
         if (typeof titleElement === "string") {
             let args = title;
             title = titleElement;

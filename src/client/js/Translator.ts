@@ -178,7 +178,7 @@ export class Translator extends SharedTranslator{
      * @param useText
      * @returns {any}
      */
-    makePersistentTranslation(key, args?, tag?, useText?) {
+    makePersistentTranslation(key, args?, tag?, useText?): HTMLElement {
         useText = Helper.nonNull(useText, tag, args, false);
         tag = tag || "span";
 

@@ -33,7 +33,7 @@ export declare class AbstractSite extends Context {
      * @param titleElement
      * @param title
      */
-    setTitle(titleElement: any, title: any): void;
+    setTitle(titleElement: HTMLElement | string, title?: any): void;
     setParameter(name: any, value: any): void;
     setParameters(parameters: any): void;
     getParameters(): any;

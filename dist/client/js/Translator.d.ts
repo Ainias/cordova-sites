@@ -61,12 +61,12 @@ export declare class Translator extends SharedTranslator {
      * @param useText
      * @returns {any}
      */
-    makePersistentTranslation(key: any, args?: any, tag?: any, useText?: any): any;
+    makePersistentTranslation(key: any, args?: any, tag?: any, useText?: any): HTMLElement;
     getTranslationClass(): string;
     getCurrentLanguage(): string;
     static getInstance(): Translator;
     static setLanguage(language: any): Promise<void>;
-    static makePersistentTranslation(key: any, args?: any, tag?: any, useText?: any): any;
+    static makePersistentTranslation(key: any, args?: any, tag?: any, useText?: any): HTMLElement;
     static addTranslationCallback(callback: any, callImmediately?: any): number;
     static removeTranslationCallback(callbackId: any): void;
     static updateTranslations(baseElement: any): Promise<void>;

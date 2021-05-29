@@ -233,6 +233,21 @@ class Context {
         }
         return getVal(this._view);
     }
+    find(selector) {
+        if (this._view.matches(selector)) {
+            return this._view;
+        }
+        else {
+            return this._view.querySelector(selector);
+        }
+    }
+    findAll(selector) {
+        const res = this._view.querySelectorAll(selector);
+        if (this._view.matches(selector)) {
+            res.push(this._view);
+        }
+        return res;
+    }
     /**
      * Setzt die PauseParameters
      * @param pauseParameters

@@ -1,7 +1,7 @@
 import {Helper} from "js-helper";
 
 export class ScaleHelper {
-    async scaleTo(scale, fontElement, container, ignoreHeight, ignoreWidth, margin, fontWeight, animationDelay, addListener) {
+    async scaleTo(scale, fontElement, container, ignoreHeight?, ignoreWidth?, margin?, fontWeight?, animationDelay?, addListener?) {
 
         addListener = Helper.nonNull(addListener, true);
         animationDelay = Helper.nonNull(animationDelay, 0);
@@ -30,7 +30,7 @@ export class ScaleHelper {
         return listener;
     }
 
-    async scaleToFull(fontElement, container, ignoreHeight, ignoreWidth, margin, fontWeight, animDelay, addListener) {
+    async scaleToFull(fontElement, container, ignoreHeight?, ignoreWidth?, margin?, fontWeight?, animDelay?, addListener?) {
         return this.scaleTo(1, fontElement, container, ignoreHeight, ignoreWidth, margin, fontWeight, animDelay, addListener);
     }
 

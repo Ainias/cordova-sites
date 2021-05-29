@@ -36,9 +36,6 @@ export class ViewInflater {
      * @returns {*}
      */
     load(viewUrl, parentUrls?) {
-
-        // console.log("viewUrl", viewUrl, parentUrls);
-
         //Kopiere Elemente, damit originale parentURLS nicht verändert werden
         parentUrls = JsonHelper.deepCopy(Helper.nonNull(parentUrls, []));
 

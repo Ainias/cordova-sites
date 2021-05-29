@@ -1,5 +1,5 @@
 export declare class Form {
-    private _formElem;
+    private formElem;
     private _method;
     private _elementChangeListener;
     private _validators;
@@ -8,7 +8,16 @@ export declare class Form {
     private _editors;
     private _submitCallback;
     private errorCallback;
-    constructor(formElem: any, urlOrCallback: any, method?: any);
+    private imageSelectionElementReady;
+    private imageSelectionElements;
+    constructor(formElem: any, urlOrCallback: any, method?: any, imageSelectionSelector?: string);
+    private prepareForImageSelection;
+    setImagesForImageSelectionElement(name: string, images: {
+        [category: string]: {
+            name?: string;
+            src: string;
+        }[];
+    }): Promise<void>;
     addValidator(validatorCallback: any): void;
     onError(errorHandler: any): void;
     addEditor(e: any): void;

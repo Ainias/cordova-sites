@@ -96,6 +96,8 @@ export declare class Context {
      * @returns {*}
      */
     findBy(query: any, all?: any, asPromise?: any): any;
+    find(selector: string): HTMLElement;
+    findAll(selector: string): NodeListOf<HTMLElement>;
     /**
      * Setzt die PauseParameters
      * @param pauseParameters

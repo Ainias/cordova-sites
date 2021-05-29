@@ -10,17 +10,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Form = void 0;
-const DataManager_1 = require("./DataManager");
-const Helper_1 = require("./Legacy/Helper");
-const Translator_1 = require("./Translator");
-const Toast_1 = require("./Toast/Toast");
+const DataManager_1 = require("../DataManager");
+const Helper_1 = require("../Legacy/Helper");
+const Translator_1 = require("../Translator");
+const Toast_1 = require("../Toast/Toast");
+const ImageSelectionElement_1 = require("./ImageSelectionElement");
+const js_helper_1 = require("js-helper");
 class Form {
-    constructor(formElem, urlOrCallback, method) {
-        this._formElem = formElem;
+    constructor(formElem, urlOrCallback, method, imageSelectionSelector) {
+        this.imageSelectionElementReady = new js_helper_1.PromiseWithHandlers();
+        this.imageSelectionElements = {};
+        this.formElem = formElem;
         this._method = Helper_1.Helper.nonNull(method, formElem["method"], "POST");
         this._elementChangeListener = null;
         this._validators = [];
         this._isBusy = false;
+        if (imageSelectionSelector === undefined) {
+            imageSelectionSelector = "input.image-selection";
+        }
         if (typeof urlOrCallback === "string") {
             this._submitHandler = (values) => {
                 if (this._method.toLowerCase() === "get") {
@@ -46,6 +53,7 @@ class Form {
                 yield self.doSubmit(e);
             });
         });
+        this.prepareForImageSelection(imageSelectionSelector).then(r => this.imageSelectionElementReady.resolve(r));
         let self = this;
         [...formElem.elements].forEach(element => {
             element.addEventListener("change", function () {
@@ -81,6 +89,43 @@ class Form {
             });
         });
     }
+    prepareForImageSelection(imageSelectionSelector) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield Helper_1.Helper.asyncForEach(this.formElem.querySelectorAll(imageSelectionSelector), (imgElement) => __awaiter(this, void 0, void 0, function* () {
+                let name = "";
+                let value = "";
+                if (imgElement instanceof HTMLInputElement) {
+                    name = imgElement.name;
+                    value = imgElement.value;
+                }
+                if (Helper_1.Helper.isNull(name) || name === "") {
+                    name = imgElement.dataset["name"];
+                }
+                if (Helper_1.Helper.isNull(value) || value === "") {
+                    value = imgElement.dataset["value"];
+                }
+                const imgSelectionElement = new ImageSelectionElement_1.ImageSelectionElement(name);
+                if (value && value.trim() !== "") {
+                    try {
+                        yield imgSelectionElement.setValue(JSON.parse(value));
+                    }
+                    catch (e) {
+                        console.warn(e);
+                    }
+                }
+                this.imageSelectionElements[name] = imgSelectionElement;
+                imgElement.replaceWith(yield imgSelectionElement.getView());
+            }), true);
+        });
+    }
+    setImagesForImageSelectionElement(name, images) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.imageSelectionElementReady;
+            if (this.imageSelectionElements[name]) {
+                this.imageSelectionElements[name].setImages(images);
+            }
+        });
+    }
     addValidator(validatorCallback) {
         this._validators.push(validatorCallback);
     }
@@ -113,9 +158,9 @@ class Form {
             let values = yield Promise.resolve(valuePromise);
             this.setIsBusy(false);
             for (let k in values) {
-                if (Helper_1.Helper.isNotNull(this._formElem.elements[k])) {
-                    if (Helper_1.Helper.isNotNull(this._formElem.elements[k].options) && Helper_1.Helper.isNotNull(values[k + "Options"])) {
-                        let options = this._formElem.elements[k].options;
+                if (Helper_1.Helper.isNotNull(this.formElem.elements[k])) {
+                    if (Helper_1.Helper.isNotNull(this.formElem.elements[k].options) && Helper_1.Helper.isNotNull(values[k + "Options"])) {
+                        let options = this.formElem.elements[k].options;
                         for (let val in values[k + "Options"]) {
                             let option = document.createElement("option");
                             option.value = val;
@@ -123,31 +168,35 @@ class Form {
                             options.add(option);
                         }
                     }
-                    if (this._formElem.elements[k].type && (this._formElem.elements[k].type === "checkbox" || this._formElem.elements[k].type === "radio")) {
-                        this._formElem.elements[k].checked = this._formElem.elements[k].value == values[k];
+                    if (this.formElem.elements[k].type && (this.formElem.elements[k].type === "checkbox" || this.formElem.elements[k].type === "radio")) {
+                        this.formElem.elements[k].checked = this.formElem.elements[k].value == values[k];
                     }
-                    else if (this._formElem.elements[k].type && this._formElem.elements[k].type === "file") {
-                        if (this._formElem.elements[k + "-hidden"]) {
-                            this._formElem.elements[k + "-hidden"].value = values[k];
+                    else if (this.formElem.elements[k].type && this.formElem.elements[k].type === "file") {
+                        if (this.formElem.elements[k + "-hidden"]) {
+                            this.formElem.elements[k + "-hidden"].value = values[k];
                         }
-                        if (this._formElem.elements[k].accept && this._formElem.elements[k].accept.indexOf("image") !== -1) {
-                            let previewImage = this._formElem.querySelector("." + k + "-preview");
+                        if (this.formElem.elements[k].accept && this.formElem.elements[k].accept.indexOf("image") !== -1) {
+                            let previewImage = this.formElem.querySelector("." + k + "-preview");
                             if (previewImage) {
                                 previewImage.src = values[k];
                             }
                         }
                     }
                     else {
-                        this._formElem.elements[k].value = Helper_1.Helper.htmlspecialcharsDecode(values[k]);
-                        if (this._formElem.elements[k].classList) {
+                        this.formElem.elements[k].value = Helper_1.Helper.htmlspecialcharsDecode(values[k]);
+                        if (this.formElem.elements[k].classList) {
                             if (Helper_1.Helper.isNotNull(values[k]) && ("" + values[k]).trim() !== "") {
-                                this._formElem.elements[k].classList.add("notEmpty");
+                                this.formElem.elements[k].classList.add("notEmpty");
                             }
                             else {
-                                this._formElem.elements[k].classList.remove("notEmpty");
+                                this.formElem.elements[k].classList.remove("notEmpty");
                             }
                         }
                     }
+                }
+                if (Helper_1.Helper.isNotNull(this.imageSelectionElements[k])) {
+                    console.log("setImg", k, values[k]);
+                    this.imageSelectionElements[k].setValue(values[k]);
                 }
             }
             return this;
@@ -155,7 +204,7 @@ class Form {
     }
     getValues(filesToBase64) {
         return __awaiter(this, void 0, void 0, function* () {
-            let valuesFormData = new FormData(this._formElem);
+            let valuesFormData = new FormData(this.formElem);
             let values = Array.from(valuesFormData["entries"]()).reduce((memo, pair) => (Object.assign(Object.assign({}, memo), { [pair[0]]: pair[1] })), {});
             if (Helper_1.Helper.nonNull(filesToBase64, true)) {
                 values = yield Form.filesToBase64(values);
@@ -184,8 +233,8 @@ class Form {
         this._elementChangeListener = listener;
     }
     clearErrors() {
-        Object.keys(this._formElem.elements).forEach(elemKey => {
-            this._formElem.elements[elemKey].setCustomValidity("");
+        Object.keys(this.formElem.elements).forEach(elemKey => {
+            this.formElem.elements[elemKey].setCustomValidity("");
         });
     }
     setErrors(errors) {
@@ -193,9 +242,9 @@ class Form {
         let firstError = null;
         // let notCatchedErrors = [];
         for (let k in errors) {
-            if (Helper_1.Helper.isNotNull(this._formElem.elements[k]) && this._formElem.elements[k].type !== "hidden"
-                && Helper_1.Helper.isNull(this._formElem.elements[k].readonly) && (Helper_1.Helper.isNull(this._formElem.elements[k].disabled) || !this._formElem.elements[k].disabled)) {
-                this._formElem.elements[k].setCustomValidity(Translator_1.Translator.translate(Helper_1.Helper.nonNull(errors[k], "form-default-error")));
+            if (Helper_1.Helper.isNotNull(this.formElem.elements[k]) && this.formElem.elements[k].type !== "hidden"
+                && Helper_1.Helper.isNull(this.formElem.elements[k].readonly) && (Helper_1.Helper.isNull(this.formElem.elements[k].disabled) || !this.formElem.elements[k].disabled)) {
+                this.formElem.elements[k].setCustomValidity(Translator_1.Translator.translate(Helper_1.Helper.nonNull(errors[k], "form-default-error")));
                 hasElem = true;
             }
             else {
@@ -215,16 +264,16 @@ class Form {
         //     }
         // }
         if (hasElem) {
-            "reportValidity" in this._formElem && this._formElem.reportValidity();
+            "reportValidity" in this.formElem && this.formElem.reportValidity();
         }
     }
     setIsBusy(isBusy) {
         this._isBusy = isBusy;
         if (this._isBusy) {
-            this._formElem.classList.add("sending");
+            this.formElem.classList.add("sending");
         }
         else {
-            this._formElem.classList.remove("sending");
+            this.formElem.classList.remove("sending");
         }
     }
     submit() {
@@ -250,7 +299,7 @@ class Form {
     }
     validate() {
         return __awaiter(this, void 0, void 0, function* () {
-            if ("reportValidity" in this._formElem && !this._formElem.reportValidity()) {
+            if ("reportValidity" in this.formElem && !this.formElem.reportValidity()) {
                 return false;
             }
             let values = yield this.getValues();
@@ -280,7 +329,7 @@ class Form {
         this._submitCallback = callback;
     }
     getFormElement() {
-        return this._formElem;
+        return this.formElem;
     }
 }
 exports.Form = Form;

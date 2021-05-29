@@ -32,7 +32,6 @@ class ViewInflater {
      * @returns {*}
      */
     load(viewUrl, parentUrls) {
-        // console.log("viewUrl", viewUrl, parentUrls);
         //Kopiere Elemente, damit originale parentURLS nicht verändert werden
         parentUrls = shared_1.JsonHelper.deepCopy(shared_1.Helper.nonNull(parentUrls, []));
         //Detektiert eine Schleife in den Views

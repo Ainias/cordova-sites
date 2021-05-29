@@ -6,7 +6,7 @@ import {DataManager} from "../DataManager";
 export class SoundManager {
     private static _instance: null | SoundManager;
 
-    private static CHANNELS = {
+    public static CHANNELS = {
         MUSIC: "music",
         SOUND: "sound",
         DEFAULT: "default"
@@ -93,7 +93,7 @@ export class SoundManager {
         }
     }
 
-    async play(channel, audioOrOptions) {
+    async play(channel, audioOrOptions?) {
         this.resumeContext();
         channel = Helper.nonNull(channel, SoundManager.CHANNELS.DEFAULT);
         if (Helper.isNull(audioOrOptions)) {

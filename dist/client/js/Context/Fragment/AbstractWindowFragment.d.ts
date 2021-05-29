@@ -1,4 +1,5 @@
 import { AbstractFragment } from "../AbstractFragment";
+import { WindowPositionInterface } from "./WindowPositionInterface";
 export declare class AbstractWindowFragment extends AbstractFragment {
     private position;
     protected _container: any;
@@ -12,14 +13,7 @@ export declare class AbstractWindowFragment extends AbstractFragment {
     private state;
     private popupWindow;
     protected translateTitle: boolean;
-    constructor(site: any, view: any, position: {
-        x: number;
-        y: number;
-        width?: number;
-        height?: number;
-        fromTop?: boolean;
-        fromLeft?: boolean;
-    }, title?: string, id?: string);
+    constructor(site: any, view: any, position: WindowPositionInterface, title?: string, id?: string);
     setTitle(title: any): void;
     getDimension(): {
         x: number;
@@ -34,6 +28,9 @@ export declare class AbstractWindowFragment extends AbstractFragment {
     toggleMinimize(): void;
     toggleMaximize(): void;
     resizeToContent(): void;
+    private getTopLeftCornerPosition;
+    private getCenterCenterPosition;
+    private getBottomRightPosition;
     _checkPositionAndDimension(): void;
     onStart(pauseArguments: any): Promise<void>;
     moveAt(x: any, y: any): void;

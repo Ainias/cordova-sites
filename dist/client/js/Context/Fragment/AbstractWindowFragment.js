@@ -24,8 +24,8 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         this.position = {
             x: 0,
             y: 0,
-            fromTop: true,
-            fromLeft: true
+            anchorY: "top",
+            anchorX: "left"
         };
         this.title = "";
         this._margin = { x: 0, y: 0 };
@@ -33,7 +33,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         this.state = "normal";
         this.popupWindow = null;
         this.translateTitle = true;
-        this.position = Object.assign({ fromTop: true, fromLeft: true }, position);
+        this.position = Object.assign({ anchorY: "top", anchorX: "left" }, position);
         this.title = Helper_1.Helper.nonNull(title, "&nbsp;");
         if (id) {
             this.id = "window-" + id;
@@ -56,6 +56,12 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         let computedStyle = window.getComputedStyle(this._container);
         let width = parseFloat(computedStyle.getPropertyValue("width"));
         let height = parseFloat(computedStyle.getPropertyValue("height"));
+        if (isNaN(width)) {
+            width = parseFloat(this._container.style.width);
+        }
+        if (isNaN(height)) {
+            height = parseFloat(this._container.style.height);
+        }
         return { x: Math.ceil(width) - this._margin.x, y: Math.ceil(height) - this._margin.y };
     }
     setDimension(x, y) {
@@ -152,18 +158,41 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             });
             let moveListener = (x, y) => {
                 if (resizeStart !== null) {
+                    let localMultiplier = {
+                        x: multiplier.x,
+                        y: multiplier.y,
+                    };
                     let diff = {
-                        x: (x - resizeStart.x) * (multiplier.x),
-                        y: (y - resizeStart.y) * (multiplier.y)
+                        x: (x - resizeStart.x) * (localMultiplier.x),
+                        y: (y - resizeStart.y) * (localMultiplier.y)
                     };
                     dimension = { x: dimension.x + diff.x, y: dimension.y + diff.y };
                     this.setDimension(dimension.x, dimension.y);
-                    let moveDiff = { x: 0, y: 0 };
-                    if (multiplier.x * (this.position.fromLeft ? 1 : -1) < 0) {
-                        moveDiff.x = diff.x * (this.position.fromLeft ? -1 : 1);
+                    const realDimension = this.getDimension();
+                    if (dimension.x !== realDimension.x) {
+                        localMultiplier.x = 0;
                     }
-                    if (multiplier.y * (this.position.fromTop ? 1 : -1) < 0) {
-                        moveDiff.y = diff.y * (this.position.fromTop ? -1 : 1);
+                    if (dimension.y !== realDimension.y) {
+                        localMultiplier.y = 0;
+                    }
+                    this._checkPositionAndDimension();
+                    //TODO diff für Center berechnen...
+                    let moveDiff = { x: 0, y: 0 };
+                    if (localMultiplier.x !== 0) {
+                        if (this.position.anchorX === "center") {
+                            moveDiff.x = diff.x * localMultiplier.x / 2;
+                        }
+                        else if (localMultiplier.x * (this.position.anchorX === "left" ? 1 : -1) < 0) {
+                            moveDiff.x = diff.x * localMultiplier.x;
+                        }
+                    }
+                    if (localMultiplier.y !== 0) {
+                        if (this.position.anchorY === "center") {
+                            moveDiff.y = diff.y * localMultiplier.y / 2;
+                        }
+                        else if (localMultiplier.y * (this.position.anchorY === "top" ? 1 : -1) < 0) {
+                            moveDiff.y = diff.y * localMultiplier.y;
+                        }
                     }
                     this.moveAt(moveDiff.x, moveDiff.y);
                     resizeStart = { x: x, y: y };
@@ -227,7 +256,6 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             if (this.id) {
                 const saveData = yield NativeStoragePromise_1.NativeStoragePromise.getItem(this.id);
                 if (saveData) {
-                    this.saveData = saveData;
                     if (saveData.dimension) {
                         this.setDimension(saveData.dimension.x, saveData.dimension.y);
                     }
@@ -253,6 +281,8 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
                             }
                         }
                     }
+                    this.saveData = saveData;
+                    this.save();
                 }
             }
         });
@@ -260,6 +290,7 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
     save() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.id) {
+                // console.log("save", this.id, this.saveData);
                 yield NativeStoragePromise_1.NativeStoragePromise.setItem(this.id, this.saveData);
             }
         });
@@ -319,9 +350,50 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             this._checkPositionAndDimension();
         }
     }
+    getTopLeftCornerPosition() {
+        const dimension = this.getDimension();
+        let x = this.position.x;
+        if (this.position.anchorX === "center") {
+            x += window.innerWidth / 2 - dimension.x / 2;
+        }
+        else if (this.position.anchorX === "right") {
+            x += window.innerWidth - dimension.x;
+        }
+        let y = this.position.y;
+        if (this.position.anchorY === "center") {
+            y += window.innerHeight / 2 - dimension.y / 2;
+        }
+        else if (this.position.anchorY === "bottom") {
+            y += window.innerHeight - dimension.y;
+        }
+        if (x < 0) {
+            x = 0;
+        }
+        if (y < 0) {
+            y = 0;
+        }
+        return { x, y };
+    }
+    getCenterCenterPosition() {
+        const dimension = this.getDimension();
+        const topLeft = this.getTopLeftCornerPosition();
+        return {
+            x: (topLeft.x + dimension.x / 2) - window.innerWidth / 2,
+            y: (topLeft.y + dimension.y / 2) - window.innerHeight / 2
+        };
+    }
+    getBottomRightPosition() {
+        const dimension = this.getDimension();
+        const topLeft = this.getTopLeftCornerPosition();
+        return {
+            x: Math.min((topLeft.x + dimension.x) - window.innerWidth, 0),
+            y: Math.min((topLeft.y + dimension.y) - window.innerHeight, 0),
+        };
+    }
     _checkPositionAndDimension() {
         let dimension = this.getDimension();
         let setDimension = true;
+        let dimensionChanged = false;
         if (isNaN(dimension.x)) {
             dimension.x = 0;
             setDimension = false;
@@ -330,51 +402,75 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
             dimension.y = 0;
             setDimension = false;
         }
-        let maxPosition = { x: window.innerWidth - dimension.x, y: window.innerHeight - dimension.y };
-        this.position = {
-            x: Math.min(this.position.x, maxPosition.x),
-            y: Math.min(this.position.y, maxPosition.y),
-            fromTop: this.position.fromTop,
-            fromLeft: this.position.fromLeft
-        };
-        if (this.position.x < 0) {
-            if (maxPosition.x < 0) {
-                dimension.x += this.position.x;
-            }
+        let posTopLeft = this.getTopLeftCornerPosition();
+        let posCenterCenter = this.getCenterCenterPosition();
+        let posBottomRight = this.getBottomRightPosition();
+        if (dimension.x > window.innerWidth) {
+            dimensionChanged = true;
+            dimension.x = window.innerWidth;
             this.position.x = 0;
+            this.position.anchorX = "left";
         }
-        else if (maxPosition.x < 2 * this.position.x) {
-            this.position.x = maxPosition.x - this.position.x;
-            this.position.fromLeft = !this.position.fromLeft;
-        }
-        if (this.position.y < 0) {
-            if (maxPosition.y < 0) {
-                dimension.y += this.position.y;
+        else {
+            if (posTopLeft.x <= Math.abs(posCenterCenter.x) && posTopLeft.x <= -1 * posBottomRight.x) {
+                this.position.x = posTopLeft.x;
+                this.position.anchorX = "left";
             }
+            else if (-1 * posBottomRight.x <= Math.abs(posCenterCenter.x)) {
+                this.position.x = posBottomRight.x;
+                this.position.anchorX = "right";
+            }
+            else {
+                this.position.x = posCenterCenter.x;
+                this.position.anchorX = "center";
+            }
+        }
+        if (dimension.y > window.innerHeight) {
+            dimensionChanged = true;
+            dimension.y = window.innerHeight;
             this.position.y = 0;
+            this.position.anchorY = "top";
         }
-        else if (maxPosition.y < 2 * this.position.y) {
-            this.position.y = maxPosition.y - this.position.y;
-            this.position.fromTop = !this.position.fromTop;
+        else {
+            if (posTopLeft.y <= Math.abs(posCenterCenter.y) && posTopLeft.y <= -1 * posBottomRight.y) {
+                this.position.y = posTopLeft.y;
+                this.position.anchorY = "top";
+            }
+            else if (-1 * posBottomRight.y <= Math.abs(posCenterCenter.y)) {
+                this.position.y = posBottomRight.y;
+                this.position.anchorY = "bottom";
+            }
+            else {
+                this.position.y = posCenterCenter.y;
+                this.position.anchorY = "center";
+            }
         }
-        this.saveData.position = this.position;
-        if (this.position.fromTop) {
+        if (this.position.anchorY === "top") {
             this._container.style.top = this.position.y + "px";
             this._container.style.removeProperty("bottom");
         }
-        else {
-            this._container.style.bottom = this.position.y + "px";
+        else if (this.position.anchorY === "bottom") {
+            this._container.style.bottom = (-1 * this.position.y) + "px";
             this._container.style.removeProperty("top");
         }
-        if (this.position.fromLeft) {
+        else {
+            this._container.style.top = "calc(50% + " + this.position.y.toString() + "px - " + (dimension.y / 2).toString() + "px)";
+            this._container.style.removeProperty("bottom");
+        }
+        if (this.position.anchorX === "left") {
             this._container.style.left = this.position.x + "px";
             this._container.style.removeProperty("right");
         }
-        else {
-            this._container.style.right = this.position.x + "px";
+        else if (this.position.anchorX === "right") {
+            this._container.style.right = (-1 * this.position.x) + "px";
             this._container.style.removeProperty("left");
         }
-        if (!this._container.classList.contains("minimized") && setDimension) {
+        else {
+            this._container.style.left = "calc(50% + " + this.position.x.toString() + "px - " + (dimension.x / 2).toString() + "px)";
+            this._container.style.removeProperty("right");
+        }
+        this.saveData.position = this.position;
+        if (!this._container.classList.contains("minimized") && setDimension && dimensionChanged) {
             this.setDimension(dimension.x, dimension.y);
         }
     }
@@ -389,25 +485,12 @@ class AbstractWindowFragment extends AbstractFragment_1.AbstractFragment {
         });
     }
     moveAt(x, y) {
-        const dimension = this.getDimension();
-        if (this.position.fromTop) {
-            y += this.position.y;
-        }
-        else {
-            y += window.innerHeight - this.position.y - dimension.y;
-        }
-        if (this.position.fromLeft) {
-            x += this.position.x;
-        }
-        else {
-            x += window.innerWidth - this.position.x - dimension.x;
-        }
-        return this.moveTo(x, y);
+        const posTopLeft = this.getTopLeftCornerPosition();
+        return this.moveTo(x + posTopLeft.x, y + posTopLeft.y);
     }
     moveTo(x, y) {
-        this.position = { x: x, y: y, fromLeft: true, fromTop: true };
+        this.position = { x: x, y: y, anchorX: "left", anchorY: "top" };
         this._checkPositionAndDimension();
-        this.saveData.position = this.position;
         this.save();
     }
     onButtonClick(id, button, e) {
