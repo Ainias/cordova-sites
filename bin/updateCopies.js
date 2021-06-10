@@ -15,7 +15,7 @@ let pathsToProjects = [
     // "/home/silas/Projekte/Web/bible-lexicon",
     // "/home/silas/Projekte/Web/wordRotator",
     // "/home/silas/Projekte/web/stories",
-    // "/home/silas/Projekte/web/cordova-sites-easy-sync",
+    "/home/silas/Projekte/web/cordova-sites-easy-sync",
     // "/home/silas/Projekte/web/cordova-sites-user-management",
     "/home/silas/Projekte/i9/mbb",
     // "/var/www/pwa/wordRotator",
