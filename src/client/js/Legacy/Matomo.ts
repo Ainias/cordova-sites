@@ -11,7 +11,6 @@ export class Matomo {
     static currentUrl = null;
     static isTrackingPromise = null;
 
-
     static init() {
         Matomo.isTrackingPromise = new Promise(async (resolve) => {
             let shouldTrack = await NativeStoragePromise.getItem(Matomo.LOCAL_STORAGE_KEY, "1");

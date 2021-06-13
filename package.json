@@ -18,7 +18,7 @@
     "electron-json-storage": "^4.1.8",
     "event-manager": "git@github.com:Ainias/event-manager.git#0.2",
     "foundation-sites": "^6.6.3",
-    "js-helper": "git+https://github.com/Ainias/js-helper#0.7.0",
+    "js-helper": "git+https://github.com/Ainias/js-helper#0.7.1",
     "serialize-javascript": ">=2.1.1"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "cs-event-manager": "git@github.com:Ainias/event-manager.git#0.2",
     "electron-json-storage": "^4.1.8",
     "foundation-sites": "^6.5.1",
-    "js-helper": "git+https://github.com/Ainias/js-helper#0.6.6",
+    "js-helper": "git+https://github.com/Ainias/js-helper#0.7.1",
     "serialize-javascript": ">=2.1.1",
     "typeorm": "^0.2.20",
     "typescript": "^3.7.2"

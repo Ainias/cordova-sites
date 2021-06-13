@@ -57,6 +57,7 @@ __exportStar(require("./client/js/PromiseHelper"), exports);
 __exportStar(require("./client/js/ShareManager/ShareDialog"), exports);
 __exportStar(require("./client/js/ShareManager/ShareManager"), exports);
 __exportStar(require("./client/js/Singleton"), exports);
+__exportStar(require("./client/js/Sites/MatomoDelegateSite"), exports);
 __exportStar(require("./client/js/Sound/AudioChain"), exports);
 __exportStar(require("./client/js/Sound/SoundManager"), exports);
 __exportStar(require("./client/js/Toast/Toast"), exports);
