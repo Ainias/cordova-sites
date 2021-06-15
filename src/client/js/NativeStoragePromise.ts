@@ -27,7 +27,7 @@ export class NativeStoragePromise {
     static async setItem(key, value) {
         if (this.persistent) {
             if (this._isElectron()) {
-                return new Promise((res, rej) => this.electronStorage.set(this.prefix + key, value, err => {
+                return new Promise<void>((res, rej) => this.electronStorage.set(this.prefix + key, value, err => {
                     if (err) {
                         rej(err);
                     } else {
@@ -101,7 +101,7 @@ export class NativeStoragePromise {
     static async remove(key) {
         delete this._cache[this.prefix + key];
         if (this._isElectron()) {
-            return new Promise((res, rej) => this.electronStorage.remove(this.prefix + key, err => {
+            return new Promise<void>((res, rej) => this.electronStorage.remove(this.prefix + key, err => {
                 if (err){
                     rej(err);
                 }

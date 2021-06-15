@@ -47,7 +47,7 @@ export class ToastManager {
         let element = toast.getToastElement();
         if (Helper.isNotNull(element)) {
             element.style.opacity = 0;
-            return new Promise(res => {
+            return new Promise<void>(res => {
                 setTimeout(() => {
                     element.remove();
                     res();

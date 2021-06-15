@@ -5,7 +5,7 @@ export declare class ToastManager {
     private static _toastContainerSelector;
     constructor();
     showToast(toast: any): Promise<unknown>;
-    hideToast(toast: any): Promise<unknown>;
+    hideToast(toast: any): Promise<void>;
     static setToastContainerSelector(selector: any): void;
     static getInstance(): ToastManager;
 }

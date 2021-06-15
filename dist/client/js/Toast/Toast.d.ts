@@ -16,5 +16,5 @@ export declare class Toast {
     setToastElement(element: any): void;
     getToastElement(): null;
     show(): Promise<unknown>;
-    hide(): Promise<unknown>;
+    hide(): Promise<void>;
 }

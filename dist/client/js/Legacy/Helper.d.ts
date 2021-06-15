@@ -80,7 +80,7 @@ export declare class Helper {
     static removeAllChildren(element: any): any;
     static shuffleArray(array: any): any;
     static padZero(n: any, width?: any, z?: any): any;
-    static deepEqual(a: any, b: any): boolean;
+    static deepEqual(a: any, b: any): any;
     static htmlspecialcharsDecode(text: any): any;
     /**
      * Inverts the key-Values for an object
