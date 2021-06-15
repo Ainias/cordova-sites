@@ -6,8 +6,7 @@
   "main": "dist/client.js",
   "scripts": {
     "build": "node bin/build.js && tsc && cd ./src && find . -regextype sed -regex '.*\\.\\(html\\|png\\|svg\\|json\\)' -type f -exec cp --parents {} ../dist \\;",
-    "update packages": "node bin/updateCopies.js",
-    "preinstall": "npx npm-force-resolutions"
+    "update packages": "node bin/updateCopies.js"
   },
   "license": "MIT",
   "peerDependencies": {
@@ -24,8 +23,7 @@
   "devDependencies": {
     "@types/node": "^15.12.2",
     "typeorm": "^0.2.34",
-    "typescript": "^4.3.2",
-    "npm-force-resolutions": "^0.0.10"
+    "typescript": "^4.3.2"
   },
   "cordova": {
     "plugins": {
