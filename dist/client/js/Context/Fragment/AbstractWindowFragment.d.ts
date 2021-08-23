@@ -1,6 +1,7 @@
 import { AbstractFragment } from "../AbstractFragment";
 import { WindowPositionInterface } from "./WindowPositionInterface";
-export declare class AbstractWindowFragment extends AbstractFragment {
+import { AbstractSite } from "../AbstractSite";
+export declare class AbstractWindowFragment<ct extends AbstractSite> extends AbstractFragment<ct> {
     private position;
     protected _container: any;
     private title;

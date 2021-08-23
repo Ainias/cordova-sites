@@ -16,7 +16,7 @@ export class Dialog {
     protected _addedToDomePromise;
     protected _addedToDomePromiseResolver;
 
-    constructor(content, title) {
+    constructor(content, title?) {
         this._resolver = null;
         this._content = null;
         this._backgroundElement = null;

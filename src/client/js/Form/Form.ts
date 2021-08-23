@@ -214,6 +214,10 @@ export class Form {
         return this;
     }
 
+    reset() {
+        this.formElem.reset()
+    }
+
     async getValues(filesToBase64?) {
         let valuesFormData = new FormData(this.formElem);
         let values = Array.from(valuesFormData["entries"]()).reduce((memo: {}, pair: [string, FormDataEntryValue]) => ({

@@ -7,9 +7,9 @@ const view = require("../../html/Framework/Dialog/chooseDialog.html");
 const Translator_1 = require("../Translator");
 const Helper_1 = require("js-helper/dist/shared/Helper");
 class ChooseDialog extends Dialog_1.Dialog {
-    constructor(valueNames, title, translateable) {
+    constructor(valueNames, title, translatable) {
         let viewPromise = ViewInflater_1.ViewInflater.getInstance().load(view).then(view => {
-            translateable = Helper_1.Helper.nonNull(translateable, true);
+            translatable = Helper_1.Helper.nonNull(translatable, true);
             let template = view.querySelector("#choose-value-template");
             template.remove();
             template.removeAttribute("id");
@@ -17,7 +17,11 @@ class ChooseDialog extends Dialog_1.Dialog {
             for (let k in valueNames) {
                 let valueElem = template.cloneNode(true);
                 let textElem = null;
-                if (translateable) {
+                if (valueNames[k] instanceof Node) {
+                    textElem = valueNames[k];
+                    valueElem.classList.add("html-element");
+                }
+                else if (translatable) {
                     textElem = Translator_1.Translator.makePersistentTranslation(valueNames[k]);
                 }
                 else {

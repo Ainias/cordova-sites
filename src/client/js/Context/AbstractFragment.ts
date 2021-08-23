@@ -5,10 +5,10 @@ import {AbstractSite} from "./AbstractSite";
 /**
  * Ein Fragment ist ein TeilView einer Ansicht.
  */
-export class AbstractFragment extends Context {
+export class AbstractFragment<ct extends AbstractSite> extends Context {
 
-    _site: AbstractFragment | AbstractSite;
-    _viewQuery;
+    _site: ct | AbstractFragment<ct>;
+    _viewQuery: string;
     _active: boolean;
 
     /**
@@ -31,15 +31,15 @@ export class AbstractFragment extends Context {
      *
      * @returns
      */
-    getSite(): AbstractSite {
+    getSite(): ct {
         if (this._site instanceof AbstractFragment) {
             return this._site.getSite();
         }
         return this._site;
     }
 
-    async startSite(site, args) {
-        return this._site.startSite(site, args);
+    async startSite(site: AbstractSite, args) {
+        return this.getSite().startSite(site, args);
     }
 
     /**
@@ -51,7 +51,7 @@ export class AbstractFragment extends Context {
         return this._active;
     }
 
-    setViewQuery(query) {
+    setViewQuery(query: string) {
         this._viewQuery = query;
     }
 

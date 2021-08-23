@@ -1,10 +1,11 @@
 import {AbstractFragment} from "../AbstractFragment";
 import {SwipeChildFragment} from "./SwipeChildFragment";
 import {Helper} from "../../Legacy/Helper";
+import {AbstractSite} from "../AbstractSite";
 
 const view = require("../../../html/Framework/Fragment/swipeFragment.html");
 
-export class SwipeFragment extends AbstractFragment {
+export class SwipeFragment<ct extends AbstractSite> extends AbstractFragment<ct> {
     private _activeIndex: number;
     private _touchStart: any;
 

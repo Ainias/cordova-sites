@@ -1,10 +1,11 @@
 import {AbstractFragment} from "../AbstractFragment";
 import {ViewHelper} from "js-helper/dist/client";
 import {Helper} from "js-helper/dist/shared";
+import {AbstractSite} from "../AbstractSite";
 
 const defaultView = require("../../../html/Framework/Fragment/alphabeticListFragment.html");
 
-export class AlphabeticListFragment extends AbstractFragment {
+export class AlphabeticListFragment<ct extends AbstractSite> extends AbstractFragment<ct> {
 
     private elements: { [key: string]: any[] };
     private sideScrolling: boolean;

@@ -48,6 +48,10 @@ export class Context {
         });
     }
 
+    isViewLoaded(){
+        return this._state >= Context.STATE_VIEW_LOADED;
+    }
+
     getState() {
         return this._state;
     }
@@ -75,6 +79,7 @@ export class Context {
         if (!this.onViewLoadedCalled) {
             this.onViewLoadedCalled = true;
             const res = await this.onViewLoaded();
+            this._state = Context.STATE_VIEW_LOADED;
             // @ts-ignore
             this._viewLoadedPromise.resolve(res);
         }
@@ -88,8 +93,6 @@ export class Context {
      * Benutze diese Methode, um die View beim starten zu manipulieren.
      */
     async onViewLoaded() {
-        this._state = Context.STATE_VIEW_LOADED;
-
         let onViewLoadedPromises = [];
         for (let k in this._fragments) {
             onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].callOnViewLoaded()).then(
@@ -108,7 +111,7 @@ export class Context {
      * Zurückgegebenes Promise wird ignoriert!
      * @param pauseArguments, Object|NULL
      */
-    async onStart(pauseArguments) {
+    async onStart(pauseArguments?) {
         this._state = Context.STATE_RUNNING;
 
         for (let k in this._fragments) {
@@ -163,7 +166,7 @@ export class Context {
      * @param viewQuery
      * @param fragment
      */
-    addFragment(viewQuery, fragment) {
+    addFragment(viewQuery, fragment: AbstractFragment<any>) {
         this._fragments.push(fragment);
         fragment.setViewQuery(viewQuery);
         this._viewPromise = Promise.all([this._viewPromise, fragment._viewPromise]).then(res => {
@@ -190,7 +193,7 @@ export class Context {
      *
      * @param fragment
      */
-    removeFragment(fragment: AbstractFragment) {
+    removeFragment(fragment: AbstractFragment<any>) {
         const index = this._fragments.indexOf(fragment);
         if (index !== -1) {
             this._fragments.splice(index, 1);

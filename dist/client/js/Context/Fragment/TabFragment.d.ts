@@ -1,5 +1,6 @@
 import { AbstractFragment } from "../AbstractFragment";
-export declare class TabFragment extends AbstractFragment {
+import { AbstractSite } from "../AbstractSite";
+export declare class TabFragment<ct extends AbstractSite> extends AbstractFragment<ct> {
     private tabs;
     private lastTabId;
     private tabViewPromise;

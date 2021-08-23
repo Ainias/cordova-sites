@@ -1,5 +1,6 @@
 import { AbstractFragment } from "../AbstractFragment";
-export declare class SwipeFragment extends AbstractFragment {
+import { AbstractSite } from "../AbstractSite";
+export declare class SwipeFragment<ct extends AbstractSite> extends AbstractFragment<ct> {
     private _activeIndex;
     private _touchStart;
     static MAX_Y: number;

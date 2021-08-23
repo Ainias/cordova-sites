@@ -15,7 +15,7 @@ export declare class MenuSite extends TemplateSite {
      * @param menuTemplate
      */
     constructor(siteManager: any, view: any, menuTemplate?: any);
-    getNavbarFragment(): NavbarFragment;
+    getNavbarFragment(): NavbarFragment<MenuSite>;
     /**
      * Während des onConstructs werden die Menüelemente hinzugefügt => aufrufen des onCreateMenu
      *

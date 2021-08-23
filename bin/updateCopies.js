@@ -11,6 +11,7 @@ let pathsToProjects = [
     "/home/silas/Projekte/web/smd-mail",
     "/home/silas/Projekte/web/wordRotator",
     "/home/silas/Projekte/web/crew",
+    "/home/silas/Projekte/web/hoffnungsfest",
     // "/home/silas/Projekte/Web/orgel",
     // "/home/silas/Projekte/Web/bible-lexicon",
     // "/home/silas/Projekte/Web/wordRotator",

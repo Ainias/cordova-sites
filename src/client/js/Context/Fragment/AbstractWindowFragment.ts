@@ -6,10 +6,11 @@ import {Translator} from "../../Translator";
 import {NativeStoragePromise} from "../../NativeStoragePromise";
 import {Toast} from "../../Toast/Toast";
 import {WindowPositionInterface} from "./WindowPositionInterface";
+import {AbstractSite} from "../AbstractSite";
 
 const template = require("../../../html/Framework/Fragment/abstractWindowTemplate.html");
 
-export class AbstractWindowFragment extends AbstractFragment {
+export class AbstractWindowFragment<ct extends AbstractSite> extends AbstractFragment<ct> {
     private position: WindowPositionInterface = {
         x: 0,
         y: 0,

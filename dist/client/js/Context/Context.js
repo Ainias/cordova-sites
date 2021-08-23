@@ -37,6 +37,9 @@ class Context {
             this._viewLoadedPromise.reject(e);
         });
     }
+    isViewLoaded() {
+        return this._state >= Context.STATE_VIEW_LOADED;
+    }
     getState() {
         return this._state;
     }
@@ -64,6 +67,7 @@ class Context {
             if (!this.onViewLoadedCalled) {
                 this.onViewLoadedCalled = true;
                 const res = yield this.onViewLoaded();
+                this._state = Context.STATE_VIEW_LOADED;
                 // @ts-ignore
                 this._viewLoadedPromise.resolve(res);
             }
@@ -78,7 +82,6 @@ class Context {
      */
     onViewLoaded() {
         return __awaiter(this, void 0, void 0, function* () {
-            this._state = Context.STATE_VIEW_LOADED;
             let onViewLoadedPromises = [];
             for (let k in this._fragments) {
                 onViewLoadedPromises.push(this._fragments[k]._viewPromise.then(() => this._fragments[k].callOnViewLoaded()).then(() => this._fragments[k]._viewLoadedPromise.resolve()));

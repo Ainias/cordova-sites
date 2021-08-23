@@ -23,6 +23,7 @@ export declare class Form {
     addEditor(e: any): void;
     doSubmit(e?: any): Promise<boolean>;
     setValues(valuePromise: any): Promise<this>;
+    reset(): void;
     getValues(filesToBase64?: any): Promise<unknown>;
     static filesToBase64(values: any): Promise<any>;
     setElementChangeListener(listener: any): void;

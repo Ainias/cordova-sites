@@ -10,7 +10,7 @@ export class App {
     private _resolver: { resolve: null; reject: null };
     private _readyPromise: Promise<unknown>;
     private _deepLinks: {};
-    private _siteManager: any;
+    private _siteManager: SiteManager;
     private startingSite: AbstractSite;
     private startingSiteParameters: {[key: string]: any};
 

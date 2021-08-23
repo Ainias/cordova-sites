@@ -25,6 +25,7 @@ export declare class Context {
      * @param view
      */
     constructor(view: any);
+    isViewLoaded(): boolean;
     getState(): any;
     /**
      * Wird von SiteManager aufgerufen, wenn Klasse erstellt wird. Das ViewPromise ist noch nicht zwangsweise geladen!
@@ -51,7 +52,7 @@ export declare class Context {
      * Zurückgegebenes Promise wird ignoriert!
      * @param pauseArguments, Object|NULL
      */
-    onStart(pauseArguments: any): Promise<void>;
+    onStart(pauseArguments?: any): Promise<void>;
     /**
      * Seite wird pausiet => onPause wird ausgeführt => View wird aus dem Document entfernt
      * Seite wird beendet => onPause wird ausgeführt (falls State === running) => View wird aus dem Document entfernt
@@ -75,13 +76,13 @@ export declare class Context {
      * @param viewQuery
      * @param fragment
      */
-    addFragment(viewQuery: any, fragment: any): void;
+    addFragment(viewQuery: any, fragment: AbstractFragment<any>): void;
     /**
      * Entfernt ein Fragment.
      *
      * @param fragment
      */
-    removeFragment(fragment: AbstractFragment): void;
+    removeFragment(fragment: AbstractFragment<any>): void;
     /**
      * Findet ein Element anhand eines Selectors
      *

@@ -2,16 +2,16 @@ import {AbstractFragment} from "../AbstractFragment";
 
 const defaultTabView = require("../../../html/Framework/Fragment/tabFragment.html");
 import {Helper} from "../../Legacy/Helper";
-import {ViewInflater} from "../../ViewInflater";
 import {Translator} from "../../Translator";
 import {ViewHelper} from "js-helper/dist/client";
+import {AbstractSite} from "../AbstractSite";
 
-export class TabFragment extends AbstractFragment {
+export class TabFragment<ct extends AbstractSite> extends AbstractFragment<ct> {
 
     private tabs: Map<number, {
         name: string,
         nameIsTranslatable: boolean,
-        fragment: AbstractFragment,
+        fragment: AbstractFragment<any>,
         button: HTMLElement,
         view: HTMLElement,
         id: number,
@@ -29,7 +29,7 @@ export class TabFragment extends AbstractFragment {
 
     constructor(site, view?) {
         super(site, Helper.nonNull(view, defaultTabView));
-        this.tabs = new Map<number, { id: number, name: string; nameIsTranslatable: boolean; fragment: AbstractFragment; button: HTMLElement; view: HTMLElement }>();
+        this.tabs = new Map<number, { id: number, name: string; nameIsTranslatable: boolean; fragment: AbstractFragment<any>; button: HTMLElement; view: HTMLElement }>();
         this.tabViewPromise = this._viewLoadedPromise;
     }
 

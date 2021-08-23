@@ -202,6 +202,9 @@ class Form {
             return this;
         });
     }
+    reset() {
+        this.formElem.reset();
+    }
     getValues(filesToBase64) {
         return __awaiter(this, void 0, void 0, function* () {
             let valuesFormData = new FormData(this.formElem);

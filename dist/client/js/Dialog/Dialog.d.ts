@@ -11,7 +11,7 @@ export declare class Dialog {
     protected _result: any;
     protected _addedToDomePromise: any;
     protected _addedToDomePromiseResolver: any;
-    constructor(content: any, title: any);
+    constructor(content: any, title?: any);
     setTitle(title: any): this;
     setTranslatable(translatable: any): void;
     setAdditionalClasses(classes: any): void;

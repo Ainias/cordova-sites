@@ -3,9 +3,9 @@ import { AbstractSite } from "./AbstractSite";
 /**
  * Ein Fragment ist ein TeilView einer Ansicht.
  */
-export declare class AbstractFragment extends Context {
-    _site: AbstractFragment | AbstractSite;
-    _viewQuery: any;
+export declare class AbstractFragment<ct extends AbstractSite> extends Context {
+    _site: ct | AbstractFragment<ct>;
+    _viewQuery: string;
     _active: boolean;
     /**
      * Erstellt ein neues Fragment
@@ -19,15 +19,15 @@ export declare class AbstractFragment extends Context {
      *
      * @returns
      */
-    getSite(): AbstractSite;
-    startSite(site: any, args: any): any;
+    getSite(): ct;
+    startSite(site: AbstractSite, args: any): Promise<any>;
     /**
      * Gibt zurück, ob das Fragment aktiv ist. Wenn nicht, wird es in der Seite nicht angezeigt
      *
      * @returns {boolean}
      */
     isActive(): boolean;
-    setViewQuery(query: any): void;
-    getViewQuery(): any;
+    setViewQuery(query: string): void;
+    getViewQuery(): string;
     setActive(active: any): void;
 }

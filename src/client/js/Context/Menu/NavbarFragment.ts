@@ -20,7 +20,7 @@ import {AbstractSite} from "../AbstractSite";
  * Dabei hat jede MenuAction eine Sichtbarkeitsklasse. Anhand der Sichtbarkeitsklasse und der Bildschirmgröße wird
  * entweder das eine oder das andere Element sichtbar, jedoch niemals beide.
  */
-export class NavbarFragment extends AbstractFragment {
+export class NavbarFragment<ct extends AbstractSite> extends AbstractFragment<ct> {
 
     static defaultActions: any;
     static title: string;

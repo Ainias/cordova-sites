@@ -41,7 +41,7 @@ class AbstractFragment extends Context_1.Context {
     }
     startSite(site, args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this._site.startSite(site, args);
+            return this.getSite().startSite(site, args);
         });
     }
     /**

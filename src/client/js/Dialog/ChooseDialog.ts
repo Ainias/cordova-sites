@@ -7,9 +7,9 @@ import {Helper} from "js-helper/dist/shared/Helper";
 
 export class ChooseDialog extends Dialog {
 
-    constructor(valueNames, title, translateable) {
+    constructor(valueNames, title?, translatable?) {
         let viewPromise = ViewInflater.getInstance().load(view).then(view => {
-            translateable = Helper.nonNull(translateable, true);
+            translatable = Helper.nonNull(translatable, true);
             let template = view.querySelector("#choose-value-template");
             template.remove();
             template.removeAttribute("id");
@@ -20,7 +20,11 @@ export class ChooseDialog extends Dialog {
                 let valueElem = template.cloneNode(true);
 
                 let textElem = null;
-                if (translateable){
+                if (valueNames[k] instanceof Node){
+                    textElem = valueNames[k];
+                    valueElem.classList.add("html-element")
+                }
+                else if (translatable){
                     textElem = Translator.makePersistentTranslation(valueNames[k]);
                 }
                 else {

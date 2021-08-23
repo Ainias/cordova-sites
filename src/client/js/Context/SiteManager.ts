@@ -23,7 +23,7 @@ export class SiteManager {
      *
      * @return {SiteManager}
      */
-    static getInstance() {
+    static getInstance(): SiteManager {
         if (!this._instance) {
             this._instance = new SiteManager();
         }
@@ -204,7 +204,7 @@ export class SiteManager {
      * @param site
      * @return string
      */
-    getDeepLinkFor(site) {
+    getDeepLinkFor(site): string {
         return this._inversedDeepLinks[site.constructor]
     }
 

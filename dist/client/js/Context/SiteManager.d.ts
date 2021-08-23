@@ -46,7 +46,7 @@ export declare class SiteManager {
      * @param site
      * @return string
      */
-    getDeepLinkFor(site: any): any;
+    getDeepLinkFor(site: any): string;
     /**
      * Pausiert eine Seite
      *

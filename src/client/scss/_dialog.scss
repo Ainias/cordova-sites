@@ -96,6 +96,14 @@
       margin-top: 0.3rem;
       margin-bottom: 0.3rem;
       padding-left: 0.5rem;
+
+      &.html-element{
+        background: transparent;
+        border: solid 1px #828282;
+        svg {
+          max-height: 20rem;
+        }
+      }
     }
 
     //Additional classes
