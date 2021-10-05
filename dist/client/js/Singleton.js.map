@@ -1,1 +1,0 @@
-{"version":3,"file":"Singleton.js","sourceRoot":"","sources":["../../../src/client/js/Singleton.ts"],"names":[],"mappings":";;;AAAA,MAAa,SAAS;IAElB;;;OAGG;IACH,MAAM,CAAC,WAAW;QACd,IAAI,CAAC,IAAI,CAAC,SAAS,EAAC;YAChB,IAAI,CAAC,SAAS,GAAG,IAAI,IAAI,EAAE,CAAC;SAC/B;QACD,OAAO,IAAI,CAAC,SAAS,CAAC;IAC1B,CAAC;CACJ;AAZD,8BAYC"}
