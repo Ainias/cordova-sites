@@ -1,5 +1,4 @@
-html, body
-{
+html, body {
   height: 100%;
 }
 
@@ -18,4 +17,30 @@ html, body
   right: 0;
   bottom: 0;
   background-color: #efeff4;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    > div.container-xxl {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+  }
+}
+
+.back-button-img {
+  display: inline-block;
+  width: 1.31rem;
+  height: 1rem;
+  background-repeat: no-repeat;
+  background-size: contain;
+  @include design($flat) {
+    background-image: url("../img/arrowLeft.svg");
+  }
+
+  @include design($material) {
+    background-image: url("../img/back.png");
+  }
 }

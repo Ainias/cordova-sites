@@ -13,6 +13,8 @@ let pathsToProjects = [
     // '/home/silas/Projekte/web/crew',
     // '/home/silas/Projekte/web/hoffnungsfest',
     '/home/silas/Projekte/web/worktime',
+    '/home/silas/Projekte/web/TaskList',
+    '/home/silas/Projekte/web/prayercircle',
     // "/home/silas/Projekte/Web/orgel",
     // "/home/silas/Projekte/Web/bible-lexicon",
     // "/home/silas/Projekte/Web/wordRotator",
