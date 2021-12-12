@@ -1,0 +1,10 @@
+import { SiteType } from '../Site/Site';
+import type { Sites } from './Sites';
+import * as React from 'react';
+import type { SiteContainer, TopBarOptions } from '../Site/SiteContainer';
+export declare const SitesContext: React.Context<Sites | undefined>;
+export declare const SiteContainerContext: React.Context<SiteContainer | undefined>;
+export declare function useSites(): Sites | undefined;
+export declare function useCreateDeepLink(site: SiteType, params?: Record<string, string | number>): string | undefined;
+export declare function useSiteContainer(): SiteContainer | undefined;
+export declare function useTopBar(options: TopBarOptions): void;
