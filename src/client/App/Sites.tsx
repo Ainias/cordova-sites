@@ -36,6 +36,7 @@ type Props = {
     animationHandler?: SiteAnimationInterface;
     basePath?: string;
     siteContainerClass?: string;
+    contentWrapper?: ComponentType;
 };
 
 export class Sites extends PureComponent<Props, State> {
@@ -161,13 +162,13 @@ export class Sites extends PureComponent<Props, State> {
 
     render() {
         const { isInitialized, sites, visibleSite, animation } = this.state;
-        const { style, className, siteContainerClass } = this.props;
+        const { style, className, siteContainerClass, contentWrapper } = this.props;
 
         if (!isInitialized) {
             return null;
         }
 
-        return (
+        const content = (
             <div style={style} className={className || 'siteContainer'}>
                 <SitesContext.Provider value={this}>
                     {sites.map((data) => {
@@ -187,7 +188,19 @@ export class Sites extends PureComponent<Props, State> {
                 </SitesContext.Provider>
             </div>
         );
+
+        if (contentWrapper) {
+            const Wrapper = contentWrapper;
+            return <Wrapper>{content}</Wrapper>;
+        }
+        return content;
     }
+
+    setContainerForSite = (id: number, containerRef: React.RefObject<HTMLDivElement>) => {
+        if (this.sites.has(id)) {
+            this.sites.get(id)!.containerRefPromise.resolve(containerRef);
+        }
+    };
 
     private async startFirstSite() {
         const { startSite } = this.props;
@@ -217,12 +230,6 @@ export class Sites extends PureComponent<Props, State> {
         this.setState({ isInitialized: true });
     }
 
-    setContainerForSite = (id: number, containerRef: React.RefObject<HTMLDivElement>) => {
-        if (this.sites.has(id)) {
-            this.sites.get(id)!.containerRefPromise.resolve(containerRef);
-        }
-    };
-
     onPopState(e: PopStateEvent) {
         console.log('popState fired');
         e.preventDefault();
@@ -239,7 +246,7 @@ export class Sites extends PureComponent<Props, State> {
         const currentSiteId = this.order[this.order.length - 1];
         if (callOnBackListener) {
             const listener = this.sites.get(currentSiteId)?.onBackListener;
-            if (listener && listener() === true) {
+            if (listener && listener()) {
                 return;
             }
         }

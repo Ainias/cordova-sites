@@ -3,7 +3,8 @@
  */
 import { Helper } from 'js-helper/dist/shared/Helper';
 import { JsonHelper } from 'js-helper/dist/shared/JsonHelper';
-import { ArrayHelper } from 'js-helper';
+import { ArrayHelper, PromiseWithHandlers } from 'js-helper';
+import { Sites } from './App/Sites';
 
 declare const NativeStorage: any;
 
@@ -12,6 +13,7 @@ export class NativeStoragePromise {
     static prefix = '';
     static persistent = true;
     static electronStorage: any = null;
+    static readonly initializationPromise = new PromiseWithHandlers();
 
     private static isElectron() {
         return (
@@ -25,6 +27,7 @@ export class NativeStoragePromise {
      * Setzt ein Item für NativeStorage
      */
     static async setItem(key: string, value: number | string | Record<string, any>) {
+        await this.initializationPromise;
         if (this.persistent) {
             if (this.isElectron()) {
                 return new Promise<void>((res, rej) =>
@@ -50,6 +53,7 @@ export class NativeStoragePromise {
         key: string,
         defaultValue?: Type
     ): Promise<any> {
+        await this.initializationPromise;
         return new Promise((res) => {
             if (this.isElectron()) {
                 this.electronStorage.get(this.prefix + key, (e: any, data: Type) => {
@@ -76,6 +80,7 @@ export class NativeStoragePromise {
      *
      */
     static async getAllKeys() {
+        await this.initializationPromise;
         let keys: string[];
         if (this.persistent) {
             if (this.isElectron()) {
@@ -106,6 +111,7 @@ export class NativeStoragePromise {
      *
      */
     static async remove(key: string) {
+        await this.initializationPromise;
         delete this.cache[this.prefix + key];
         if (this.isElectron()) {
             return new Promise<void>((res, rej) =>
@@ -125,6 +131,7 @@ export class NativeStoragePromise {
      * Entfernt alle Objects aus dem NativeStorage
      */
     static async clear() {
+        await this.initializationPromise;
         const keys = await this.getAllKeys();
         await ArrayHelper.asyncForEach(
             keys,
@@ -136,6 +143,7 @@ export class NativeStoragePromise {
     }
 
     static async makePersistent() {
+        await this.initializationPromise;
         if (!this.persistent) {
             this.persistent = true;
             await ArrayHelper.asyncForEach(
@@ -149,6 +157,7 @@ export class NativeStoragePromise {
     }
 
     static async makeUnpersistent() {
+        await this.initializationPromise;
         if (this.persistent) {
             const keys = await this.getAllKeys();
             const values = {};
@@ -161,3 +170,5 @@ export class NativeStoragePromise {
         }
     }
 }
+
+Sites.addInitialization(() => NativeStoragePromise.initializationPromise.resolve());
