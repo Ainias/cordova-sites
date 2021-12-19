@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Context = void 0;
 const Helper_1 = require("../Legacy/Helper");
 const ViewInflater_1 = require("../ViewInflater");
+const js_helper_1 = require("js-helper");
 /**
  * Basis-Klasse für Seiten und Fragmente
  */
@@ -28,7 +29,7 @@ class Context {
         this._view = null;
         this._fragments = [];
         this._state = Context.STATE_CREATED;
-        this._viewLoadedPromise = Helper_1.Helper.newPromiseWithResolve();
+        this._viewLoadedPromise = new js_helper_1.PromiseWithHandlers();
         this._viewPromise = ViewInflater_1.ViewInflater.getInstance().load(view).then((siteContent) => {
             this._view = siteContent;
             return siteContent;
@@ -264,6 +265,9 @@ class Context {
      */
     getViewPromise() {
         return this._viewPromise;
+    }
+    getViewLoadedPromise() {
+        return this._viewLoadedPromise;
     }
 }
 exports.Context = Context;

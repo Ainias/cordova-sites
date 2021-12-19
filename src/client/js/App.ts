@@ -11,7 +11,7 @@ export class App {
     private _readyPromise: Promise<unknown>;
     private _deepLinks: {};
     private _siteManager: SiteManager;
-    private startingSite: AbstractSite;
+    private startingSite: typeof AbstractSite;
     private startingSiteParameters: {[key: string]: any};
 
     private static _logo: string;
@@ -35,7 +35,7 @@ export class App {
         this._deepLinks[link] = siteConstructor;
     }
 
-    async startSite(site, args?){
+    async startSite(site: typeof AbstractSite, args?){
         if (this._siteManager){
             return this._siteManager.startSite(site, args);
         }

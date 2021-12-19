@@ -129,7 +129,7 @@ export class SiteManager {
      * @param paramsPromise
      * @returns {Promise<any>}
      */
-    async startSite(siteConstructor, paramsPromise) {
+    async startSite(siteConstructor: typeof AbstractSite, paramsPromise) {
         //Testen, ob der Constructor vom richtigen Typen ist
         if (!(siteConstructor.prototype instanceof AbstractSite)) {
             throw {
@@ -156,9 +156,9 @@ export class SiteManager {
             await Promise.all([site._onConstructPromise, site.getViewPromise()]);
 
             //If site is ended inside onConstruct, don't do anything
-            if (site._state !== Context.STATE_DESTROYED && site._state !== Context.STATE_DESTROYING) {
+            if (site.getState() !== Context.STATE_DESTROYED && site.getState() !== Context.STATE_DESTROYING) {
                 await site.callOnViewLoaded();
-                site._viewLoadedPromise.resolve();
+                site.getViewLoadedPromise().resolve();
                 return this._show(site);
             }
             loadingSymbol.remove();
@@ -173,7 +173,7 @@ export class SiteManager {
                     return this._show(this._siteStack[i]);
                 }
             }
-            site._viewLoadedPromise.reject();
+            site.getViewLoadedPromise().reject();
         });
 
         //Gebe Site-Promise zurück

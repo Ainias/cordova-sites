@@ -20,7 +20,7 @@ export declare class AbstractFragment<ct extends AbstractSite> extends Context {
      * @returns
      */
     getSite(): ct;
-    startSite(site: AbstractSite, args: any): Promise<any>;
+    startSite(site: typeof AbstractSite, args: any): Promise<any>;
     /**
      * Gibt zurück, ob das Fragment aktiv ist. Wenn nicht, wird es in der Seite nicht angezeigt
      *

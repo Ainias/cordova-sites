@@ -1,3 +1,4 @@
+import { AbstractSite } from "./AbstractSite";
 /**
  * Manager-Klasse für die Seiten
  */
@@ -37,7 +38,7 @@ export declare class SiteManager {
      * @param paramsPromise
      * @returns {Promise<any>}
      */
-    startSite(siteConstructor: any, paramsPromise: any): Promise<any>;
+    startSite(siteConstructor: typeof AbstractSite, paramsPromise: any): Promise<any>;
     updateUrl(site: any, args: any): void;
     _generateUrl(site: any, args: any): string;
     /**

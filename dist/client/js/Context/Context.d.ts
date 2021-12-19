@@ -1,4 +1,5 @@
 import { AbstractFragment } from "./AbstractFragment";
+import { PromiseWithHandlers } from "js-helper";
 /**
  * Basis-Klasse für Seiten und Fragmente
  */
@@ -14,7 +15,7 @@ export declare class Context {
     protected _view: any;
     protected _fragments: any;
     protected _state: any;
-    protected _viewLoadedPromise: Promise<any>;
+    protected _viewLoadedPromise: PromiseWithHandlers<any>;
     protected _viewPromise: Promise<any>;
     protected constructParameters: any;
     private onViewLoadedCalled;
@@ -109,4 +110,5 @@ export declare class Context {
      * @returns {*}
      */
     getViewPromise(): Promise<any>;
+    getViewLoadedPromise(): PromiseWithHandlers<any>;
 }

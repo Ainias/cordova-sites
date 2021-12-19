@@ -1,6 +1,7 @@
 import {Helper} from "../Legacy/Helper";
 import {ViewInflater} from "../ViewInflater";
 import {AbstractFragment} from "./AbstractFragment";
+import { PromiseWithHandlers } from "js-helper";
 
 /**
  * Basis-Klasse für Seiten und Fragmente
@@ -19,7 +20,7 @@ export class Context {
     protected _view;
     protected _fragments;
     protected _state;
-    protected _viewLoadedPromise: Promise<any>;
+    protected _viewLoadedPromise: PromiseWithHandlers<any>;
     protected _viewPromise: Promise<any>;
     protected constructParameters;
 
@@ -37,7 +38,7 @@ export class Context {
         this._view = null;
         this._fragments = [];
         this._state = Context.STATE_CREATED;
-        this._viewLoadedPromise = Helper.newPromiseWithResolve();
+        this._viewLoadedPromise = new PromiseWithHandlers<any>();
 
         this._viewPromise = ViewInflater.getInstance().load(view).then((siteContent) => {
             this._view = siteContent;
@@ -281,5 +282,9 @@ export class Context {
      */
     getViewPromise() {
         return this._viewPromise;
+    }
+
+    getViewLoadedPromise(){
+        return this._viewLoadedPromise;
     }
 }

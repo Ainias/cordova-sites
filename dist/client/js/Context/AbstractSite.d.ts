@@ -20,7 +20,7 @@ export declare class AbstractSite extends Context {
      * @param siteManager
      * @param view
      */
-    constructor(siteManager: any, view: any);
+    constructor(siteManager: any, view?: any);
     getTitle(): any;
     onConstruct(constructParameters: any): Promise<any[]>;
     onStart(pauseArguments: any): Promise<void>;
@@ -53,7 +53,7 @@ export declare class AbstractSite extends Context {
      * @param args
      * @returns {*|Promise<*>}
      */
-    startSite(site: any, args?: any): Promise<any>;
+    startSite(site: typeof AbstractSite, args?: any): Promise<any>;
     /**
      * Alias für
      *  this.startSite(...);

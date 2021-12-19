@@ -140,9 +140,9 @@ class SiteManager {
                 site._onConstructPromise = site.onConstruct(Helper_1.Helper.nonNull(params, {}));
                 yield Promise.all([site._onConstructPromise, site.getViewPromise()]);
                 //If site is ended inside onConstruct, don't do anything
-                if (site._state !== Context_1.Context.STATE_DESTROYED && site._state !== Context_1.Context.STATE_DESTROYING) {
+                if (site.getState() !== Context_1.Context.STATE_DESTROYED && site.getState() !== Context_1.Context.STATE_DESTROYING) {
                     yield site.callOnViewLoaded();
-                    site._viewLoadedPromise.resolve();
+                    site.getViewLoadedPromise().resolve();
                     return this._show(site);
                 }
                 loadingSymbol.remove();
@@ -156,7 +156,7 @@ class SiteManager {
                         return this._show(this._siteStack[i]);
                     }
                 }
-                site._viewLoadedPromise.reject();
+                site.getViewLoadedPromise().reject();
             });
             //Gebe Site-Promise zurück
             return site.getFinishPromise();

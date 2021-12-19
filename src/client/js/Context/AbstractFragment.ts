@@ -38,7 +38,7 @@ export class AbstractFragment<ct extends AbstractSite> extends Context {
         return this._site;
     }
 
-    async startSite(site: AbstractSite, args) {
+    async startSite(site: typeof AbstractSite, args) {
         return this.getSite().startSite(site, args);
     }
 

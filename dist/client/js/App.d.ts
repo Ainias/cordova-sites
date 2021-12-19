@@ -1,3 +1,4 @@
+import { AbstractSite } from "./Context/AbstractSite";
 export declare class App {
     private _resolver;
     private _readyPromise;
@@ -18,7 +19,7 @@ export declare class App {
      */
     constructor();
     addDeepLink(link: any, siteConstructor: any): void;
-    startSite(site: any, args?: any): Promise<any>;
+    startSite(site: typeof AbstractSite, args?: any): Promise<any>;
     static setLogo(logo: any): void;
     static getLogo(): string;
     start(startSiteConstructor: any): Promise<void>;

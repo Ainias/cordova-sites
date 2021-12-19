@@ -29,7 +29,7 @@ export class AbstractSite extends Context {
      * @param siteManager
      * @param view
      */
-    constructor(siteManager, view) {
+    constructor(siteManager, view?) {
         super(view);
 
         this._isDestroying = false;
@@ -186,7 +186,7 @@ export class AbstractSite extends Context {
      * @param args
      * @returns {*|Promise<*>}
      */
-    startSite(site, args?) {
+    startSite(site: typeof AbstractSite, args?) {
         return this._siteManager.startSite(site, args);
     }
 
