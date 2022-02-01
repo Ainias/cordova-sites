@@ -45,7 +45,7 @@ export class RouteDeepLinkHandler<SiteType> implements DeepLinkHandler<SiteType>
 
     createDeepLinkForSite(site: SiteType, params?: Record<string, string | number | boolean>): string {
         if (!this.reverseDeepLinks.has(site)) {
-            return '';
+            return this.basePath;
         }
         const fullLink = this.reverseDeepLinks.get(site)!;
         if (params) {

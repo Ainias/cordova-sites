@@ -1,94 +1,103 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
-import * as React from 'react';
-import { createRef } from 'react';
-import { SiteIdContext } from '../App/SiteIdContext';
-import { TopBar } from './TopBar/TopBar';
-import { SiteContainerContext } from '../App/Hooks';
-import { Container } from 'react-bootstrap';
-var initialTopBarOptions = {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SiteContainer = exports.initialFooterOptions = exports.initialTopBarOptions = void 0;
+const React = __importStar(require("react"));
+const react_1 = require("react");
+const SiteIdContext_1 = require("../App/SiteIdContext");
+const VisibleContext_1 = require("../App/VisibleContext");
+const TopBar_1 = require("./TopBar/TopBar");
+const Hooks_1 = require("../App/Hooks");
+const react_bootstrap_1 = require("react-bootstrap");
+exports.initialTopBarOptions = {
+    visible: true,
     title: undefined,
     leftButtons: [],
     rightButtons: [],
     backButton: undefined,
+    transparent: false,
+    drawBehind: false,
 };
-var initialState = {
-    topBarOptions: initialTopBarOptions,
+exports.initialFooterOptions = {
+    visible: true,
+    buttons: [],
 };
-var SiteContainer = /** @class */ (function (_super) {
-    __extends(SiteContainer, _super);
-    function SiteContainer() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.state = initialState;
-        _this.container = createRef();
-        _this.child = createRef();
-        return _this;
+const initialState = {
+    topBarOptions: {},
+};
+class SiteContainer extends React.PureComponent {
+    constructor() {
+        super(...arguments);
+        this.state = initialState;
+        this.container = react_1.createRef();
+        this.child = react_1.createRef();
     }
-    SiteContainer.prototype.componentDidMount = function () {
-        var _a = this.props, visible = _a.visible, onContainerListener = _a.onContainerListener, id = _a.id;
+    componentDidMount() {
+        const { visible, onContainerListener, id } = this.props;
         if (this.child.current && !visible) {
             this.child.current.remove();
         }
         if (onContainerListener) {
             onContainerListener(id, this.container);
         }
-    };
-    SiteContainer.prototype.getSnapshotBeforeUpdate = function (prevProps) {
-        var visible = this.props.visible;
+    }
+    getSnapshotBeforeUpdate(prevProps) {
+        const { visible } = this.props;
         if (!prevProps.visible && visible && this.container.current && this.child.current) {
             this.container.current.appendChild(this.child.current);
         }
         return null;
-    };
-    SiteContainer.prototype.componentDidUpdate = function (prevProps) {
-        var visible = this.props.visible;
+    }
+    componentDidUpdate(prevProps) {
+        const { visible } = this.props;
         if (!visible && prevProps.visible && this.child.current) {
             this.child.current.remove();
         }
-    };
-    SiteContainer.prototype.render = function () {
-        var _a = this.props, siteComponent = _a.siteComponent, siteContainerStyle = _a.siteContainerStyle, siteProps = _a.siteProps, visible = _a.visible, id = _a.id, leaving = _a.leaving, siteContainerClass = _a.siteContainerClass;
-        var Base = siteComponent;
-        var _b = this.state.topBarOptions, title = _b.title, rightButtons = _b.rightButtons, leftButtons = _b.leftButtons, backButton = _b.backButton;
-        return (React.createElement("div", { ref: this.container, style: siteContainerStyle, className: siteContainerClass || 'site' },
+    }
+    render() {
+        var _a, _b;
+        const { siteComponent, siteContainerStyle, siteProps, visible, id, siteContainerClass, defaultTopBarOptions } = this.props;
+        const Base = siteComponent;
+        const { topBarOptions } = this.state;
+        if (typeof topBarOptions.rightButtons === 'function') {
+            topBarOptions.rightButtons = topBarOptions.rightButtons([...((_a = defaultTopBarOptions.rightButtons) !== null && _a !== void 0 ? _a : [])]);
+        }
+        if (typeof topBarOptions.leftButtons === 'function') {
+            topBarOptions.leftButtons = topBarOptions.leftButtons([...((_b = defaultTopBarOptions.leftButtons) !== null && _b !== void 0 ? _b : [])]);
+        }
+        return (React.createElement("div", { ref: this.container, style: siteContainerStyle, className: (siteContainerClass !== null && siteContainerClass !== void 0 ? siteContainerClass : 'site') + (visible ? ' visible' : ' hidden') },
             React.createElement("div", { ref: this.child },
-                React.createElement(SiteContainerContext.Provider, { value: this },
-                    React.createElement(SiteIdContext.Provider, { value: id },
-                        React.createElement(TopBar, { title: title, rightButtons: rightButtons, leftButtons: leftButtons, backButton: backButton }),
-                        React.createElement(Container, { fluid: "xxl" },
-                            React.createElement(Base, __assign({ visible: visible, leaving: leaving }, siteProps, { id: id }))))))));
-    };
-    SiteContainer.prototype.updateTopBarOptions = function (newOptions) {
-        var topBarOptions = this.state.topBarOptions;
+                React.createElement(Hooks_1.SiteContainerContext.Provider, { value: this },
+                    React.createElement(SiteIdContext_1.SiteIdContext.Provider, { value: id },
+                        React.createElement(VisibleContext_1.VisibleContext.Provider, { value: visible },
+                            React.createElement(TopBar_1.TopBar, Object.assign({}, defaultTopBarOptions, topBarOptions)),
+                            React.createElement(react_bootstrap_1.Container, { fluid: "xxl", style: { overflowX: 'hidden', padding: 0 } },
+                                React.createElement(Base, Object.assign({}, siteProps)))))))));
+    }
+    updateTopBarOptions(newOptions) {
+        const { topBarOptions } = this.state;
         this.setState({
-            topBarOptions: __assign(__assign({}, topBarOptions), newOptions),
+            topBarOptions: Object.assign(Object.assign({}, topBarOptions), newOptions),
         });
-    };
-    return SiteContainer;
-}(React.PureComponent));
-export { SiteContainer };
+    }
+}
+exports.SiteContainer = SiteContainer;
 //# sourceMappingURL=SiteContainer.js.map

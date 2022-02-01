@@ -1,21 +1,22 @@
-import { Helper } from 'js-helper/dist/shared';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Translator = void 0;
+const shared_1 = require("js-helper/dist/shared");
 /**
  * Singleton-Klasse zum Übersetzen von Text-Inhalten
  */
-var Translator = /** @class */ (function () {
+class Translator {
     /**
      * Erstellt einen neuen Translator
      * @param config
      */
-    function Translator(config) {
-        var _this = this;
-        if (config === void 0) { config = {
-            translations: {},
-            fallbackLanguage: 'en',
-            markUntranslatedTranslations: true,
-            markTranslations: false,
-            logMissingTranslations: true,
-        }; }
+    constructor(config = {
+        translations: {},
+        fallbackLanguage: 'en',
+        markUntranslatedTranslations: true,
+        markTranslations: false,
+        logMissingTranslations: true,
+    }) {
         this.dynamicKey = 0;
         this.translations = {};
         this.addDynamicTranslations(Translator.translations);
@@ -24,12 +25,12 @@ var Translator = /** @class */ (function () {
         this.markUntranslatedTranslations = config.markUntranslatedTranslations;
         this.markTranslations = config.markTranslations;
         if (config.logMissingTranslations === true) {
-            this.logMissingTranslationsFunction = function (missingTranslation, language) {
-                if (language === _this.fallbackLanguage) {
-                    console.error("missing base translation for key " + missingTranslation);
+            this.logMissingTranslationsFunction = (missingTranslation, language) => {
+                if (language === this.fallbackLanguage) {
+                    console.error(`missing base translation for key ${missingTranslation}`);
                 }
                 else {
-                    console.warn("missing translation for language >" + language + "< and key >" + missingTranslation + "<");
+                    console.warn(`missing translation for language >${language}< and key >${missingTranslation}<`);
                 }
             };
         }
@@ -42,10 +43,10 @@ var Translator = /** @class */ (function () {
         this.translationCallbacks = new Map();
         this.lastTranslationCallbackId = 0;
     }
-    Translator.prototype.createDynamicKey = function () {
+    createDynamicKey() {
         this.dynamicKey++;
-        return "translator-dynamic-" + new Date().getTime() + "-" + this.dynamicKey;
-    };
+        return `translator-dynamic-${new Date().getTime()}-${this.dynamicKey}`;
+    }
     /**
      * Übersetzt sofort einen Key in die aktuelle Sprache
      * @param key
@@ -53,14 +54,14 @@ var Translator = /** @class */ (function () {
      * @param selectedLanguage
      * @returns {*}
      */
-    Translator.prototype.translate = function (key, args, selectedLanguage) {
-        if (Helper.isNull(key)) {
+    translate(key, args, selectedLanguage) {
+        if (shared_1.Helper.isNull(key)) {
             return '';
         }
-        var language = Helper.nonNull(selectedLanguage, args, this.fallbackLanguage);
-        var translation = null;
+        const language = shared_1.Helper.nonNull(selectedLanguage, args, this.fallbackLanguage);
+        let translation = null;
         key = key.toLowerCase();
-        if (Helper.isNotNull(this.translations[language]) && Helper.isNotNull(this.translations[language][key])) {
+        if (shared_1.Helper.isNotNull(this.translations[language]) && shared_1.Helper.isNotNull(this.translations[language][key])) {
             translation = this.translations[language][key];
         }
         else {
@@ -77,75 +78,73 @@ var Translator = /** @class */ (function () {
                 translation = key;
             }
             if (this.markUntranslatedTranslations) {
-                translation = "&gt;&gt;" + translation + "&lt;&lt;";
+                translation = `&gt;&gt;${translation}&lt;&lt;`;
             }
         }
         if (this.markTranslations) {
-            translation = "$" + translation + "$";
+            translation = `$${translation}$`;
         }
         if (args !== undefined) {
             translation = Translator.format(translation, args);
         }
         return translation;
-    };
+    }
     /**
      * Fügt neue Übersetzungen hinzu
      * @param trans
      */
-    Translator.prototype.addDynamicTranslations = function (trans) {
-        var _this = this;
-        Object.keys(trans).forEach(function (lang) {
-            if (!_this.translations[lang]) {
-                _this.translations[lang] = {};
+    addDynamicTranslations(trans) {
+        Object.keys(trans).forEach((lang) => {
+            if (!this.translations[lang]) {
+                this.translations[lang] = {};
             }
-            Object.keys(trans[lang]).forEach(function (key) {
-                _this.translations[lang][key.toLowerCase()] = trans[lang][key];
+            Object.keys(trans[lang]).forEach((key) => {
+                this.translations[lang][key.toLowerCase()] = trans[lang][key];
             });
         });
-    };
-    Translator.prototype.getLanguages = function () {
+    }
+    getLanguages() {
         return Object.keys(this.translations);
-    };
-    Translator.prototype.getFallbackLanguage = function () {
+    }
+    getFallbackLanguage() {
         return this.fallbackLanguage;
-    };
-    Translator.translate = function (key, args, language) {
-        var instance = Translator.getInstance();
+    }
+    static translate(key, args, language) {
+        const instance = Translator.getInstance();
         if (instance) {
             return instance.translate(key, args, language);
         }
         return '';
-    };
-    Translator.addDynamicTranslations = function (trans) {
-        var instance = Translator.getInstance();
+    }
+    static addDynamicTranslations(trans) {
+        const instance = Translator.getInstance();
         if (instance) {
             instance.addDynamicTranslations(trans);
         }
         else {
-            Object.keys(trans).forEach(function (lang) {
-                if (Helper.isNull(Translator.translations[lang])) {
+            Object.keys(trans).forEach((lang) => {
+                if (shared_1.Helper.isNull(Translator.translations[lang])) {
                     Translator.translations[lang] = {};
                 }
                 Object.assign(Translator.translations[lang], trans[lang]);
             });
         }
-    };
-    Translator.init = function (config) {
+    }
+    static init(config) {
         Translator.instance = new Translator(config);
-    };
+    }
     /**
      * @returns {Translator|null}
      */
-    Translator.getInstance = function () {
+    static getInstance() {
         return Translator.instance;
-    };
-    Translator.format = function (translation, args) {
-        return translation.replace(/{(\d+)}/g, function (match, number) {
+    }
+    static format(translation, args) {
+        return translation.replace(/{(\d+)}/g, (match, number) => {
             return args[number] !== undefined ? args[number] : match;
         });
-    };
-    Translator.translations = {};
-    return Translator;
-}());
-export { Translator };
+    }
+}
+exports.Translator = Translator;
+Translator.translations = {};
 //# sourceMappingURL=Translator.js.map

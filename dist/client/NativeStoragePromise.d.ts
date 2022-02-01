@@ -9,11 +9,11 @@ export declare class NativeStoragePromise {
     /**
      * Setzt ein Item für NativeStorage
      */
-    static setItem(key: string, value: number | string | Record<string, any>): Promise<unknown>;
+    static setItem(key: string, value: number | string | Record<string, any> | unknown[]): Promise<unknown>;
     /**
      * Bekomme ein Item von NativeStorage
      */
-    static getItem<Type extends number | string | Record<string, unknown>>(key: string, defaultValue?: Type): Promise<any>;
+    static getItem<Type extends number | string | Record<string, unknown> | unknown[]>(key: string, defaultValue?: Type): Promise<any>;
     /**
      * Bekomme die Keys vom NativeStorage
      *

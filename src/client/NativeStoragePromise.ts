@@ -5,6 +5,7 @@ import { Helper } from 'js-helper/dist/shared/Helper';
 import { JsonHelper } from 'js-helper/dist/shared/JsonHelper';
 import { ArrayHelper, PromiseWithHandlers } from 'js-helper';
 import { Sites } from './App/Sites';
+import { SerializationType } from 'child_process';
 
 declare const NativeStorage: any;
 
@@ -18,7 +19,6 @@ export class NativeStoragePromise {
     private static isElectron() {
         return (
             typeof navigator === 'object' &&
-            typeof navigator.userAgent === 'string' &&
             navigator.userAgent.indexOf('Electron') >= 0
         );
     }
@@ -26,7 +26,7 @@ export class NativeStoragePromise {
     /**
      * Setzt ein Item für NativeStorage
      */
-    static async setItem(key: string, value: number | string | Record<string, any>) {
+    static async setItem(key: string, value: number | string | Record<string, any> | unknown[]) {
         await this.initializationPromise;
         if (this.persistent) {
             if (this.isElectron()) {
@@ -49,7 +49,7 @@ export class NativeStoragePromise {
     /**
      * Bekomme ein Item von NativeStorage
      */
-    static async getItem<Type extends number | string | Record<string, unknown>>(
+    static async getItem<Type extends number | string | Record<string, unknown> | unknown[]>(
         key: string,
         defaultValue?: Type
     ): Promise<any> {

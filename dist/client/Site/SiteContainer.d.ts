@@ -1,42 +1,49 @@
 import * as React from 'react';
-import { SiteProps } from './Site';
-import type { TopBarButtonType } from 'react-bootstrap-mobile';
-declare const initialTopBarOptions: {
-    title: string | undefined;
-    leftButtons: TopBarButtonType[];
-    rightButtons: TopBarButtonType[];
-    backButton: false | TopBarButtonType | undefined;
+import { SitesTopBarButtonType, TopBarProps } from './TopBar/TopBar';
+import { FooterButton } from './Footer/Footer';
+import { StringMap } from 'i18next';
+import { Override } from 'react-bootstrap-mobile';
+export declare const initialTopBarOptions: TopBarProps<StringMap>;
+export declare const initialFooterOptions: {
+    visible: boolean;
+    buttons: FooterButton[];
 };
+export declare type TopBarOptions = Partial<TopBarProps<StringMap>>;
+export declare type TopBarOptionsWithButtonFunctions = Partial<Override<TopBarProps<StringMap>, {
+    rightButtons: SitesTopBarButtonType<StringMap>[] | ((defaultButtons: SitesTopBarButtonType<StringMap>[]) => SitesTopBarButtonType<StringMap>[]);
+    leftButtons: SitesTopBarButtonType<StringMap>[] | ((defaultButtons: SitesTopBarButtonType<StringMap>[]) => SitesTopBarButtonType<StringMap>[]);
+}>>;
+export declare type FooterOptions = Partial<typeof initialFooterOptions & {
+    activeTab: number;
+}>;
 declare const initialState: {
-    topBarOptions: {
-        title: string | undefined;
-        leftButtons: TopBarButtonType[];
-        rightButtons: TopBarButtonType[];
-        backButton: false | TopBarButtonType | undefined;
-    };
+    topBarOptions: Partial<Override<TopBarProps<StringMap>, {
+        rightButtons: SitesTopBarButtonType<StringMap>[] | ((defaultButtons: SitesTopBarButtonType<StringMap>[]) => SitesTopBarButtonType<StringMap>[]);
+        leftButtons: SitesTopBarButtonType<StringMap>[] | ((defaultButtons: SitesTopBarButtonType<StringMap>[]) => SitesTopBarButtonType<StringMap>[]);
+    }>>;
 };
-export declare type TopBarOptions = Partial<typeof initialTopBarOptions>;
 declare type State = Readonly<typeof initialState>;
-declare type Props = {
+declare type Props<SitePropsType> = {
     visible: boolean;
     leaving: boolean;
     id: number;
-    siteComponent: React.ComponentType<SiteProps>;
-    siteProps: any;
+    siteComponent: React.ComponentType<SitePropsType>;
+    siteProps: SitePropsType;
     siteContainerStyle?: {
         [key: string]: string | number;
     };
     siteContainerClass?: string;
     onContainerListener?: (id: number, ref: React.RefObject<HTMLDivElement>) => void;
+    defaultTopBarOptions: typeof initialTopBarOptions;
 };
-export declare class SiteContainer extends React.PureComponent<Props, State> {
+export declare class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsType>, State> {
     readonly state: State;
     container: React.RefObject<HTMLDivElement>;
     child: React.RefObject<HTMLDivElement>;
     componentDidMount(): void;
-    getSnapshotBeforeUpdate(prevProps: Readonly<Props>): null;
-    componentDidUpdate(prevProps: Readonly<Props>): void;
+    getSnapshotBeforeUpdate(prevProps: Readonly<Props<SitePropsType>>): null;
+    componentDidUpdate(prevProps: Readonly<Props<SitePropsType>>): void;
     render(): JSX.Element;
-    updateTopBarOptions(newOptions: TopBarOptions): void;
+    updateTopBarOptions(newOptions: TopBarOptionsWithButtonFunctions): void;
 }
 export {};

@@ -1,4 +1,4 @@
-import { ComponentType, PureComponent } from 'react';
+import { PureComponent } from 'react';
 declare const defaultState: {};
 export declare type SiteProps = {
     id: number;
@@ -15,5 +15,4 @@ export declare class Site<TProps extends SiteProps, TState extends State> extend
     componentDidAppear(): void;
     componentDidDisappear(): void;
 }
-export declare type SiteType = ComponentType<Record<string, any> & SiteProps>;
 export {};

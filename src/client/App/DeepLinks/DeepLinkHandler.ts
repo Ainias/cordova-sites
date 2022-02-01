@@ -1,6 +1,6 @@
 export type DeepLinkData<SiteType> = {
     site: SiteType;
-    params: Record<string, string | number>;
+    params: Record<string, string | number | boolean>;
 };
 
 export interface DeepLinkHandler<SiteType> {
@@ -8,6 +8,6 @@ export interface DeepLinkHandler<SiteType> {
     set(link: string, site: SiteType): void;
     get(link: string): SiteType | undefined;
     setBasePath(link: string): void;
-    calculateSite(link: string): DeepLinkData<SiteType> | undefined;
+    calculateSite(fullLink: string): DeepLinkData<SiteType> | undefined;
     createDeepLinkForSite(site: SiteType, params?: Record<string, string | number>): string;
 }

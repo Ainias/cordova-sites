@@ -1,10 +1,31 @@
-import * as React from 'react';
-import { useEffect, useState } from 'react';
-export var DeviceReady = React.memo(function (_a) {
-    var style = _a.style, className = _a.className, children = _a.children;
-    var _b = useState(false), isReady = _b[0], setIsReady = _b[1];
-    useEffect(function () {
-        document.addEventListener('deviceready', function () { return setIsReady(true); });
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DeviceReady = void 0;
+const React = __importStar(require("react"));
+const react_1 = require("react");
+exports.DeviceReady = React.memo(({ style, className, children }) => {
+    const [isReady, setIsReady] = react_1.useState(false);
+    react_1.useEffect(() => {
+        document.addEventListener('deviceready', () => setIsReady(true));
     }, []);
     if (isReady) {
         return (React.createElement("span", { style: style, className: className }, children));

@@ -1,21 +1,20 @@
-import {Translator} from "../shared/Translator";
-import {Helper} from "js-helper/dist/shared";
+import { Translator } from '../shared/Translator';
+import { Helper } from 'js-helper/dist/shared';
 
-export class ServerTranslator{
+export class ServerTranslator {
+    private lang: string;
 
-    _lang: string;
-
-    constructor(lang){
-        this._lang = lang;
+    constructor(lang: string) {
+        this.lang = lang;
     }
 
-    translate(key, args?) {
-        return Translator.translate(key, args, this._lang);
+    translate(key: string, args?: string[]) {
+        return Translator.translate(key, args, this.lang);
     }
 
-    static setUserLanguage(req, res, next){
+    static setUserLanguage(req: any, _res: any, next: () => void) {
         let lang = req.acceptsLanguages(...Translator.getInstance().getLanguages());
-        if (Helper.isNull(lang)){
+        if (Helper.isNull(lang)) {
             lang = Translator.getInstance().getFallbackLanguage();
         }
         req.lang = lang;

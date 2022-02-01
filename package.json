@@ -17,9 +17,14 @@
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-beta.6",
     "react-bootstrap-mobile": "git+https://github.com/Ainias/react-bootstrap-mobile#0.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.16"
   },
   "devDependencies": {
+    "react-i18next": "^11.15.3",
+    "i18next": "^21.6.6",
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "@babel/preset-react": "^7.14.5",
