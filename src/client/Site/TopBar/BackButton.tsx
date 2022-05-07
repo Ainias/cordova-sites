@@ -9,12 +9,12 @@ export const BackButton: FunctionComponent<Props> = React.memo(({}) => {
     const sites = useSites();
     const goBack = useCallback(() => sites?.goBack(), [sites]);
 
-    if (sites?.canGoBack()) {
-        return (
-            <TopBarButton onClick={goBack}>
-                <span className="back-button-img" />
-            </TopBarButton>
-        );
-    }
+    // if (sites?.canGoBack()) {
+    return (
+        <TopBarButton onClick={goBack}>
+            <span className="back-button-img" />
+        </TopBarButton>
+    );
+    // }
     return null;
 });

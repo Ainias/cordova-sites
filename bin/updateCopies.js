@@ -12,13 +12,15 @@ let pathsToProjects = [
     // '/home/silas/Projekte/web/wordRotator',
     // '/home/silas/Projekte/web/crew',
     // '/home/silas/Projekte/web/hoffnungsfest',
+    '/home/silas/Projekte/web/nextjsTest/poc-nextjs',
+    '/home/silas/Projekte/web/bat',
     '/home/silas/Projekte/web/worktime',
-    '/home/silas/Projekte/web/TaskList',
+    // '/home/silas/Projekte/web/TaskList',
     '/home/silas/Projekte/web/cordova-sites-legacy-adapter',
     '/home/silas/Projekte/web/prayercircle',
-    '/home/silas/Projekte/web/project-echo',
-    '/home/silas/Projekte/web/cordova-sites-easy-sync',
-    '/home/silas/Projekte/web/cordova-sites-user-management',
+    // '/home/silas/Projekte/web/project-echo',
+    // '/home/silas/Projekte/web/cordova-sites-easy-sync',
+    // '/home/silas/Projekte/web/cordova-sites-user-management',
     // "/home/silas/Projekte/Web/orgel",
     // "/home/silas/Projekte/Web/bible-lexicon",
     // "/home/silas/Projekte/Web/wordRotator",
@@ -75,7 +77,7 @@ execPromise('npm pack')
         process.chdir('tmp');
         await execPromise('tar -xvzf ' + pathToTar + ' -C ./');
         process.chdir('package');
-        fs.unlinkSync('package.json');
+        // fs.unlinkSync('package.json');
 
         let promise = Promise.resolve();
         pathsToProjects.forEach((project) => {

@@ -26,7 +26,7 @@ export const TopBarImage = React.memo(function TopBarImage({ image, maxHeight }:
     );
 
     // Effects
-    useTopBar({ transparent: transparentTopBar, drawBehind: true });
+    useTopBar({ transparent: transparentTopBar, drawBehind: true }, [transparentTopBar]);
 
     // Other
 

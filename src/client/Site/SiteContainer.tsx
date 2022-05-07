@@ -111,7 +111,7 @@ export class SiteContainer<SitePropsType> extends React.PureComponent<Props<Site
                         <SiteIdContext.Provider value={id}>
                             <VisibleContext.Provider value={visible}>
                                 <TopBar {...defaultTopBarOptions} {...(topBarOptions as TopBarOptions)} />
-                                <Container fluid="xxl" style={{ overflowX: 'hidden', padding: 0 }}>
+                                <Container fluid="xxl">
                                     <Base {...siteProps} />
                                 </Container>
                             </VisibleContext.Provider>

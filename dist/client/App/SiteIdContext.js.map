@@ -1,1 +1,0 @@
-{"version":3,"file":"SiteIdContext.js","sourceRoot":"","sources":["../../../src/client/App/SiteIdContext.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;AAAA,+CAA0C;AAE7B,QAAA,aAAa,GAAG,eAAK,CAAC,aAAa,CAAC,CAAC,CAAC,CAAC,CAAC;AACrD,qBAAa,CAAC,WAAW,GAAG,eAAe,CAAC;AAE5C,SAAgB,SAAS;IACrB,OAAO,kBAAU,CAAC,qBAAa,CAAC,CAAC;AACrC,CAAC;AAFD,8BAEC"}

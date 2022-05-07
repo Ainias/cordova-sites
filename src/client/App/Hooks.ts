@@ -1,4 +1,4 @@
-import type { Sites, SiteType } from './Sites';
+import type { SitesInner, SitesType, SiteType } from './Sites';
 import { useCallback, useContext, useEffect, useMemo } from 'react';
 import * as React from 'react';
 import type {
@@ -9,7 +9,7 @@ import type {
 } from '../Site/SiteContainer';
 import { useSiteId } from './SiteIdContext';
 
-export const SitesContext = React.createContext<Sites | undefined>(undefined);
+export const SitesContext = React.createContext<SitesInner | undefined>(undefined);
 SitesContext.displayName = 'Sites';
 
 export const SiteContainerContext = React.createContext<SiteContainer<any> | undefined>(undefined);
@@ -19,52 +19,33 @@ export function useSites() {
     return useContext(SitesContext);
 }
 
-export function useCreateDeepLink<PropTypes extends Record<string, string | number>>(
-    site: SiteType<PropTypes>,
-    params?: PropTypes
-) {
-    const app = useSites();
-    return app?.getDeepLinkHandler().createDeepLinkForSite(site, params);
-}
-
 export function useSiteContainer() {
     return useContext(SiteContainerContext);
 }
 
-export function useTopBar(options: TopBarOptionsWithButtonFunctions) {
-    const { backButton, rightButtons, leftButtons, title, visible, transparent, drawBehind } = options;
-    const savedOptions = useMemo(() => {
-        const newOptions: TopBarOptionsWithButtonFunctions = {};
-
-        if (backButton !== undefined) newOptions.backButton = backButton;
-        if (rightButtons !== undefined) newOptions.rightButtons = rightButtons;
-        if (leftButtons !== undefined) newOptions.leftButtons = leftButtons;
-        if (title !== undefined) newOptions.title = title;
-        if (visible !== undefined) newOptions.visible = visible;
-        if (transparent !== undefined) newOptions.transparent = transparent;
-        if (drawBehind !== undefined) newOptions.drawBehind = drawBehind;
-
-        return newOptions;
-    }, [backButton, rightButtons, leftButtons, title, visible, transparent, drawBehind]);
-
+export function useTopBar(options: TopBarOptionsWithButtonFunctions, dependencies?: any[]): void;
+export function useTopBar(optionsGenerator: () => TopBarOptionsWithButtonFunctions, dependencies?: any[]): void;
+export function useTopBar(
+    optionsOrGenerator: TopBarOptionsWithButtonFunctions | (() => TopBarOptionsWithButtonFunctions),
+    dependencies: any[] = []
+) {
+    const savedOptions = useMemo(
+        typeof optionsOrGenerator === 'function' ? optionsOrGenerator : () => optionsOrGenerator,
+        dependencies
+    );
     const siteContainer = useSiteContainer();
     useEffect(() => {
         siteContainer?.updateTopBarOptions(savedOptions);
     }, [savedOptions, siteContainer]);
 }
 
-export function useFooter(options: FooterOptions) {
-    const { visible, buttons, activeTab } = options;
-    const savedOptions = useMemo(() => {
-        const newOptions: FooterOptions = {};
-
-        if (visible !== undefined) newOptions.visible = visible;
-        if (buttons !== undefined) newOptions.buttons = buttons;
-        if (activeTab !== undefined) newOptions.activeTab = activeTab;
-
-        return newOptions;
-    }, [visible, buttons, activeTab]);
-
+export function useFooter(options: FooterOptions, dependencies?: any[]): void;
+export function useFooter(optionsGenerator: () => FooterOptions, dependencies?: any[]): void;
+export function useFooter(optionsOrGenerator: FooterOptions | (() => FooterOptions), dependencies: any[] = []) {
+    const savedOptions = useMemo(
+        typeof optionsOrGenerator === 'function' ? optionsOrGenerator : () => optionsOrGenerator,
+        dependencies
+    );
     const sites = useSites();
     const siteId = useSiteId();
     useEffect(() => {

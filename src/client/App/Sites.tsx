@@ -8,15 +8,22 @@ import {
     TopBarOptions,
     TopBarOptionsWithButtonFunctions,
 } from '../Site/SiteContainer';
-import { Helper, PromiseWithHandlers } from 'js-helper';
-import { DeepLinkHandler } from './DeepLinks/DeepLinkHandler';
-import { RouteDeepLinkHandler } from './DeepLinks/RouteDeepLinkHandler';
+import { PromiseWithHandlers } from 'js-helper';
 import { SiteAnimationInterface } from './SiteAnimation/SiteAnimationInterface';
 import { DefaultSiteAnimation } from './SiteAnimation/DefaultSiteAnimation';
 import { SitesContext } from './Hooks';
 import { Footer } from '../Site/Footer/Footer';
-import { OnClickProps, Toast, ToastContainer } from 'react-bootstrap-mobile';
-import { QueryDeepLinkHandler } from './DeepLinks/QueryDeepLinkHandler';
+import { Listener, Toast, ToastContainer } from 'react-bootstrap-mobile';
+import { NextRouter, withRouter } from 'next/router';
+import { AppProps } from 'next/app';
+import { UrlObject } from 'url';
+import { PrefetchOptions } from 'next/dist/shared/lib/router/router';
+
+type TransitionOptions = {
+    scroll?: boolean;
+    shallow?: boolean;
+    locale?: string;
+};
 
 export type SiteType<PropsType> = ComponentType<PropsType>;
 
@@ -31,25 +38,30 @@ type ToastData =
           text: string;
           actionName: string;
           duration: number;
-      } & OnClickProps<any>);
+      } & Listener<'onClick', any>);
 
-export interface SiteData<PropsType> {
-    site: SiteType<PropsType>;
+export type SiteData<PropsType> = {
     id: number;
-    props: PropsType;
     onBackListener?: () => boolean | void;
     containerRefPromise: PromiseWithHandlers<React.RefObject<HTMLDivElement>>;
     footerOptions: FooterOptions;
-}
+    finished: boolean;
+} & AppProps<PropsType>;
 
 const initialState = {
-    isInitialized: false,
-    visibleSite: -1,
+    isInitialized: true,
+    currentSiteId: 1,
     sites: [] as SiteData<any>[],
-    animation: null as null | {
-        type: 'start' | 'end' | 'pop-to-front';
-        leavingSite: number;
-    },
+    animation: null as
+        | null
+        | ({
+              leavingSite: number;
+          } & (
+              | {
+                    type: 'start';
+                }
+              | { type: 'end'; sitesToDelete?: number }
+          )),
     defaultTopBarOptions: initialTopBarOptions,
     defaultFooterOptions: initialFooterOptions,
     footerOptions: {} as FooterOptions,
@@ -58,65 +70,32 @@ const initialState = {
 
 type State = Readonly<typeof initialState>;
 type Props = {
-    startSite: SiteType<any>;
     style?: CSSProperties;
     className?: string;
-    deepLinkHandler?: DeepLinkHandler<SiteType<any>>;
     animationHandler?: SiteAnimationInterface;
     basePath?: string;
     siteContainerClass?: string;
     contentWrapper?: ComponentType;
+    router: NextRouter;
+    currentSite: AppProps;
 };
 
-export class Sites extends PureComponent<Props, State> {
-    private static instance: Sites;
-    private static initialisationPromises: Promise<void>[] = [];
-    private static appCreatedPromise: PromiseWithHandlers<Sites> = new PromiseWithHandlers<Sites>();
-
-    readonly state: State = initialState;
-    private lastSiteId = 0;
+export class SitesInner extends PureComponent<Props, State> {
+    readonly state: State;
+    private currentSiteId = -1;
     private sites = new Map<number, SiteData<any>>();
-    private singleInstanceSites = new Map<ComponentType<any>, number | undefined>();
-    private order: number[] = [];
-    private initializationPromise = new PromiseWithHandlers<void>();
 
     private lastToastId = 0;
     private toasts = new Map<number, ToastData>();
+    private pushingNewSite = true;
 
     private title = 'Test';
-    private url = '';
+    // private url = '';
 
-    private readonly basePath: string;
-    private readonly deepLinkHandler: DeepLinkHandler<SiteType<any>>;
     private readonly animationHandler: SiteAnimationInterface;
-
-    static getInstance() {
-        return this.instance;
-    }
-
-    static addInitialization(initializationFuncOrPromise: ((app: Sites) => Promise<void> | void) | Promise<void>) {
-        if (typeof initializationFuncOrPromise === 'function') {
-            this.initialisationPromises.push(this.appCreatedPromise.then(initializationFuncOrPromise));
-        } else {
-            this.initialisationPromises.push(initializationFuncOrPromise);
-        }
-    }
 
     constructor(props: Props) {
         super(props);
-
-        if (Sites.instance) {
-            throw Error(
-                'there can only be one instance of this class! If react unmounts previous instance, check your code. This should not be happening!'
-            );
-        }
-
-        if (props.deepLinkHandler) {
-            this.deepLinkHandler = props.deepLinkHandler;
-        } else {
-            // this.deepLinkHandler = new RouteDeepLinkHandler<SiteType<any>>();
-            this.deepLinkHandler = new QueryDeepLinkHandler<SiteType<any>>();
-        }
 
         if (props.animationHandler) {
             this.animationHandler = props.animationHandler;
@@ -124,68 +103,80 @@ export class Sites extends PureComponent<Props, State> {
             this.animationHandler = new DefaultSiteAnimation();
         }
 
-        this.basePath = Helper.nonNull(props.basePath, '');
-        this.deepLinkHandler.setBasePath(this.basePath);
-        this.url = window.location.pathname + window.location.search + window.location.hash;
-        Sites.instance = this;
+        this.sites.set(this.currentSiteId, {
+            ...props.currentSite,
+            id: this.currentSiteId,
+            containerRefPromise: new PromiseWithHandlers<React.RefObject<HTMLDivElement>>(),
+            footerOptions: {},
+            finished: false,
+        });
+
+        // eslint-disable-next-line react/state-in-constructor
+        this.state = {
+            ...initialState,
+            currentSiteId: this.currentSiteId,
+            animation: null,
+            sites: this.getActiveSites(),
+            footerOptions: {},
+        };
 
         // Push state in order to allow backward navigation
-        window.onpopstate = (e) => this.onPopState(e);
-        window.history.pushState(null, this.title, this.url);
-
-        this.startFirstSite();
-        this.resolveInitialisationPromise();
+        // window.onpopstate = (e) => this.onPopState(e);
+        // window.history.pushState(null, this.title, this.url);
     }
 
-    componentDidUpdate(_prevProps: Readonly<Props>, prevState: Readonly<State>) {
-        const { visibleSite, animation } = this.state;
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
+        const { currentSite } = this.props;
+        const { currentSiteId, animation } = this.state;
 
-        if (prevState.visibleSite !== visibleSite) {
-            this.updateUrl();
+        if (currentSite !== prevProps.currentSite) {
+            if (this.pushingNewSite) {
+                this.currentSiteId++;
+                this.pushingNewSite = false;
+            }
+            this.addOrUpdateCurrentSite(currentSite);
+        }
 
+        if (prevState.currentSiteId !== currentSiteId) {
             if (animation !== null) {
-                // Handle animation
-                Promise.all([
-                    this.sites.get(animation.leavingSite)?.containerRefPromise,
-                    this.sites.get(visibleSite)?.containerRefPromise,
-                ]).then(async ([oldElementRef, newElementRef]) => {
-                    const oldElement = oldElementRef?.current;
-                    const newElement = newElementRef?.current;
+                const leavingSiteData = this.sites.get(animation.leavingSite);
+                const currentSiteData = this.sites.get(currentSiteId);
 
-                    if (oldElement && newElement) {
-                        switch (animation.type) {
-                            case 'start': {
-                                await this.animationHandler.animateSiteStart(oldElement, newElement);
-                                break;
-                            }
-                            case 'pop-to-front': {
-                                await this.animationHandler.animateSitePopToFront(oldElement, newElement);
-                                break;
-                            }
-                            case 'end': {
-                                await this.animationHandler.animateSiteEnd(oldElement, newElement);
-                                this.sites.delete(animation.leavingSite);
+                if (leavingSiteData && currentSiteData) {
+                    // Handle animation
+                    Promise.all([leavingSiteData.containerRefPromise, currentSiteData.containerRefPromise]).then(
+                        async ([oldElementRef, newElementRef]) => {
+                            const oldElement = oldElementRef?.current;
+                            const newElement = newElementRef?.current;
 
-                                if (this.sites.size === 0) {
-                                    // TODO app ended listener
-                                    // Go back 2, because first one is own pushed state
-                                    console.log('ending site');
-                                    window.history.go(-2);
-                                    return;
+                            if (oldElement && newElement) {
+                                switch (animation?.type) {
+                                    case 'start': {
+                                        await this.animationHandler.animateSiteStart(oldElement, newElement);
+                                        break;
+                                    }
+                                    case 'end': {
+                                        await this.animationHandler.animateSiteEnd(oldElement, newElement);
+
+                                        for (let i = 0; i < (animation.sitesToDelete ?? 1); i++) {
+                                            this.sites.delete(animation.leavingSite - i);
+                                        }
+
+                                        break;
+                                    }
                                 }
-                                break;
+
+                                const { animation: newAnimation } = this.state;
+                                const activeSite = this.sites.get(currentSiteId)!;
+                                this.setState({
+                                    animation: animation === newAnimation ? null : newAnimation,
+                                    sites: this.getActiveSites(),
+                                    footerOptions: activeSite ? activeSite.footerOptions : {},
+                                });
                             }
                         }
-
-                        const { animation: newAnimation } = this.state;
-                        const activeSite = this.sites.get(visibleSite)!;
-                        this.setState({
-                            animation: animation === newAnimation ? null : newAnimation,
-                            sites: Array.from(this.sites.values()),
-                            footerOptions: activeSite.footerOptions,
-                        });
-                    }
-                });
+                    );
+                }
             }
         }
     }
@@ -193,18 +184,25 @@ export class Sites extends PureComponent<Props, State> {
     render() {
         const {
             isInitialized,
-            sites,
-            visibleSite,
+            currentSiteId,
             animation,
             defaultFooterOptions,
             defaultTopBarOptions,
             footerOptions,
             toasts,
         } = this.state;
+        let { sites } = this.state;
         const { style, className, siteContainerClass, contentWrapper } = this.props;
 
         if (!isInitialized) {
             return null;
+        }
+
+        if (animation && animation.type === 'end') {
+            const animationSite = this.sites.get(animation.leavingSite);
+            if (animationSite) {
+                sites = [...sites, animationSite];
+            }
         }
 
         const content = (
@@ -214,12 +212,12 @@ export class Sites extends PureComponent<Props, State> {
                         {sites.map((data) => {
                             return (
                                 <SiteContainer
-                                    visible={data.id === visibleSite || data.id === animation?.leavingSite}
+                                    visible={data.id === currentSiteId || data.id === animation?.leavingSite}
                                     leaving={data.id === animation?.leavingSite}
-                                    siteComponent={data.site}
+                                    siteComponent={data.Component}
                                     key={data.id}
                                     id={data.id}
-                                    siteProps={data.props}
+                                    siteProps={data.pageProps}
                                     siteContainerClass={siteContainerClass}
                                     onContainerListener={this.setContainerForSite}
                                     defaultTopBarOptions={defaultTopBarOptions}
@@ -261,6 +259,60 @@ export class Sites extends PureComponent<Props, State> {
         }
     };
 
+    setContainerForSite = (id: number, containerRef: React.RefObject<HTMLDivElement>) => {
+        const siteData = this.sites.get(id);
+        if (siteData && !siteData.finished) {
+            siteData.containerRefPromise.resolve(containerRef);
+        }
+    };
+
+    private addOrUpdateCurrentSite(nextPage: AppProps) {
+        const id = this.currentSiteId;
+        const { currentSiteId } = this.state;
+
+        if (this.sites.has(id)) {
+            const currentData = this.sites.get(id);
+            if (currentData) {
+                this.sites.set(id, {
+                    ...currentData,
+                    pageProps: nextPage.pageProps,
+                });
+            } else {
+                // TODO Sollte nicht vorkommen!
+                throw new Error('Not possible!');
+            }
+        } else {
+            this.sites.set(id, {
+                ...nextPage,
+                id,
+                containerRefPromise: new PromiseWithHandlers<React.RefObject<HTMLDivElement>>(),
+                footerOptions: {},
+                finished: false,
+            });
+        }
+
+        const newState = {
+            currentSiteId: id,
+            sites: this.getActiveSites(),
+            footerOptions: {},
+        };
+
+        if (id > currentSiteId) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            newState.animation = {
+                type: 'start' as const,
+                leavingSite: currentSiteId,
+            };
+        }
+
+        this.setState(newState);
+    }
+
+    private getActiveSites() {
+        return Array.from(this.sites.values()).filter((s) => !s.finished) as SiteData<any>[];
+    }
+
     addToast<Data>(
         text: string,
         action?: {
@@ -285,188 +337,64 @@ export class Sites extends PureComponent<Props, State> {
         this.setState({ toasts: Array.from(this.toasts.values()) });
     }
 
-    setContainerForSite = (id: number, containerRef: React.RefObject<HTMLDivElement>) => {
-        if (this.sites.has(id)) {
-            this.sites.get(id)!.containerRefPromise.resolve(containerRef);
-        }
-    };
-
-    registerSingleInstanceSite(site: ComponentType) {
-        if (!this.singleInstanceSites.has(site)) {
-            this.singleInstanceSites.set(site, undefined);
-        }
-    }
-
-    updateSiteProps(siteId: number, newProps: any) {
-        const { visibleSite } = this.state;
-        const site = this.sites.get(siteId);
-        if (site) {
-            site.props = newProps;
-            if (visibleSite === siteId) {
-                this.updateUrl();
-            }
-        }
-    }
-
-    updateUrl() {
-        const { visibleSite } = this.state;
-
-        const siteContainer = this.sites.get(visibleSite);
-        if (siteContainer) {
-            this.url = this.deepLinkHandler.createDeepLinkForSite(siteContainer.site, siteContainer.props);
-        } else {
-            this.url = this.basePath;
-        }
-
-        window.history.replaceState(null, this.title, this.url);
-    }
-
-    private async startFirstSite() {
-        const { startSite } = this.props;
-        await this.initializationPromise;
-
-        const urlPath = window.location.pathname + window.location.search + window.location.hash;
-
-        const deepLinkSiteData = this.deepLinkHandler.calculateSite(urlPath);
-        if (typeof deepLinkSiteData !== 'undefined') {
-            this.startSite(deepLinkSiteData.site, deepLinkSiteData.params);
-        } else {
-            this.startSite(startSite);
-        }
-    }
-
-    private async resolveInitialisationPromise() {
-        document.addEventListener(
-            'deviceready',
-            async () => {
-                Sites.appCreatedPromise.resolve(this);
-                await Promise.all(Sites.initialisationPromises);
-                this.initializationPromise.resolve();
-            },
-            true
-        );
-        await this.initializationPromise;
-        this.setState({ isInitialized: true });
-    }
-
-    onPopState(e: PopStateEvent) {
-        e.preventDefault();
-        // pushState so that you can go back again
-        window.history.pushState(null, this.title, this.url);
-        this.goBack();
-    }
-
-    canGoBack() {
-        return this.order.length > 1;
-    }
-
     goBack(callOnBackListener = true) {
-        const currentSiteId = this.order[this.order.length - 1];
+        const { currentSiteId } = this;
         if (callOnBackListener) {
-            const listener = this.sites.get(currentSiteId)?.onBackListener;
-            if (listener && listener()) {
-                return;
+            const siteData = this.sites.get(currentSiteId);
+            if (siteData && !siteData.finished) {
+                const listener = siteData.onBackListener;
+                if (listener && listener()) {
+                    return undefined;
+                }
             }
         }
 
-        this.removeSite(currentSiteId);
+        return this.removeSite(currentSiteId);
     }
 
-    getDeepLinkHandler() {
-        return this.deepLinkHandler;
+    push(url: UrlObject | string, as?: UrlObject | string, options?: TransitionOptions) {
+        const { router } = this.props;
+
+        this.pushingNewSite = true;
+        return router.push(url, as, options);
     }
 
-    addDeepLink(link: string, site: SiteType<any>) {
-        this.deepLinkHandler.set(link, site);
-    }
+    prefetch(url: string, as?: string, prefetchOptions?: PrefetchOptions) {
+        const { router } = this.props;
 
-    startSite<PropsType extends Record<string, any>>(site: ComponentType<PropsType>, props?: PropsType) {
-        const { visibleSite } = this.state;
-
-        const singleInstanceSiteId = this.singleInstanceSites.get(site);
-        if (singleInstanceSiteId) {
-            this.showSite(singleInstanceSiteId);
-            return;
-        }
-
-        const nextId = ++this.lastSiteId;
-        this.sites.set(nextId, {
-            site,
-            props,
-            id: nextId,
-            containerRefPromise: new PromiseWithHandlers<React.RefObject<HTMLDivElement>>(),
-            footerOptions: {},
-        });
-        this.order.push(nextId);
-        this.setState({
-            visibleSite: nextId,
-            animation: {
-                leavingSite: visibleSite,
-                type: 'start',
-            },
-            sites: Array.from(this.sites.values()),
-            footerOptions: {},
-        });
-
-        if (this.singleInstanceSites.has(site)) {
-            this.singleInstanceSites.set(site, nextId);
-        }
-    }
-
-    showSite(siteId: number) {
-        if (this.sites.has(siteId)) {
-            const activeSite = this.sites.get(siteId)!;
-            const { visibleSite } = this.state;
-
-            const orderIndex = this.order.indexOf(siteId);
-            if (orderIndex !== this.order.length - 1) {
-                if (orderIndex !== -1) this.order.splice(orderIndex, 1);
-            }
-
-            this.order.push(siteId);
-            this.setState({
-                visibleSite: siteId,
-                animation: {
-                    leavingSite: visibleSite,
-                    type: 'pop-to-front',
-                },
-                footerOptions: activeSite.footerOptions,
-            });
-        }
+        return router.prefetch(url, as, prefetchOptions);
     }
 
     async removeSite(siteId: number) {
-        if (this.sites.has(siteId)) {
-            const siteToRemove = this.sites.get(siteId)!;
-            let visibleSiteIndex = this.order.length - 1;
-
-            const orderIndex = this.order.indexOf(siteId);
-            if (orderIndex !== -1) {
-                this.order.splice(orderIndex, 1);
-            }
-
-            if (orderIndex === visibleSiteIndex) {
-                visibleSiteIndex--;
-                const visibleSiteId = visibleSiteIndex >= 0 ? this.order[visibleSiteIndex] : -1;
-                const activeSite = this.sites.get(visibleSiteId);
-                const footerOptions = activeSite?.footerOptions ?? {};
-
-                await this.setState({
-                    visibleSite: visibleSiteId,
-                    animation: {
-                        type: 'end',
-                        leavingSite: siteId,
-                    },
-                    footerOptions,
-                });
-            } else {
-                this.sites.delete(siteId);
-                this.setState({ sites: Array.from(this.sites.values()) });
-            }
-            if (this.singleInstanceSites.has(siteToRemove.site)) {
-                this.singleInstanceSites.delete(siteToRemove.site);
-            }
+        const siteData = this.sites.get(siteId);
+        if (siteData && !siteData.finished) {
+            siteData.finished = true;
+            this.checkCurrentSite();
         }
+    }
+
+    private checkCurrentSite() {
+        let deletedSites = 0;
+        while (this.sites.get(this.currentSiteId)?.finished) {
+            this.currentSiteId--;
+            deletedSites++;
+        }
+
+        if (deletedSites > 0) {
+            // eslint-disable-next-line no-restricted-globals
+            history.go(-deletedSites);
+        }
+
+        // TODO next back?
+        this.setState({
+            currentSiteId: this.currentSiteId,
+            sites: this.getActiveSites(),
+            footerOptions: {},
+            animation: {
+                type: 'end',
+                leavingSite: this.currentSiteId + deletedSites,
+            },
+        });
     }
 
     getSiteDataById(siteId: number) {
@@ -474,9 +402,9 @@ export class Sites extends PureComponent<Props, State> {
     }
 
     setOnBackListener(siteId: number, listener: () => boolean | void) {
-        const siteContainer = this.sites.get(siteId);
-        if (siteContainer) {
-            siteContainer.onBackListener = listener;
+        const siteData = this.sites.get(siteId);
+        if (siteData && !siteData.finished) {
+            siteData.onBackListener = listener;
         }
     }
 
@@ -510,8 +438,8 @@ export class Sites extends PureComponent<Props, State> {
 
     updateFooterOptions(siteId: number, newOptions: FooterOptions) {
         const site = this.sites.get(siteId);
-        const { visibleSite } = this.state;
-        if (!site) {
+        const { currentSiteId } = this.state;
+        if (!site || site.finished) {
             return;
         }
         site.footerOptions = {
@@ -519,8 +447,12 @@ export class Sites extends PureComponent<Props, State> {
             ...newOptions,
         };
 
-        if (visibleSite === siteId) {
+        if (currentSiteId === siteId) {
             this.setState({ footerOptions: site.footerOptions });
         }
     }
 }
+
+export const SitesType = SitesInner;
+const SitesWithRouter = withRouter(SitesInner) as unknown as typeof SitesInner;
+export { SitesWithRouter as Sites };

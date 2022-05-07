@@ -4,7 +4,7 @@
 import { Helper } from 'js-helper/dist/shared/Helper';
 import { JsonHelper } from 'js-helper/dist/shared/JsonHelper';
 import { ArrayHelper, PromiseWithHandlers } from 'js-helper';
-import { Sites } from './App/Sites';
+import { SitesInner } from './App/Sites';
 import { SerializationType } from 'child_process';
 
 declare const NativeStorage: any;
@@ -17,10 +17,7 @@ export class NativeStoragePromise {
     static readonly initializationPromise = new PromiseWithHandlers();
 
     private static isElectron() {
-        return (
-            typeof navigator === 'object' &&
-            navigator.userAgent.indexOf('Electron') >= 0
-        );
+        return typeof navigator === 'object' && navigator.userAgent.indexOf('Electron') >= 0;
     }
 
     /**
@@ -170,5 +167,3 @@ export class NativeStoragePromise {
         }
     }
 }
-
-Sites.addInitialization(() => NativeStoragePromise.initializationPromise.resolve());

@@ -1,6 +1,3 @@
-export * from './client/App/DeepLinks/DeepLinkHandler';
-export * from './client/App/DeepLinks/QueryDeepLinkHandler';
-export * from './client/App/DeepLinks/RouteDeepLinkHandler';
 export * from './client/App/Hooks';
 export * from './client/App/SiteAnimation/ClassSiteAnimation';
 export * from './client/App/SiteAnimation/DefaultSiteAnimation';
