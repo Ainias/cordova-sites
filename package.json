@@ -18,7 +18,7 @@
     "@fortawesome/react-fontawesome": "^0.1.16",
     "bootstrap": "^5.1.0",
     "js-helper": "git+https://github.com/Ainias/js-helper#0.7.9",
-    "next": "^12.0.10",
+    "next": "^12.0.9",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-beta.6",
     "react-bootstrap-mobile": "git+https://github.com/Ainias/react-bootstrap-mobile#0.0.3",
