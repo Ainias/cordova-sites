@@ -1,20 +1,25 @@
 import * as React from 'react';
-import { FunctionComponent, useCallback } from 'react';
-import { TopBarButton } from 'react-bootstrap-mobile';
+import { useCallback } from 'react';
+import { TopBarButton, withMemo, InlineBlock } from 'react-bootstrap-mobile';
 import { useSites } from '../../App/Hooks';
+
+import styles from './backButton.scss';
 
 type Props = {};
 
-export const BackButton: FunctionComponent<Props> = React.memo(({}) => {
+function BackButton({}: Props) {
     const sites = useSites();
     const goBack = useCallback(() => sites?.goBack(), [sites]);
 
-    // if (sites?.canGoBack()) {
-    return (
-        <TopBarButton onClick={goBack}>
-            <span className="back-button-img" />
-        </TopBarButton>
-    );
-    // }
+    if (sites?.canGoBack()) {
+        return (
+            <TopBarButton onClick={goBack}>
+                <InlineBlock className={styles.backButtonImg} />
+            </TopBarButton>
+        );
+    }
     return null;
-});
+}
+
+const BackButtonMemo = withMemo(BackButton, styles);
+export { BackButtonMemo as BackButton };

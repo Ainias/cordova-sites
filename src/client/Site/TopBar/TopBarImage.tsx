@@ -1,15 +1,16 @@
 import * as React from 'react';
-import { Image } from 'react-bootstrap';
 import { useCallback, useState } from 'react';
-import { InViewport } from 'react-bootstrap-mobile';
+import { InViewport, Image, withMemo } from 'react-bootstrap-mobile';
 import { useTopBar } from '../../App/Hooks';
+
+import styles from './topBarImage.scss';
 
 export type TopBarImageProps = {
     image: string;
     maxHeight?: string;
 };
 
-export const TopBarImage = React.memo(function TopBarImage({ image, maxHeight }: TopBarImageProps) {
+function TopBarImage({ image, maxHeight }: TopBarImageProps) {
     // Variables
 
     // States
@@ -33,8 +34,11 @@ export const TopBarImage = React.memo(function TopBarImage({ image, maxHeight }:
     // Render Functions
 
     return (
-        <InViewport onInViewportChange={onInViewportChange} threshold={0.1} className="topbar-image">
+        <InViewport onInViewportChange={onInViewportChange} threshold={0.1} className={styles.topBarImage}>
             <Image style={maxHeight ? { maxHeight } : undefined} src={image} />
         </InViewport>
     );
-});
+}
+
+const TopBarImageMemo = withMemo(TopBarImage, styles);
+export { TopBarImageMemo as TopBarImage };

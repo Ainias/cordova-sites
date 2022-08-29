@@ -90,7 +90,7 @@
     "import/no-extraneous-dependencies": ["error", {"devDependencies": ["src/client/**/*.tsx"]}],
     "react/destructuring-assignment": ["error", "always", { "ignoreClassFields": true }],
     "react/state-in-constructor": ["error", "never"],
-
+    "react/require-default-props": "off",
 
 
 

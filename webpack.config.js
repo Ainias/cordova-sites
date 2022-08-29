@@ -5,7 +5,7 @@ const webpack = require('webpack');
 // const PrettierPlugin = require('prettier-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const getPackageJson = require('./scripts/getPackageJson');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 const { version, name, license, repository, author } = getPackageJson(
     'version',
@@ -69,21 +69,30 @@ function getCssModuleLocalIdent(context, _, exportName, options) {
             .replace(/^(\d|--|-\d)/, '__$1')
     );
 }
+
 module.exports = {
     mode: 'production',
-    devtool: 'source-map',
-    entry: './dist/client.ts',
+    // devtool: 'source-map',
+    entry: './src/client.ts',
     output: {
-        filename: 'cordova-sites.js',
+        filename: 'client.js',
         path: path.resolve(__dirname, 'dist'),
         library: { type: 'umd' },
         clean: true,
         globalObject: 'this',
+        publicPath: '',
     },
-    externals: {
-        react: 'commonjs react',
-        'react-dom': 'commonjs react-dom',
-    },
+    externals: [
+        {
+            react: 'commonjs react',
+            'react-dom': 'commonjs react-dom',
+            next: 'commonjs2 next',
+            '@fortawesome/react-fontawesome': 'commonjs2 @fortawesome/react-fontawesome',
+            '@fortawesome/fontawesome-svg-core': 'commonjs2 @fortawesome/fontawesome-svg-core',
+            '@fortawesome/free-solid-svg-icons': 'commonjs2 @fortawesome/free-solid-svg-icons',
+        },
+        nodeExternals(),
+    ],
     optimization: {
         minimize: false,
         minimizer: [
@@ -122,10 +131,16 @@ module.exports = {
                         loader: 'css-loader',
                         options: {
                             esModule: false,
+                            modules: true,
                         },
                     },
                     { loader: 'sass-loader' },
                 ],
+            },
+            {
+                //Kopiert nur benutzte Bilder/Videos/Sound (benutzt durch JS (import), html oder css/sass)
+                test: /\.(png|svg)$/,
+                type: 'asset/inline',
             },
         ],
     },

@@ -1,18 +1,13 @@
-import type { SitesInner, SitesType, SiteType } from './Sites';
+import type { SitesType } from './Sites';
 import { useCallback, useContext, useEffect, useMemo } from 'react';
 import * as React from 'react';
-import type {
-    FooterOptions,
-    SiteContainer,
-    TopBarOptions,
-    TopBarOptionsWithButtonFunctions,
-} from '../Site/SiteContainer';
+import type { FooterOptions, SiteContainerType, TopBarOptionsWithButtonFunctions } from '../Site/SiteContainer';
 import { useSiteId } from './SiteIdContext';
 
-export const SitesContext = React.createContext<SitesInner | undefined>(undefined);
+export const SitesContext = React.createContext<SitesType | undefined>(undefined);
 SitesContext.displayName = 'Sites';
 
-export const SiteContainerContext = React.createContext<SiteContainer<any> | undefined>(undefined);
+export const SiteContainerContext = React.createContext<SiteContainerType<any> | undefined>(undefined);
 SiteContainerContext.displayName = 'SiteContainer';
 
 export function useSites() {

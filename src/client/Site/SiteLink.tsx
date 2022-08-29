@@ -1,26 +1,29 @@
-import React, { CSSProperties, PropsWithChildren, useCallback, useEffect, useRef, useState, MouseEvent } from 'react';
+import React, { CSSProperties, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useSites } from '../App/Hooks';
 import { useSiteId } from '../App/SiteIdContext';
-import { useInViewport } from 'react-bootstrap-mobile';
+import { Clickable, RbmComponentProps, useInViewport, withMemo } from 'react-bootstrap-mobile';
 import { PrefetchOptions } from 'next/dist/shared/lib/router/router';
 
-export type SiteLinkProps = PropsWithChildren<{
-    link: string;
-    prefetch?: boolean | PrefetchOptions;
-    replace?: boolean;
-    shallow?: boolean;
-    scroll?: boolean;
-    finishCurrentSite?: boolean;
-    style?: CSSProperties;
-}>;
+export type SiteLinkProps = RbmComponentProps<
+    {
+        href: string;
+        prefetch?: boolean | PrefetchOptions;
+        shallow?: boolean;
+        scroll?: boolean;
+        finishCurrentSite?: boolean;
+        style?: CSSProperties;
+    },
+    { children: ReactNode }
+>;
 
 const SiteLink = function SiteLink({
-    link,
+    href,
     prefetch = true,
     shallow = false,
     scroll = true,
     finishCurrentSite = false,
     style,
+    className,
     children,
 }: SiteLinkProps) {
     const sites = useSites();
@@ -29,31 +32,34 @@ const SiteLink = function SiteLink({
     const isInViewport = useInViewport(linkRef);
     const [prefetched, setPrefetched] = useState(false);
 
-    const onClickHandler = useCallback(
-        (e: MouseEvent) => {
-            e.stopPropagation();
-            e.preventDefault();
-            sites?.push(link, undefined, { scroll, shallow });
-            if (finishCurrentSite) {
-                sites?.removeSite(currentSiteId);
-            }
-        },
-        [finishCurrentSite, sites, link, scroll, shallow, currentSiteId]
-    );
+    const onClickHandler = useCallback(() => {
+        sites?.push(href, undefined, { scroll, shallow });
+        if (finishCurrentSite) {
+            sites?.removeSite(currentSiteId);
+        }
+    }, [finishCurrentSite, sites, href, scroll, shallow, currentSiteId]);
 
     useEffect(() => {
         if (isInViewport && prefetch && !prefetched) {
             const options = typeof prefetch === 'object' ? prefetch : undefined;
-            sites?.prefetch(link, undefined, options);
+            sites?.prefetch(href, undefined, options);
             setPrefetched(true);
         }
-    }, [isInViewport, link, prefetch, prefetched, sites]);
+    }, [isInViewport, href, prefetch, prefetched, sites]);
 
     return (
-        <a role="button" style={style} onClick={onClickHandler} href={link} ref={linkRef}>
+        <Clickable
+            interactable={true}
+            style={style}
+            onClick={onClickHandler}
+            href={href}
+            ref={linkRef}
+            __allowChildren="text"
+            className={className}
+        >
             {children}
-        </a>
+        </Clickable>
     );
 };
-const SiteLinkMemo = React.memo(SiteLink) as typeof SiteLink;
+const SiteLinkMemo = withMemo(SiteLink, undefined, 'text');
 export { SiteLinkMemo as SiteLink };

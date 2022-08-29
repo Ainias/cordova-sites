@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { TabBar, TabBarButtonType } from 'react-bootstrap-mobile';
+import { TabBar, TabBarButtonType, withMemo } from 'react-bootstrap-mobile';
 import { useCallback } from 'react';
+
+import styles from './footer.scss';
 
 export type FooterButton = TabBarButtonType & {
     onClick?: () => void;
@@ -9,11 +11,10 @@ export type FooterButton = TabBarButtonType & {
 export type FooterProps = {
     buttons: FooterButton[];
     visible?: boolean;
-    transparent?: boolean;
     activeTab?: number;
 };
 
-export const Footer = React.memo(function Footer({ buttons, visible, activeTab }: FooterProps) {
+function Footer({ buttons, visible = false, activeTab = undefined }: FooterProps) {
     // Variables
 
     // States
@@ -39,8 +40,11 @@ export const Footer = React.memo(function Footer({ buttons, visible, activeTab }
     }
 
     return (
-        <div className="footer">
+        <div className={styles.footer}>
             <TabBar buttons={buttons} activeTab={activeTab} onTabChange={onTabSelect} />
         </div>
     );
-});
+}
+
+const FooterMemo = withMemo(Footer, styles);
+export { FooterMemo as Footer };

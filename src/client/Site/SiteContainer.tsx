@@ -2,14 +2,14 @@ import * as React from 'react';
 import { createRef } from 'react';
 import { SiteIdContext } from '../App/SiteIdContext';
 import { VisibleContext } from '../App/VisibleContext';
-import { SitesTopBarButtonType, TopBar, TopBarProps } from './TopBar/TopBar';
+import { TopBar, TopBarProps } from './TopBar/TopBar';
 import { SiteContainerContext } from '../App/Hooks';
-import { Container } from 'react-bootstrap';
+import { Container, Override, Block, withMemo, TopBarButtonType } from 'react-bootstrap-mobile';
 import { FooterButton } from './Footer/Footer';
-import { StringMap } from 'i18next';
-import { Override } from 'react-bootstrap-mobile';
 
-export const initialTopBarOptions: TopBarProps<StringMap> = {
+import styles from './siteContainer.scss';
+
+export const initialTopBarOptions: TopBarProps = {
     visible: true,
     title: undefined,
     leftButtons: [],
@@ -23,17 +23,13 @@ export const initialFooterOptions = {
     buttons: [] as FooterButton[],
 };
 
-export type TopBarOptions = Partial<TopBarProps<StringMap>>;
+export type TopBarOptions = Partial<TopBarProps>;
 export type TopBarOptionsWithButtonFunctions = Partial<
     Override<
-        TopBarProps<StringMap>,
+        TopBarProps,
         {
-            rightButtons:
-                | SitesTopBarButtonType<StringMap>[]
-                | ((defaultButtons: SitesTopBarButtonType<StringMap>[]) => SitesTopBarButtonType<StringMap>[]);
-            leftButtons:
-                | SitesTopBarButtonType<StringMap>[]
-                | ((defaultButtons: SitesTopBarButtonType<StringMap>[]) => SitesTopBarButtonType<StringMap>[]);
+            rightButtons: TopBarButtonType[] | ((defaultButtons: TopBarButtonType[]) => TopBarButtonType[]);
+            leftButtons: TopBarButtonType[] | ((defaultButtons: TopBarButtonType[]) => TopBarButtonType[]);
         }
     >
 >;
@@ -56,7 +52,7 @@ type Props<SitePropsType> = {
     defaultTopBarOptions: typeof initialTopBarOptions;
 };
 
-export class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsType>, State> {
+class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsType>, State> {
     readonly state: State = initialState;
     container: React.RefObject<HTMLDivElement> = createRef();
     child: React.RefObject<HTMLDivElement> = createRef();
@@ -101,24 +97,24 @@ export class SiteContainer<SitePropsType> extends React.PureComponent<Props<Site
         }
 
         return (
-            <div
+            <Block
                 ref={this.container}
                 style={siteContainerStyle}
-                className={(siteContainerClass ?? 'site') + (visible ? ' visible' : ' hidden')}
+                className={`${siteContainerClass ?? styles.site} ${visible ? '' : styles.hidden}`}
             >
-                <div ref={this.child}>
+                <Block ref={this.child}>
                     <SiteContainerContext.Provider value={this}>
                         <SiteIdContext.Provider value={id}>
                             <VisibleContext.Provider value={visible}>
                                 <TopBar {...defaultTopBarOptions} {...(topBarOptions as TopBarOptions)} />
-                                <Container fluid="xxl">
+                                <Container fluid="xxl" className={styles.container}>
                                     <Base {...siteProps} />
                                 </Container>
                             </VisibleContext.Provider>
                         </SiteIdContext.Provider>
                     </SiteContainerContext.Provider>
-                </div>
-            </div>
+                </Block>
+            </Block>
         );
     }
 
@@ -132,3 +128,7 @@ export class SiteContainer<SitePropsType> extends React.PureComponent<Props<Site
         });
     }
 }
+
+export type SiteContainerType<T> = SiteContainer<T>;
+const SiteContainerMemo = withMemo(SiteContainer, styles);
+export { SiteContainerMemo as SiteContainer };

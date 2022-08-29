@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { CSSProperties, FunctionComponent, useCallback } from 'react';
+import { CSSProperties, useCallback } from 'react';
 import { useSiteId } from '../App/SiteIdContext';
 import { useSites } from '../App/Hooks';
+import { Clickable, RbmComponentProps, withMemo } from 'react-bootstrap-mobile';
 
-type Props = {
+export type FinishSiteLinkProps = RbmComponentProps<{
     style?: CSSProperties;
-    className?: string;
-};
+}>;
 
-export const FinishSiteLink: FunctionComponent<Props> = React.memo(({ style, children, className }) => {
+function FinishSiteLink({ style, children, className }: FinishSiteLinkProps) {
     const id = useSiteId();
     const sites = useSites();
     const onClickHandler = useCallback(() => {
@@ -18,8 +18,11 @@ export const FinishSiteLink: FunctionComponent<Props> = React.memo(({ style, chi
     }, [id, sites]);
 
     return (
-        <button style={style} onClick={onClickHandler} className={className} type="button">
+        <Clickable style={style} onClick={onClickHandler} className={className} __allowChildren="all">
             {children}
-        </button>
+        </Clickable>
     );
-});
+}
+
+const FinishSiteLinkMemo = withMemo(FinishSiteLink);
+export { FinishSiteLinkMemo as FinishSiteLink };

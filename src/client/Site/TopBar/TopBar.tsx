@@ -1,27 +1,14 @@
 import * as React from 'react';
 import { BackButton } from './BackButton';
 import { TopBarButtonType, TopBar as BMTopBar, useBreakpointSelect } from 'react-bootstrap-mobile';
-import { StringMap } from 'i18next';
-import { useTranslation } from 'react-i18next';
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 
-export type SitesTopBarButtonType<T extends StringMap> = TopBarButtonType &
-    (
-        | {
-              translate?: boolean;
-          }
-        | {
-              translate: true;
-              translationArgs: T;
-          }
-    );
-
-export type TopBarProps<T extends StringMap> = {
+export type TopBarProps = {
     visible: boolean;
-    backButton?: SitesTopBarButtonType<T> | false;
+    backButton?: TopBarButtonType | false;
     title?: string;
-    rightButtons?: SitesTopBarButtonType<T>[];
-    leftButtons?: SitesTopBarButtonType<T>[];
+    rightButtons?: TopBarButtonType[];
+    leftButtons?: TopBarButtonType[];
     transparent?: boolean;
     drawBehind?: boolean;
     numberButtons?: number;
@@ -31,7 +18,7 @@ export type TopBarProps<T extends StringMap> = {
     numberButtonsLG?: number;
     numberButtonsXL?: number;
     numberButtonsXXL?: number;
-} & ({ translate?: boolean } | { translate: true; translationArgs: T });
+};
 
 export const TopBar = React.memo(function TopBar({
     visible = true,
@@ -48,9 +35,7 @@ export const TopBar = React.memo(function TopBar({
     numberButtonsLG = 5,
     numberButtonsXL = 5,
     numberButtonsXXL = 5,
-    translate = true,
-    ...translationProps
-}: TopBarProps<StringMap>) {
+}: TopBarProps) {
     const realNumberButtons =
         useBreakpointSelect([
             numberButtonsXS,
@@ -61,54 +46,36 @@ export const TopBar = React.memo(function TopBar({
             numberButtonsXXL,
         ]) ?? numberButtons;
 
-    const { t } = useTranslation();
+    const newLeftButtons = useMemo(() => {
+        const lButtons = [...leftButtons];
+        let newBackButton = backButton;
+        if (newBackButton === undefined) {
+            newBackButton = { component: BackButton };
+        }
+        if (newBackButton !== false) {
+            lButtons.unshift(newBackButton);
+        }
+        return lButtons;
+    }, [backButton, leftButtons]);
 
-    const translateButton = useCallback(
-        (button: SitesTopBarButtonType<StringMap>) => {
-            if (button.title && button.translate !== false) {
-                const buttonTitle =
-                    'translationArgs' in button ? t(button.title, button.translationArgs) : t(button.title);
-                button = {
-                    ...button,
-                    title: buttonTitle,
-                };
-            }
-            return button;
-        },
-        [t]
-    );
-
-    if (backButton === undefined) {
-        backButton = { component: BackButton };
-    }
-    if (backButton !== false) {
-        leftButtons = leftButtons.slice(0, leftButtons.length);
-        leftButtons.unshift(backButton);
-    }
-
-    let hiddenButtons: TopBarButtonType[] = [];
-    if (rightButtons.length > realNumberButtons) {
-        rightButtons = [...rightButtons];
-        hiddenButtons.push(...rightButtons.splice(realNumberButtons - 1, rightButtons.length));
-    }
-
-    rightButtons = rightButtons.map(translateButton);
-    leftButtons = leftButtons.map(translateButton);
-    hiddenButtons = hiddenButtons.map(translateButton);
+    const [hiddenButtons, newRightButtons]: [TopBarButtonType[], TopBarButtonType[]] = useMemo(() => {
+        const hButtons: TopBarButtonType[] = [];
+        const rButtons = [...rightButtons];
+        if (rightButtons.length > realNumberButtons) {
+            hButtons.push(...rButtons.splice(realNumberButtons - 1, rButtons.length));
+        }
+        return [hButtons, rButtons];
+    }, [realNumberButtons, rightButtons]);
 
     if (!visible) {
         return null;
     }
 
-    if (title && translate) {
-        title = 'translationArgs' in translationProps ? t(title, translationProps.translationArgs) : t(title);
-    }
-
     return (
         <BMTopBar
             title={title}
-            rightButtons={rightButtons}
-            leftButtons={leftButtons}
+            rightButtons={newRightButtons}
+            leftButtons={newLeftButtons}
             hiddenButtons={hiddenButtons}
             transparent={transparent}
             drawBehind={drawBehind}

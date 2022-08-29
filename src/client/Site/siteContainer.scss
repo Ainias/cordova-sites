@@ -1,0 +1,23 @@
+.site {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #efeff4;
+
+  &.hidden {
+    display: none;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    > div.container {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+  }
+}

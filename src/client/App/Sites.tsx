@@ -6,18 +6,19 @@ import {
     initialTopBarOptions,
     SiteContainer,
     TopBarOptions,
-    TopBarOptionsWithButtonFunctions,
 } from '../Site/SiteContainer';
 import { PromiseWithHandlers } from 'js-helper';
 import { SiteAnimationInterface } from './SiteAnimation/SiteAnimationInterface';
 import { DefaultSiteAnimation } from './SiteAnimation/DefaultSiteAnimation';
 import { SitesContext } from './Hooks';
 import { Footer } from '../Site/Footer/Footer';
-import { Listener, Toast, ToastContainer } from 'react-bootstrap-mobile';
+import { Listener, Toast, ToastContainer, Block, Text, Flex, withMemo } from 'react-bootstrap-mobile';
 import { NextRouter, withRouter } from 'next/router';
 import { AppProps } from 'next/app';
 import { UrlObject } from 'url';
 import { PrefetchOptions } from 'next/dist/shared/lib/router/router';
+
+import styles from './sites.scss';
 
 type TransitionOptions = {
     scroll?: boolean;
@@ -68,7 +69,7 @@ const initialState = {
     toasts: [] as ToastData[],
 };
 
-type State = Readonly<typeof initialState>;
+type State = typeof initialState;
 type Props = {
     style?: CSSProperties;
     className?: string;
@@ -78,9 +79,11 @@ type Props = {
     contentWrapper?: ComponentType;
     router: NextRouter;
     currentSite: AppProps;
+    defaultTopBarOptions?: TopBarOptions;
+    defaultFooterOptions?: FooterOptions;
 };
 
-export class SitesInner extends PureComponent<Props, State> {
+class SitesInner extends PureComponent<Props, State> {
     readonly state: State;
     private currentSiteId = -1;
     private sites = new Map<number, SiteData<any>>();
@@ -88,14 +91,14 @@ export class SitesInner extends PureComponent<Props, State> {
     private lastToastId = 0;
     private toasts = new Map<number, ToastData>();
     private pushingNewSite = true;
-
-    private title = 'Test';
-    // private url = '';
+    private isInternalNavigation = false;
 
     private readonly animationHandler: SiteAnimationInterface;
 
     constructor(props: Props) {
         super(props);
+
+        const { defaultTopBarOptions, defaultFooterOptions } = this.props;
 
         if (props.animationHandler) {
             this.animationHandler = props.animationHandler;
@@ -117,17 +120,36 @@ export class SitesInner extends PureComponent<Props, State> {
             currentSiteId: this.currentSiteId,
             animation: null,
             sites: this.getActiveSites(),
-            footerOptions: {},
+            defaultFooterOptions: { ...initialFooterOptions, ...(defaultFooterOptions ?? {}) },
+            defaultTopBarOptions: { ...initialTopBarOptions, ...(defaultTopBarOptions ?? {}) },
         };
+    }
 
-        // Push state in order to allow backward navigation
-        // window.onpopstate = (e) => this.onPopState(e);
-        // window.history.pushState(null, this.title, this.url);
+    componentDidMount() {
+        const { router } = this.props;
+        router.beforePopState(() => false);
+        window.onpopstate = (e) => this.onPopState(e);
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
-        const { currentSite } = this.props;
-        const { currentSiteId, animation } = this.state;
+        const { currentSite, defaultTopBarOptions, defaultFooterOptions } = this.props;
+        const {
+            currentSiteId,
+            animation,
+            defaultFooterOptions: stateDefaultFooterOptions,
+            defaultTopBarOptions: stateDefaultTopBarOptions,
+        } = this.state;
+
+        if (defaultTopBarOptions !== prevProps.defaultTopBarOptions) {
+            this.setState({
+                defaultTopBarOptions: { ...stateDefaultTopBarOptions, ...defaultTopBarOptions },
+            });
+        }
+        if (defaultFooterOptions !== prevProps.defaultFooterOptions) {
+            this.setState({
+                defaultFooterOptions: { ...stateDefaultFooterOptions, ...defaultFooterOptions },
+            });
+        }
 
         if (currentSite !== prevProps.currentSite) {
             if (this.pushingNewSite) {
@@ -207,8 +229,8 @@ export class SitesInner extends PureComponent<Props, State> {
 
         const content = (
             <SitesContext.Provider value={this}>
-                <div className="sites">
-                    <div style={style} className={className || 'siteContainer'}>
+                <Flex className={styles.sites}>
+                    <Block style={style} className={className || styles.siteContainer}>
                         {sites.map((data) => {
                             return (
                                 <SiteContainer
@@ -224,7 +246,7 @@ export class SitesInner extends PureComponent<Props, State> {
                                 />
                             );
                         })}
-                    </div>
+                    </Block>
                     <Footer {...defaultFooterOptions} {...footerOptions} />
                     <ToastContainer>
                         {toasts.map((toast) => {
@@ -236,12 +258,12 @@ export class SitesInner extends PureComponent<Props, State> {
                                     onDismissed={this.dismissedToast}
                                     onDismissedData={toast}
                                 >
-                                    {toast.text}
+                                    <Text>{toast.text}</Text>
                                 </Toast>
                             );
                         })}
                     </ToastContainer>
-                </div>
+                </Flex>
             </SitesContext.Provider>
         );
 
@@ -264,6 +286,20 @@ export class SitesInner extends PureComponent<Props, State> {
         if (siteData && !siteData.finished) {
             siteData.containerRefPromise.resolve(containerRef);
         }
+    };
+
+    private onPopState = (e: PopStateEvent) => {
+        if (e.state?.obsolete) {
+            window.history.go(-1);
+        } else if (this.isInternalNavigation) {
+            window.history.replaceState({ obsolete: true }, '');
+            window.history.pushState({ obsolete: true }, '');
+            this.isInternalNavigation = false;
+        } else if (e.state !== null && !e.state.forward) {
+            window.history.pushState(e.state, '', '');
+            this.goBack();
+        }
+        return false;
     };
 
     private addOrUpdateCurrentSite(nextPage: AppProps) {
@@ -311,6 +347,11 @@ export class SitesInner extends PureComponent<Props, State> {
 
     private getActiveSites() {
         return Array.from(this.sites.values()).filter((s) => !s.finished) as SiteData<any>[];
+    }
+
+    canGoBack() {
+        const { sites } = this.state;
+        return sites.length >= 2;
     }
 
     addToast<Data>(
@@ -380,21 +421,22 @@ export class SitesInner extends PureComponent<Props, State> {
             deletedSites++;
         }
 
-        if (deletedSites > 0) {
-            // eslint-disable-next-line no-restricted-globals
-            history.go(-deletedSites);
-        }
-
-        // TODO next back?
-        this.setState({
+        const newState: Partial<State> = {
             currentSiteId: this.currentSiteId,
             sites: this.getActiveSites(),
             footerOptions: {},
-            animation: {
+        };
+        if (deletedSites > 0) {
+            this.isInternalNavigation = true;
+            window.history.go(-deletedSites);
+            newState.animation = {
                 type: 'end',
                 leavingSite: this.currentSiteId + deletedSites,
-            },
-        });
+                sitesToDelete: deletedSites,
+            };
+        }
+
+        this.setState(newState as Readonly<State>);
     }
 
     getSiteDataById(siteId: number) {
@@ -408,33 +450,33 @@ export class SitesInner extends PureComponent<Props, State> {
         }
     }
 
-    updateDefaultTopBarOptions(newOptions: TopBarOptionsWithButtonFunctions) {
-        const { defaultTopBarOptions } = this.state;
-
-        if (typeof newOptions.rightButtons === 'function') {
-            newOptions.rightButtons = newOptions.rightButtons(defaultTopBarOptions.rightButtons ?? []);
-        }
-        if (typeof newOptions.leftButtons === 'function') {
-            newOptions.leftButtons = newOptions.leftButtons(defaultTopBarOptions.leftButtons ?? []);
-        }
-
-        this.setState({
-            defaultTopBarOptions: {
-                ...defaultTopBarOptions,
-                ...(newOptions as TopBarOptions),
-            },
-        });
-    }
-
-    updateDefaultFooterOptions(newOptions: FooterOptions) {
-        const { defaultFooterOptions } = this.state;
-        this.setState({
-            defaultFooterOptions: {
-                ...defaultFooterOptions,
-                ...newOptions,
-            },
-        });
-    }
+    // updateDefaultTopBarOptions(newOptions: TopBarOptionsWithButtonFunctions) {
+    //     const { defaultTopBarOptions } = this.state;
+    //
+    //     if (typeof newOptions.rightButtons === 'function') {
+    //         newOptions.rightButtons = newOptions.rightButtons(defaultTopBarOptions.rightButtons ?? []);
+    //     }
+    //     if (typeof newOptions.leftButtons === 'function') {
+    //         newOptions.leftButtons = newOptions.leftButtons(defaultTopBarOptions.leftButtons ?? []);
+    //     }
+    //
+    //     this.setState({
+    //         defaultTopBarOptions: {
+    //             ...defaultTopBarOptions,
+    //             ...(newOptions as TopBarOptions),
+    //         },
+    //     });
+    // }
+    //
+    // updateDefaultFooterOptions(newOptions: FooterOptions) {
+    //     const { defaultFooterOptions } = this.state;
+    //     this.setState({
+    //         defaultFooterOptions: {
+    //             ...defaultFooterOptions,
+    //             ...newOptions,
+    //         },
+    //     });
+    // }
 
     updateFooterOptions(siteId: number, newOptions: FooterOptions) {
         const site = this.sites.get(siteId);
@@ -453,6 +495,6 @@ export class SitesInner extends PureComponent<Props, State> {
     }
 }
 
-export const SitesType = SitesInner;
-const SitesWithRouter = withRouter(SitesInner) as unknown as typeof SitesInner;
+export type { SitesInner as SitesType };
+const SitesWithRouter = withRouter(withMemo(SitesInner, styles)) as typeof SitesInner;
 export { SitesWithRouter as Sites };
