@@ -13,8 +13,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "js-helper": "git+https://github.com/Ainias/js-helper#0.7.9",
-    "react-bootstrap-mobile": "git+https://github.com/Ainias/react-bootstrap-mobile#0.1.4"
+    "js-helper": "git+https://github.com/Ainias/js-helper#0.7.10",
+    "react-bootstrap-mobile": "git+https://github.com/Ainias/react-bootstrap-mobile#0.1.6"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.36",

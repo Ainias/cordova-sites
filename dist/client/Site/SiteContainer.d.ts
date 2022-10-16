@@ -20,6 +20,7 @@ declare const initialState: {
         rightButtons: TopBarButtonType[] | ((defaultButtons: TopBarButtonType[]) => TopBarButtonType[]);
         leftButtons: TopBarButtonType[] | ((defaultButtons: TopBarButtonType[]) => TopBarButtonType[]);
     }>>;
+    useFullWidth: boolean;
 };
 declare type State = Readonly<typeof initialState>;
 declare type Props<SitePropsType> = {
@@ -42,6 +43,7 @@ declare class SiteContainer<SitePropsType> extends React.PureComponent<Props<Sit
     componentDidMount(): void;
     getSnapshotBeforeUpdate(prevProps: Readonly<Props<SitePropsType>>): null;
     componentDidUpdate(prevProps: Readonly<Props<SitePropsType>>): void;
+    setUseFullWidth(useFullWidth: boolean): void;
     render(): JSX.Element;
     updateTopBarOptions(newOptions: TopBarOptionsWithButtonFunctions): void;
 }

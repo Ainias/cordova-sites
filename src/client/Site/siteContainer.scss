@@ -18,6 +18,15 @@
     > div.container {
       flex-grow: 1;
       overflow-y: auto;
+
+      .fullWidth {
+        max-width: initial;
+        padding: 0;
+      }
+
+      > div {
+        min-height: 100%;
+      }
     }
   }
 }

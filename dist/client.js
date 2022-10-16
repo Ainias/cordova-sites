@@ -106,12 +106,13 @@ var ___CSS_LOADER_API_NO_SOURCEMAP_IMPORT___ = __webpack_require__(81);
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(645);
 var ___CSS_LOADER_EXPORT___ = ___CSS_LOADER_API_IMPORT___(___CSS_LOADER_API_NO_SOURCEMAP_IMPORT___);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".q98hhidxMFJ7c7kukBcW{position:absolute;top:0;left:0;right:0;bottom:0;background-color:#efeff4}.q98hhidxMFJ7c7kukBcW.PyBmWflMH2F7Bp5_dTbO{display:none}.q98hhidxMFJ7c7kukBcW>div{display:flex;flex-direction:column;height:100%}.q98hhidxMFJ7c7kukBcW>div>div.Vb9ZW_AgGZVSoBCxg52Q{flex-grow:1;overflow-y:auto}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".q98hhidxMFJ7c7kukBcW{position:absolute;top:0;left:0;right:0;bottom:0;background-color:#efeff4}.q98hhidxMFJ7c7kukBcW.PyBmWflMH2F7Bp5_dTbO{display:none}.q98hhidxMFJ7c7kukBcW>div{display:flex;flex-direction:column;height:100%}.q98hhidxMFJ7c7kukBcW>div>div.Vb9ZW_AgGZVSoBCxg52Q{flex-grow:1;overflow-y:auto}.q98hhidxMFJ7c7kukBcW>div>div.Vb9ZW_AgGZVSoBCxg52Q .HJS0JtmOxznx2sgxhKh5{max-width:initial;padding:0}.q98hhidxMFJ7c7kukBcW>div>div.Vb9ZW_AgGZVSoBCxg52Q>div{min-height:100%}", ""]);
 // Exports
 ___CSS_LOADER_EXPORT___.locals = {
 	"site": "q98hhidxMFJ7c7kukBcW",
 	"hidden": "PyBmWflMH2F7Bp5_dTbO",
-	"container": "Vb9ZW_AgGZVSoBCxg52Q"
+	"container": "Vb9ZW_AgGZVSoBCxg52Q",
+	"fullWidth": "HJS0JtmOxznx2sgxhKh5"
 };
 module.exports = ___CSS_LOADER_EXPORT___;
 
@@ -857,7 +858,8 @@ const initialFooterOptions = {
   buttons: []
 };
 const initialState = {
-  topBarOptions: {}
+  topBarOptions: {},
+  useFullWidth: false
 };
 
 class SiteContainer extends external_react_namespaceObject.PureComponent {
@@ -906,6 +908,12 @@ class SiteContainer extends external_react_namespaceObject.PureComponent {
     }
   }
 
+  setUseFullWidth(useFullWidth) {
+    this.setState({
+      useFullWidth
+    });
+  }
+
   render() {
     var _a, _b;
 
@@ -920,7 +928,8 @@ class SiteContainer extends external_react_namespaceObject.PureComponent {
     } = this.props;
     const Base = siteComponent;
     const {
-      topBarOptions
+      topBarOptions,
+      useFullWidth
     } = this.state;
 
     if (typeof topBarOptions.rightButtons === 'function') {
@@ -943,10 +952,12 @@ class SiteContainer extends external_react_namespaceObject.PureComponent {
       value: id
     }, /*#__PURE__*/external_react_namespaceObject.createElement(VisibleContext.Provider, {
       value: visible
-    }, /*#__PURE__*/external_react_namespaceObject.createElement(TopBar, _extends({}, defaultTopBarOptions, topBarOptions)), /*#__PURE__*/external_react_namespaceObject.createElement(external_react_bootstrap_mobile_namespaceObject.Container, {
-      fluid: "xxl",
+    }, /*#__PURE__*/external_react_namespaceObject.createElement(TopBar, _extends({}, defaultTopBarOptions, topBarOptions)), /*#__PURE__*/external_react_namespaceObject.createElement(external_react_bootstrap_mobile_namespaceObject.Block, {
       className: (siteContainer_default()).container
-    }, /*#__PURE__*/external_react_namespaceObject.createElement(Base, siteProps)))))));
+    }, /*#__PURE__*/external_react_namespaceObject.createElement(external_react_bootstrap_mobile_namespaceObject.Container, {
+      fluid: "xxl",
+      className: useFullWidth ? (siteContainer_default()).fullWidth : undefined
+    }, /*#__PURE__*/external_react_namespaceObject.createElement(Base, siteProps))))))));
   }
 
   updateTopBarOptions(newOptions) {
@@ -1069,6 +1080,7 @@ class SitesInner extends external_react_namespaceObject.PureComponent {
     super(props);
     this.currentSiteId = -1;
     this.sites = new Map();
+    this.lastDialogId = 0;
     this.lastToastId = 0;
     this.toasts = new Map();
     this.pushingNewSite = true;
@@ -1265,7 +1277,7 @@ class SitesInner extends external_react_namespaceObject.PureComponent {
 
     const content = /*#__PURE__*/external_react_namespaceObject.createElement(SitesContext.Provider, {
       value: this
-    }, /*#__PURE__*/external_react_namespaceObject.createElement(external_react_bootstrap_mobile_namespaceObject.Flex, {
+    }, /*#__PURE__*/external_react_namespaceObject.createElement(external_react_bootstrap_mobile_namespaceObject.DialogContainer, null, /*#__PURE__*/external_react_namespaceObject.createElement(external_react_bootstrap_mobile_namespaceObject.Flex, {
       className: (sites_default()).sites
     }, /*#__PURE__*/external_react_namespaceObject.createElement(external_react_bootstrap_mobile_namespaceObject.Block, {
       style: style,
@@ -1289,7 +1301,7 @@ class SitesInner extends external_react_namespaceObject.PureComponent {
         onDismissed: this.dismissedToast,
         onDismissedData: toast
       }), /*#__PURE__*/external_react_namespaceObject.createElement(external_react_bootstrap_mobile_namespaceObject.Text, null, toast.text));
-    }))));
+    })))));
 
     if (contentWrapper) {
       const Wrapper = contentWrapper;

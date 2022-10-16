@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ComponentType, CSSProperties, PureComponent } from 'react';
+import { Component, ComponentProps, ComponentType, CSSProperties, FunctionComponent, PureComponent } from 'react';
 import {
     FooterOptions,
     initialFooterOptions,
@@ -12,7 +12,17 @@ import { SiteAnimationInterface } from './SiteAnimation/SiteAnimationInterface';
 import { DefaultSiteAnimation } from './SiteAnimation/DefaultSiteAnimation';
 import { SitesContext } from './Hooks';
 import { Footer } from '../Site/Footer/Footer';
-import { Listener, Toast, ToastContainer, Block, Text, Flex, withMemo } from 'react-bootstrap-mobile';
+import {
+    Listener,
+    Toast,
+    ToastContainer,
+    Block,
+    Text,
+    Flex,
+    withMemo,
+    Dialog,
+    DialogContainer,
+} from 'react-bootstrap-mobile';
 import { NextRouter, withRouter } from 'next/router';
 import { AppProps } from 'next/app';
 import { UrlObject } from 'url';
@@ -88,6 +98,7 @@ class SitesInner extends PureComponent<Props, State> {
     private currentSiteId = -1;
     private sites = new Map<number, SiteData<any>>();
 
+    private lastDialogId = 0;
     private lastToastId = 0;
     private toasts = new Map<number, ToastData>();
     private pushingNewSite = true;
@@ -229,41 +240,43 @@ class SitesInner extends PureComponent<Props, State> {
 
         const content = (
             <SitesContext.Provider value={this}>
-                <Flex className={styles.sites}>
-                    <Block style={style} className={className || styles.siteContainer}>
-                        {sites.map((data) => {
-                            return (
-                                <SiteContainer
-                                    visible={data.id === currentSiteId || data.id === animation?.leavingSite}
-                                    leaving={data.id === animation?.leavingSite}
-                                    siteComponent={data.Component}
-                                    key={data.id}
-                                    id={data.id}
-                                    siteProps={data.pageProps}
-                                    siteContainerClass={siteContainerClass}
-                                    onContainerListener={this.setContainerForSite}
-                                    defaultTopBarOptions={defaultTopBarOptions}
-                                />
-                            );
-                        })}
-                    </Block>
-                    <Footer {...defaultFooterOptions} {...footerOptions} />
-                    <ToastContainer>
-                        {toasts.map((toast) => {
-                            return (
-                                <Toast
-                                    {...toast}
-                                    key={toast.id}
-                                    timeToShow={toast.duration}
-                                    onDismissed={this.dismissedToast}
-                                    onDismissedData={toast}
-                                >
-                                    <Text>{toast.text}</Text>
-                                </Toast>
-                            );
-                        })}
-                    </ToastContainer>
-                </Flex>
+                <DialogContainer>
+                    <Flex className={styles.sites}>
+                        <Block style={style} className={className || styles.siteContainer}>
+                            {sites.map((data) => {
+                                return (
+                                    <SiteContainer
+                                        visible={data.id === currentSiteId || data.id === animation?.leavingSite}
+                                        leaving={data.id === animation?.leavingSite}
+                                        siteComponent={data.Component}
+                                        key={data.id}
+                                        id={data.id}
+                                        siteProps={data.pageProps}
+                                        siteContainerClass={siteContainerClass}
+                                        onContainerListener={this.setContainerForSite}
+                                        defaultTopBarOptions={defaultTopBarOptions}
+                                    />
+                                );
+                            })}
+                        </Block>
+                        <Footer {...defaultFooterOptions} {...footerOptions} />
+                        <ToastContainer>
+                            {toasts.map((toast) => {
+                                return (
+                                    <Toast
+                                        {...toast}
+                                        key={toast.id}
+                                        timeToShow={toast.duration}
+                                        onDismissed={this.dismissedToast}
+                                        onDismissedData={toast}
+                                    >
+                                        <Text>{toast.text}</Text>
+                                    </Toast>
+                                );
+                            })}
+                        </ToastContainer>
+                    </Flex>
+                </DialogContainer>
             </SitesContext.Provider>
         );
 
@@ -274,7 +287,7 @@ class SitesInner extends PureComponent<Props, State> {
         return content;
     }
 
-    dismissedToast = (toast?: ToastData) => {
+    private dismissedToast = (toast?: ToastData) => {
         if (toast && this.toasts.has(toast.id)) {
             this.toasts.delete(toast.id);
             this.setState({ toasts: Array.from(this.toasts.values()) });

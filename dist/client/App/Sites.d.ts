@@ -74,6 +74,7 @@ declare class SitesInner extends PureComponent<Props, State> {
     readonly state: State;
     private currentSiteId;
     private sites;
+    private lastDialogId;
     private lastToastId;
     private toasts;
     private pushingNewSite;
@@ -83,7 +84,7 @@ declare class SitesInner extends PureComponent<Props, State> {
     componentDidMount(): void;
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): void;
     render(): JSX.Element | null;
-    dismissedToast: (toast?: ToastData) => void;
+    private dismissedToast;
     setContainerForSite: (id: number, containerRef: React.RefObject<HTMLDivElement>) => void;
     private onPopState;
     private addOrUpdateCurrentSite;

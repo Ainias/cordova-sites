@@ -4,7 +4,7 @@ import { SiteIdContext } from '../App/SiteIdContext';
 import { VisibleContext } from '../App/VisibleContext';
 import { TopBar, TopBarProps } from './TopBar/TopBar';
 import { SiteContainerContext } from '../App/Hooks';
-import { Container, Override, Block, withMemo, TopBarButtonType } from 'react-bootstrap-mobile';
+import { Container, Override, Block, withMemo, TopBarButtonType, Flex, Grow } from 'react-bootstrap-mobile';
 import { FooterButton } from './Footer/Footer';
 
 import styles from './siteContainer.scss';
@@ -37,6 +37,7 @@ export type FooterOptions = Partial<typeof initialFooterOptions & { activeTab: n
 
 const initialState = {
     topBarOptions: {} as TopBarOptionsWithButtonFunctions,
+    useFullWidth: false,
 };
 
 type State = Readonly<typeof initialState>;
@@ -82,12 +83,16 @@ class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsTy
         }
     }
 
+    setUseFullWidth(useFullWidth: boolean) {
+        this.setState({ useFullWidth });
+    }
+
     render() {
         const { siteComponent, siteContainerStyle, siteProps, visible, id, siteContainerClass, defaultTopBarOptions } =
             this.props;
         const Base = siteComponent;
 
-        const { topBarOptions } = this.state;
+        const { topBarOptions, useFullWidth } = this.state;
 
         if (typeof topBarOptions.rightButtons === 'function') {
             topBarOptions.rightButtons = topBarOptions.rightButtons([...(defaultTopBarOptions.rightButtons ?? [])]);
@@ -107,9 +112,11 @@ class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsTy
                         <SiteIdContext.Provider value={id}>
                             <VisibleContext.Provider value={visible}>
                                 <TopBar {...defaultTopBarOptions} {...(topBarOptions as TopBarOptions)} />
-                                <Container fluid="xxl" className={styles.container}>
-                                    <Base {...siteProps} />
-                                </Container>
+                                <Block className={styles.container}>
+                                    <Container fluid="xxl" className={useFullWidth ? styles.fullWidth : undefined}>
+                                        <Base {...siteProps} />
+                                    </Container>
+                                </Block>
                             </VisibleContext.Provider>
                         </SiteIdContext.Provider>
                     </SiteContainerContext.Provider>
