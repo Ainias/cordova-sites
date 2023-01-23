@@ -112,11 +112,11 @@ class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsTy
                         <SiteIdContext.Provider value={id}>
                             <VisibleContext.Provider value={visible}>
                                 <TopBar {...defaultTopBarOptions} {...(topBarOptions as TopBarOptions)} />
-                                <Block className={styles.container}>
+                                <Flex className={styles.container}>
                                     <Container fluid="xxl" className={useFullWidth ? styles.fullWidth : undefined}>
                                         <Base {...siteProps} />
                                     </Container>
-                                </Block>
+                                </Flex>
                             </VisibleContext.Provider>
                         </SiteIdContext.Provider>
                     </SiteContainerContext.Provider>
