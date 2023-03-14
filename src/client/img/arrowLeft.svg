@@ -59,7 +59,7 @@
      id="layer1"
      transform="translate(0.99510127,-280.30576)">
     <path
-       style="fill:none;stroke-width:1.79;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="stroke:black;fill:none;stroke-width:1.79;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 6.9984654,281.3115 0,289.16153 7.0014184,297"
        id="path3788"
        inkscape:connector-curvature="0" />

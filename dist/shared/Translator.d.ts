@@ -1,51 +1,53 @@
+type Translations = Record<string, Record<string, string>>;
+type TranslatorConfig = {
+    translations: Translations;
+    fallbackLanguage: string;
+    markUntranslatedTranslations: boolean;
+    markTranslations: boolean;
+    logMissingTranslations?: boolean | ((missingTranslation: string, language: string) => void);
+};
 /**
  * Singleton-Klasse zum Übersetzen von Text-Inhalten
  */
 export declare class Translator {
-    static _translations: any;
+    private static translations;
     static instance: Translator;
-    _dynamicKey: number;
-    _translations: any;
-    _fallbackLanguage: string;
-    _markUntranslatedTranslations: boolean;
-    _markTranslations: boolean;
-    _logMissingTranslationsFunction: any;
-    _translationCallbacks: any;
-    _lastTranslationCallbackId: number;
+    private dynamicKey;
+    private translations;
+    private fallbackLanguage;
+    private markUntranslatedTranslations;
+    private markTranslations;
+    private logMissingTranslationsFunction?;
+    private translationCallbacks;
+    private lastTranslationCallbackId;
     /**
      * Erstellt einen neuen Translator
      * @param config
      */
-    constructor(config?: {
-        translations: {};
-        fallbackLanguage: string;
-        markUntranslatedTranslations: boolean;
-        markTranslations: boolean;
-        logMissingTranslations: boolean;
-    });
+    constructor(config?: TranslatorConfig);
     createDynamicKey(): string;
     /**
      * Übersetzt sofort einen Key in die aktuelle Sprache
      * @param key
      * @param args
-     * @param language
+     * @param selectedLanguage
      * @returns {*}
      */
-    translate(key: any, args?: any, language?: any): any;
+    translate(key: string, args?: string[], selectedLanguage?: string): string;
     /**
      * Fügt neue Übersetzungen hinzu
      * @param trans
      */
-    addDynamicTranslations(trans: any): void;
+    addDynamicTranslations(trans: Translations): void;
     getLanguages(): string[];
     getFallbackLanguage(): string;
-    static translate(key: any, args?: any, language?: any): any;
-    static addDynamicTranslations(trans: any): void;
-    static init(config: any): void;
+    static translate(key: string, args?: string[], language?: string): string;
+    static addDynamicTranslations(trans: Translations): void;
+    static init(config: TranslatorConfig): void;
     /**
      * @returns {Translator|null}
      */
     static getInstance(): Translator;
-    static _isValid(translation: any): boolean;
-    static _format(translation: any, args: any): any;
+    private static format;
 }
+export {};

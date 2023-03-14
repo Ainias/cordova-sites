@@ -1,6 +1,6 @@
 export declare class ServerTranslator {
-    _lang: string;
-    constructor(lang: any);
-    translate(key: any, args?: any): any;
-    static setUserLanguage(req: any, res: any, next: any): void;
+    private lang;
+    constructor(lang: string);
+    translate(key: string, args?: string[]): string;
+    static setUserLanguage(req: any, _res: any, next: () => void): void;
 }

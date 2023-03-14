@@ -1,1 +1,0 @@
-{"version":3,"file":"NotOnlineError.js","sourceRoot":"","sources":["../../../../src/client/js/DataManager/NotOnlineError.ts"],"names":[],"mappings":";;;AAAA,MAAa,cAAe,SAAQ,KAAK;IAGrC,YAAY,OAAe,EAAE,GAAW;QACpC,KAAK,CAAC,OAAO,GAAC,WAAW,GAAC,GAAG,CAAC,CAAC;QAC/B,IAAI,CAAC,IAAI,GAAG,GAAG,CAAC;IACpB,CAAC;CACJ;AAPD,wCAOC"}

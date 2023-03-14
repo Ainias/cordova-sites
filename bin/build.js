@@ -1,7 +1,7 @@
-const path = require("path");
+const path = require('path');
 const fs = require('fs');
 
-const tmpFile = "./tmp/script.js";
+const tmpFile = './tmp/script.js';
 
 function findNames(dir, excluded) {
     let names = {};
@@ -10,15 +10,16 @@ function findNames(dir, excluded) {
     }
 
     let files = fs.readdirSync(dir);
-    files.forEach(file => {
+    files.forEach((file) => {
         let stats = fs.statSync(dir + file);
         if (stats.isDirectory()) {
             let nameObject = findNames(dir + file + '/', excluded);
             names = Object.assign(names, nameObject);
-        } else if ((file.endsWith(".ts") ) && !excluded.includes(dir + file)) {
+        } else if (file.endsWith('.d.ts') && !excluded.includes(dir + file)) {
+            return;
+        } else if (file.endsWith('.ts') && !excluded.includes(dir + file)) {
             names[file.substring(0, file.length - 3)] = dir + file.substring(0, file.length - 3);
-        }
-        else if ((file.endsWith(".mjs") ) && !excluded.includes(dir + file)) {
+        } else if ((file.endsWith('.mjs') || file.endsWith('.tsx')) && !excluded.includes(dir + file)) {
             names[file.substring(0, file.length - 4)] = dir + file.substring(0, file.length - 4);
         }
     });
@@ -33,13 +34,16 @@ async function buildEntryPoints(fileOption, target) {
     const resultDir = path.resolve(process.cwd(), path.dirname(target));
 
     let names = {};
-    fileOption.input.forEach(dir => {
-        Object.assign(names, findNames(dir + "/", []));
+    fileOption.input.forEach((dir) => {
+        Object.assign(names, findNames(dir + '/', []));
     });
 
     let imports = '';
     for (let k in names) {
-        imports += "export * from './" + path.relative(resultDir, path.resolve(process.cwd(), names[k].substring(cutLengthFront))) + "';\n";
+        imports +=
+            "export * from './" +
+            path.relative(resultDir, path.resolve(process.cwd(), names[k].substring(cutLengthFront))) +
+            "';\n";
     }
 
     if (!fs.existsSync(resultDir)) {
@@ -48,19 +52,21 @@ async function buildEntryPoints(fileOption, target) {
     fs.writeFileSync(target, imports);
 }
 
-
-buildEntryPoints({
-    input: [
-        path.resolve(process.cwd(), "src/server/"),
-    ],
-}, "./src/server.ts");
-buildEntryPoints({
-    input: [
-        path.resolve(process.cwd(), "src/client/"),
-    ],
-}, "./src/client.ts");
-buildEntryPoints({
-    input: [
-        path.resolve(process.cwd(), "src/shared/"),
-    ],
-}, "./src/shared.ts");
+buildEntryPoints(
+    {
+        input: [path.resolve(process.cwd(), 'src/server/')],
+    },
+    './dist/server.ts'
+);
+buildEntryPoints(
+    {
+        input: [path.resolve(process.cwd(), 'src/client/')],
+    },
+    './src/client.ts'
+);
+buildEntryPoints(
+    {
+        input: [path.resolve(process.cwd(), 'src/shared/')],
+    },
+    './dist/shared.ts'
+);

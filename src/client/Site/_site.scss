@@ -1,0 +1,48 @@
+//html, body {
+//  height: 100%;
+//}
+
+//.sites {
+//  height: 100%;
+//  width: 100%;
+//  display: flex;
+//  flex-direction: column;
+//}
+
+//.siteContainer {
+//  flex: 1;
+//  position: relative;
+//  //height: 100%;
+//  width: 100%;
+//  //display: inline-block;
+//  overflow: hidden;
+//  //display: flex;
+//  //flex-direction: column;
+//}
+
+//.site {
+//  //flex: 1;
+//  //overflow-y: auto;
+//
+//  position: absolute;
+//  top: 0;
+//  left: 0;
+//  right: 0;
+//  bottom: 0;
+//  background-color: #efeff4;
+//
+//  &.hidden {
+//    display: none;
+//  }
+//
+//  > div {
+//    display: flex;
+//    flex-direction: column;
+//    height: 100%;
+//
+//    > div.container-xxl {
+//      flex-grow: 1;
+//      overflow-y: auto;
+//    }
+//  }
+//}

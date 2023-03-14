@@ -1,0 +1,17 @@
+@import "node_modules/@ainias42/react-bootstrap-mobile/src/scss/variables";
+@import "node_modules/@ainias42/react-bootstrap-mobile/src/scss/designMixin";
+
+.backButtonImg {
+  display: inline-block;
+  width: 1.31rem;
+  height: 1rem;
+  background-repeat: no-repeat;
+  background-size: contain;
+  @include design($flat) {
+    background-image: url("../../img/arrowLeft.svg");
+  }
+
+  @include design($material) {
+    background-image: url("../../img/back.png");
+  }
+}

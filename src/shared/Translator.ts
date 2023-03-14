@@ -1,118 +1,119 @@
-import {Helper} from "js-helper/dist/shared";
+import { Helper } from '@ainias42/js-helper';
+
+type Translations = Record<string, Record<string, string>>;
+type TranslatorConfig = {
+    translations: Translations;
+    fallbackLanguage: string;
+    markUntranslatedTranslations: boolean;
+    markTranslations: boolean;
+    logMissingTranslations?: boolean | ((missingTranslation: string, language: string) => void);
+};
 
 /**
  * Singleton-Klasse zum Übersetzen von Text-Inhalten
  */
 export class Translator {
+    private static translations: Record<string, Record<string, string>> = {};
+    static instance: Translator;
 
-    static _translations;
-    static instance : Translator;
+    private dynamicKey = 0;
 
-    _dynamicKey = 0;
+    private translations: Translations;
+    private fallbackLanguage: string;
+    private markUntranslatedTranslations: boolean;
+    private markTranslations: boolean;
+    private logMissingTranslationsFunction?: (missingTranslation: string, language: string) => void;
 
-    _translations;
-    _fallbackLanguage: string;
-    _markUntranslatedTranslations: boolean;
-    _markTranslations: boolean;
-    _logMissingTranslationsFunction: any;
-
-    _translationCallbacks;
-    _lastTranslationCallbackId: number;
-
+    private translationCallbacks;
+    private lastTranslationCallbackId: number;
 
     /**
      * Erstellt einen neuen Translator
      * @param config
      */
-    constructor(config={
-        translations: {},
-        fallbackLanguage: "en",
-        markUntranslatedTranslations: true,
-        markTranslations: false,
-        logMissingTranslations: true
-    }) {
-
-        this._translations = {};
-        this.addDynamicTranslations(Translator._translations);
+    constructor(
+        config: TranslatorConfig = {
+            translations: {},
+            fallbackLanguage: 'en',
+            markUntranslatedTranslations: true,
+            markTranslations: false,
+            logMissingTranslations: true,
+        }
+    ) {
+        this.translations = {};
+        this.addDynamicTranslations(Translator.translations);
         this.addDynamicTranslations(config.translations);
 
-        this._fallbackLanguage = config.fallbackLanguage;
+        this.fallbackLanguage = config.fallbackLanguage;
 
-        this._markUntranslatedTranslations = config.markUntranslatedTranslations;
-        this._markTranslations = config.markTranslations;
+        this.markUntranslatedTranslations = config.markUntranslatedTranslations;
+        this.markTranslations = config.markTranslations;
 
-        if (config.logMissingTranslations === true){
-            this._logMissingTranslationsFunction = (missingTranslation, language) => {
-                if (language === this._fallbackLanguage){
-                    console.error("missing base translation for key " + missingTranslation)
+        if (config.logMissingTranslations === true) {
+            this.logMissingTranslationsFunction = (missingTranslation, language) => {
+                if (language === this.fallbackLanguage) {
+                    console.error(`missing base translation for key ${missingTranslation}`);
+                } else {
+                    console.warn(`missing translation for language >${language}< and key >${missingTranslation}<`);
                 }
-                else {
-                    console.warn("missing translation for language >" + language + "< and key >" + missingTranslation+"<");
-                }
-            }
-        }
-        else if (typeof config.logMissingTranslations === "function"){
-            this._logMissingTranslationsFunction = config.logMissingTranslations;
-        }
-        else {
-            this._logMissingTranslationsFunction = null;
+            };
+        } else if (typeof config.logMissingTranslations === 'function') {
+            this.logMissingTranslationsFunction = config.logMissingTranslations;
+        } else {
+            this.logMissingTranslationsFunction = undefined;
         }
 
-        this._translationCallbacks = new Map();
-        this._lastTranslationCallbackId = 0;
+        this.translationCallbacks = new Map();
+        this.lastTranslationCallbackId = 0;
     }
 
-    createDynamicKey(){
-        this._dynamicKey++;
-        return "translator-dynamic-"+new Date().getTime()+"-"+this._dynamicKey;
+    createDynamicKey() {
+        this.dynamicKey++;
+        return `translator-dynamic-${new Date().getTime()}-${this.dynamicKey}`;
     }
 
     /**
      * Übersetzt sofort einen Key in die aktuelle Sprache
      * @param key
      * @param args
-     * @param language
+     * @param selectedLanguage
      * @returns {*}
      */
-    translate(key, args?, language?) {
+    translate(key: string, args?: string[], selectedLanguage?: string) {
         if (Helper.isNull(key)) {
-            return "";
+            return '';
         }
 
-        language = Helper.nonNull(language, args, this._fallbackLanguage);
+        const language = Helper.nonNull(selectedLanguage, args, this.fallbackLanguage);
 
-        let translation = null;
+        let translation;
 
         key = key.toLowerCase();
-        if (Helper.isNotNull(this._translations[language]) && Helper.isNotNull(this._translations[language][key])) {
-            translation = this._translations[language][key];
-        }
-
-        if (!Translator._isValid(translation)) {
-            if (this._logMissingTranslationsFunction !== null) {
-                this._logMissingTranslationsFunction(key, language);
+        if (Helper.isNotNull(this.translations[language]) && Helper.isNotNull(this.translations[language][key])) {
+            translation = this.translations[language][key];
+        } else {
+            if (typeof this.logMissingTranslationsFunction === 'function') {
+                this.logMissingTranslationsFunction(key, language);
             }
-            if (this._translations[this._fallbackLanguage]) {
-                translation = this._translations[this._fallbackLanguage][key];
-            }
-
-            if (!Translator._isValid(translation)) {
-                if (this._logMissingTranslationsFunction !== null) {
-                    this._logMissingTranslationsFunction(key, language);
+            if (this.translations[this.fallbackLanguage]) {
+                translation = this.translations[this.fallbackLanguage][key];
+            } else {
+                if (typeof this.logMissingTranslationsFunction === 'function') {
+                    this.logMissingTranslationsFunction(key, language);
                 }
                 translation = key;
             }
-            if (this._markUntranslatedTranslations) {
-                translation = "&gt;&gt;" + translation + "&lt;&lt;";
+            if (this.markUntranslatedTranslations) {
+                translation = `&gt;&gt;${translation}&lt;&lt;`;
             }
         }
 
-        if (this._markTranslations) {
-            translation = "$" + translation + "$";
+        if (this.markTranslations) {
+            translation = `$${translation}$`;
         }
 
         if (args !== undefined) {
-            translation = Translator._format(translation, args)
+            translation = Translator.format(translation, args);
         }
 
         return translation;
@@ -122,69 +123,61 @@ export class Translator {
      * Fügt neue Übersetzungen hinzu
      * @param trans
      */
-    addDynamicTranslations(trans) {
-        for (let lang in trans) {
-            if (!this._translations[lang]) {
-                this._translations[lang] = {};
+    addDynamicTranslations(trans: Translations) {
+        Object.keys(trans).forEach((lang) => {
+            if (!this.translations[lang]) {
+                this.translations[lang] = {};
             }
-            for (let key in trans[lang]) {
-                this._translations[lang][key.toLowerCase()] = trans[lang][key];
-            }
-        }
+            Object.keys(trans[lang]).forEach((key) => {
+                this.translations[lang][key.toLowerCase()] = trans[lang][key];
+            });
+        });
     }
 
     getLanguages() {
-        return Object.keys(this._translations);
+        return Object.keys(this.translations);
     }
 
     getFallbackLanguage() {
-        return this._fallbackLanguage;
+        return this.fallbackLanguage;
     }
 
-    static translate(key, args?, language?) {
-        let instance = Translator.getInstance();
+    static translate(key: string, args?: string[], language?: string) {
+        const instance = Translator.getInstance();
         if (instance) {
             return instance.translate(key, args, language);
         }
-        return "";
+        return '';
     }
 
-    static addDynamicTranslations(trans) {
-        let instance = Translator.getInstance();
+    static addDynamicTranslations(trans: Translations) {
+        const instance = Translator.getInstance();
         if (instance) {
-            return instance.addDynamicTranslations(trans);
+            instance.addDynamicTranslations(trans);
         } else {
-            Object.keys(trans).forEach(lang => {
-                if (Helper.isNull(Translator._translations[lang])) {
-                    Translator._translations[lang] = {};
+            Object.keys(trans).forEach((lang) => {
+                if (Helper.isNull(Translator.translations[lang])) {
+                    Translator.translations[lang] = {};
                 }
-                Object.assign(Translator._translations[lang], trans[lang]);
+                Object.assign(Translator.translations[lang], trans[lang]);
             });
         }
     }
 
-    static init(config) {
+    static init(config: TranslatorConfig) {
         Translator.instance = new Translator(config);
     }
 
     /**
      * @returns {Translator|null}
      */
-    static getInstance() : Translator {
+    static getInstance(): Translator {
         return Translator.instance;
     }
 
-    static _isValid(translation) {
-        return (typeof translation === "string");
-    }
-
-    static _format(translation, args) {
-        return translation.replace(/{(\d+)}/g, function (match, number) {
+    private static format(translation: string, args: string[]) {
+        return translation.replace(/{(\d+)}/g, (match, number) => {
             return args[number] !== undefined ? args[number] : match;
         });
     }
 }
-
-Translator._translations = {};
-
-Translator.instance = null;
