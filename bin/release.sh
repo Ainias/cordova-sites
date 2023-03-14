@@ -12,6 +12,7 @@ fi;
 
 versionName=$1
 versionExists="$(git ls-remote $REPOSITORY refs/tags/"$versionName"| tr -d '\n')"
+workingDir=$(pwd);
 
 if [ -n "$versionExists" ]; then
 	echo "Version existiert bereits!";
@@ -45,3 +46,6 @@ git commit -m "pre-version-commit for version $versionName" || echo "no commit n
 npm version "$versionName"
 npm publish
 git push
+
+cd "$workingDir"
+git pull

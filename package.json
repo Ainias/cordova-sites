@@ -11,6 +11,9 @@
     "update packages": "node bin/updateCopies.js",
     "force-audit-fix": "npx npm-force-resolutions"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "dependencies": {
     "@ainias42/js-helper": "^0.7.12",
