@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { InViewport, Image, withMemo } from 'react-bootstrap-mobile';
+import { InViewport, Image, withMemo } from '@ainias42/react-bootstrap-mobile';
 import { useTopBar } from '../../App/Hooks';
 
 import styles from './topBarImage.scss';

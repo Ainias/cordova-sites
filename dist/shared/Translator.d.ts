@@ -1,5 +1,5 @@
-declare type Translations = Record<string, Record<string, string>>;
-declare type TranslatorConfig = {
+type Translations = Record<string, Record<string, string>>;
+type TranslatorConfig = {
     translations: Translations;
     fallbackLanguage: string;
     markUntranslatedTranslations: boolean;

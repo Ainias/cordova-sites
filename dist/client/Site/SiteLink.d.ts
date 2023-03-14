@@ -1,7 +1,7 @@
 import { CSSProperties, ReactNode } from 'react';
-import { RbmComponentProps } from 'react-bootstrap-mobile';
+import { RbmComponentProps } from '@ainias42/react-bootstrap-mobile';
 import { PrefetchOptions } from 'next/dist/shared/lib/router/router';
-export declare type SiteLinkProps = RbmComponentProps<{
+export type SiteLinkProps = RbmComponentProps<{
     href: string;
     prefetch?: boolean | PrefetchOptions;
     shallow?: boolean;

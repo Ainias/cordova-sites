@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BackButton } from './BackButton';
-import { TopBarButtonType, TopBar as BMTopBar, useBreakpointSelect } from 'react-bootstrap-mobile';
+import { TopBarButtonType, TopBar as BMTopBar, useBreakpointSelect } from '@ainias42/react-bootstrap-mobile';
 import { useMemo } from 'react';
 
 export type TopBarProps = {

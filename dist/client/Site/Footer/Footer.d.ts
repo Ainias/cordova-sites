@@ -1,9 +1,9 @@
 /// <reference types="react" />
-import { TabBarButtonType } from 'react-bootstrap-mobile';
-export declare type FooterButton = TabBarButtonType & {
+import { TabBarButtonType } from '@ainias42/react-bootstrap-mobile';
+export type FooterButton = TabBarButtonType & {
     onClick?: () => void;
 };
-export declare type FooterProps = {
+export type FooterProps = {
     buttons: FooterButton[];
     visible?: boolean;
     activeTab?: number;

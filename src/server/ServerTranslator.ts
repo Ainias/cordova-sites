@@ -1,5 +1,5 @@
 import { Translator } from '../shared/Translator';
-import { Helper } from 'js-helper/dist/shared';
+import { Helper } from '@ainias42/js-helper';
 
 export class ServerTranslator {
     private lang: string;

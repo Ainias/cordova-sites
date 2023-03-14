@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TabBar, TabBarButtonType, withMemo } from 'react-bootstrap-mobile';
+import { TabBar, TabBarButtonType, withMemo } from '@ainias42/react-bootstrap-mobile';
 import { useCallback } from 'react';
 
 import styles from './footer.scss';

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { CSSProperties, useCallback } from 'react';
 import { useSiteId } from '../App/SiteIdContext';
 import { useSites } from '../App/Hooks';
-import { Clickable, RbmComponentProps, withMemo } from 'react-bootstrap-mobile';
+import { Clickable, RbmComponentProps, withMemo } from '@ainias42/react-bootstrap-mobile';
 
 export type FinishSiteLinkProps = RbmComponentProps<{
     style?: CSSProperties;

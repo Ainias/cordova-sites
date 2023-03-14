@@ -6,23 +6,23 @@
   "main": "dist/client.js",
   "scripts": {
     "eslint": "eslint 'src/client/**/*.tsx' 'src/shared/**/*.ts'",
-    "build2": "node bin/build.js && tsc && cd ./src && find . -regextype sed -regex '.*\\.\\(html\\|png\\|svg\\|json\\)' -type f -exec cp --parents {} ../dist \\;",
     "build": "node bin/build.js && webpack",
+    "build:production": "node bin/build.js && webpack --env production",
     "update packages": "node bin/updateCopies.js",
     "force-audit-fix": "npx npm-force-resolutions"
   },
   "license": "MIT",
   "dependencies": {
-    "js-helper": "git+https://github.com/Ainias/js-helper#0.7.10",
-    "react-bootstrap-mobile": "git+https://github.com/Ainias/react-bootstrap-mobile#0.1.6"
+    "@ainias42/js-helper": "^0.7.12",
+    "@ainias42/react-bootstrap-mobile": "^0.1.8"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
     "next": "^12.2.4",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
   },
   "devDependencies": {
     "bootstrap": "^5.2.0",

@@ -1,5 +1,5 @@
 /// <reference types="react" />
-export declare type TopBarImageProps = {
+export type TopBarImageProps = {
     image: string;
     maxHeight?: string;
 };

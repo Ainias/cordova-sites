@@ -1,13 +1,11 @@
 import * as React from 'react';
 import { useCallback } from 'react';
-import { TopBarButton, withMemo, InlineBlock } from 'react-bootstrap-mobile';
+import { TopBarButton, withMemo, InlineBlock } from '@ainias42/react-bootstrap-mobile';
 import { useSites } from '../../App/Hooks';
 
 import styles from './backButton.scss';
 
-type Props = {};
-
-function BackButton({}: Props) {
+export const BackButton = withMemo(function BackButton() {
     const sites = useSites();
     const goBack = useCallback(() => sites?.goBack(), [sites]);
 
@@ -19,7 +17,4 @@ function BackButton({}: Props) {
         );
     }
     return null;
-}
-
-const BackButtonMemo = withMemo(BackButton, styles);
-export { BackButtonMemo as BackButton };
+}, styles);

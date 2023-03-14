@@ -2,20 +2,20 @@
 import * as React from 'react';
 import { ComponentType, CSSProperties, PureComponent } from 'react';
 import { FooterOptions, TopBarOptions } from '../Site/SiteContainer';
-import { PromiseWithHandlers } from 'js-helper';
+import { PromiseWithHandlers } from '@ainias42/js-helper';
 import { SiteAnimationInterface } from './SiteAnimation/SiteAnimationInterface';
-import { Listener } from 'react-bootstrap-mobile';
+import { Listener } from '@ainias42/react-bootstrap-mobile';
 import { NextRouter } from 'next/router';
 import { AppProps } from 'next/app';
 import { UrlObject } from 'url';
 import { PrefetchOptions } from 'next/dist/shared/lib/router/router';
-declare type TransitionOptions = {
+type TransitionOptions = {
     scroll?: boolean;
     shallow?: boolean;
     locale?: string;
 };
-export declare type SiteType<PropsType> = ComponentType<PropsType>;
-declare type ToastData = {
+export type SiteType<PropsType> = ComponentType<PropsType>;
+type ToastData = {
     id: number;
     text: string;
     duration: number;
@@ -25,7 +25,7 @@ declare type ToastData = {
     actionName: string;
     duration: number;
 } & Listener<'onClick', any>);
-export declare type SiteData<PropsType> = {
+export type SiteData<PropsType> = {
     id: number;
     onBackListener?: () => boolean | void;
     containerRefPromise: PromiseWithHandlers<React.RefObject<HTMLDivElement>>;
@@ -57,8 +57,8 @@ declare const initialState: {
     }>;
     toasts: ToastData[];
 };
-declare type State = typeof initialState;
-declare type Props = {
+type State = typeof initialState;
+type Props = {
     style?: CSSProperties;
     className?: string;
     animationHandler?: SiteAnimationInterface;
@@ -74,7 +74,6 @@ declare class SitesInner extends PureComponent<Props, State> {
     readonly state: State;
     private currentSiteId;
     private sites;
-    private lastDialogId;
     private lastToastId;
     private toasts;
     private pushingNewSite;

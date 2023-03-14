@@ -1,7 +1,7 @@
 import React, { CSSProperties, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useSites } from '../App/Hooks';
 import { useSiteId } from '../App/SiteIdContext';
-import { Clickable, RbmComponentProps, useInViewport, withMemo } from 'react-bootstrap-mobile';
+import { Clickable, RbmComponentProps, useInViewport, withMemo } from '@ainias42/react-bootstrap-mobile';
 import { PrefetchOptions } from 'next/dist/shared/lib/router/router';
 
 export type SiteLinkProps = RbmComponentProps<

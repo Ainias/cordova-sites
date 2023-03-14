@@ -1,4 +1,4 @@
-import { Helper } from 'js-helper/dist/shared';
+import { Helper } from '@ainias42/js-helper';
 
 type Translations = Record<string, Record<string, string>>;
 type TranslatorConfig = {
@@ -86,7 +86,7 @@ export class Translator {
 
         const language = Helper.nonNull(selectedLanguage, args, this.fallbackLanguage);
 
-        let translation = null;
+        let translation;
 
         key = key.toLowerCase();
         if (Helper.isNotNull(this.translations[language]) && Helper.isNotNull(this.translations[language][key])) {

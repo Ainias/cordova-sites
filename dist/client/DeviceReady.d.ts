@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FunctionComponent } from 'react';
-declare type Props = {
+type Props = {
     style?: React.CSSProperties;
     className: string;
 };

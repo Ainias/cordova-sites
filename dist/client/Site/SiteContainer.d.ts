@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { TopBarProps } from './TopBar/TopBar';
-import { Override, TopBarButtonType } from 'react-bootstrap-mobile';
+import { Override, TopBarButtonType } from '@ainias42/react-bootstrap-mobile';
 import { FooterButton } from './Footer/Footer';
 export declare const initialTopBarOptions: TopBarProps;
 export declare const initialFooterOptions: {
     visible: boolean;
     buttons: FooterButton[];
 };
-export declare type TopBarOptions = Partial<TopBarProps>;
-export declare type TopBarOptionsWithButtonFunctions = Partial<Override<TopBarProps, {
+export type TopBarOptions = Partial<TopBarProps>;
+export type TopBarOptionsWithButtonFunctions = Partial<Override<TopBarProps, {
     rightButtons: TopBarButtonType[] | ((defaultButtons: TopBarButtonType[]) => TopBarButtonType[]);
     leftButtons: TopBarButtonType[] | ((defaultButtons: TopBarButtonType[]) => TopBarButtonType[]);
 }>>;
-export declare type FooterOptions = Partial<typeof initialFooterOptions & {
+export type FooterOptions = Partial<typeof initialFooterOptions & {
     activeTab: number;
 }>;
 declare const initialState: {
@@ -22,8 +22,8 @@ declare const initialState: {
     }>>;
     useFullWidth: boolean;
 };
-declare type State = Readonly<typeof initialState>;
-declare type Props<SitePropsType> = {
+type State = Readonly<typeof initialState>;
+type Props<SitePropsType> = {
     visible: boolean;
     leaving: boolean;
     id: number;
@@ -43,10 +43,10 @@ declare class SiteContainer<SitePropsType> extends React.PureComponent<Props<Sit
     componentDidMount(): void;
     getSnapshotBeforeUpdate(prevProps: Readonly<Props<SitePropsType>>): null;
     componentDidUpdate(prevProps: Readonly<Props<SitePropsType>>): void;
-    setUseFullWidth(useFullWidth: boolean): void;
     render(): JSX.Element;
+    setUseFullWidth(useFullWidth: boolean): void;
     updateTopBarOptions(newOptions: TopBarOptionsWithButtonFunctions): void;
 }
-export declare type SiteContainerType<T> = SiteContainer<T>;
+export type SiteContainerType<T> = SiteContainer<T>;
 declare const SiteContainerMemo: typeof SiteContainer;
 export { SiteContainerMemo as SiteContainer };

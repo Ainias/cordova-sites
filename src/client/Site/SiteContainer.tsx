@@ -4,7 +4,7 @@ import { SiteIdContext } from '../App/SiteIdContext';
 import { VisibleContext } from '../App/VisibleContext';
 import { TopBar, TopBarProps } from './TopBar/TopBar';
 import { SiteContainerContext } from '../App/Hooks';
-import { Container, Override, Block, withMemo, TopBarButtonType, Flex, Grow } from 'react-bootstrap-mobile';
+import { Container, Override, Block, withMemo, TopBarButtonType, Flex } from '@ainias42/react-bootstrap-mobile';
 import { FooterButton } from './Footer/Footer';
 
 import styles from './siteContainer.scss';
@@ -83,10 +83,6 @@ class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsTy
         }
     }
 
-    setUseFullWidth(useFullWidth: boolean) {
-        this.setState({ useFullWidth });
-    }
-
     render() {
         const { siteComponent, siteContainerStyle, siteProps, visible, id, siteContainerClass, defaultTopBarOptions } =
             this.props;
@@ -114,6 +110,8 @@ class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsTy
                                 <TopBar {...defaultTopBarOptions} {...(topBarOptions as TopBarOptions)} />
                                 <Flex className={styles.container}>
                                     <Container fluid="xxl" className={useFullWidth ? styles.fullWidth : undefined}>
+                                        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                                        {/* @ts-ignore */}
                                         <Base {...siteProps} />
                                     </Container>
                                 </Flex>
@@ -123,6 +121,10 @@ class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsTy
                 </Block>
             </Block>
         );
+    }
+
+    setUseFullWidth(useFullWidth: boolean) {
+        this.setState({ useFullWidth });
     }
 
     updateTopBarOptions(newOptions: TopBarOptionsWithButtonFunctions) {

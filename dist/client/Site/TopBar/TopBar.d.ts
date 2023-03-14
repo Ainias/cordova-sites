@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { TopBarButtonType } from 'react-bootstrap-mobile';
-export declare type TopBarProps = {
+import { TopBarButtonType } from '@ainias42/react-bootstrap-mobile';
+export type TopBarProps = {
     visible: boolean;
     backButton?: TopBarButtonType | false;
     title?: string;

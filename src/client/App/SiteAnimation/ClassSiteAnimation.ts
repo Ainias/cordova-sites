@@ -1,12 +1,5 @@
 import { SiteAnimationInterface } from './SiteAnimationInterface';
-import { Helper } from 'js-helper';
-
-type Option = {
-    hideClass: string;
-    showClass: string;
-    duration: number;
-    removeClasses?: boolean;
-};
+import { Helper } from '@ainias42/js-helper';
 
 export class ClassSiteAnimation implements SiteAnimationInterface {
     private readonly siteStartClass: string;

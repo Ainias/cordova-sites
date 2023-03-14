@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react';
-import { RbmComponentProps } from 'react-bootstrap-mobile';
-export declare type FinishSiteLinkProps = RbmComponentProps<{
+import { RbmComponentProps } from '@ainias42/react-bootstrap-mobile';
+export type FinishSiteLinkProps = RbmComponentProps<{
     style?: CSSProperties;
 }>;
 declare function FinishSiteLink({ style, children, className }: FinishSiteLinkProps): JSX.Element;

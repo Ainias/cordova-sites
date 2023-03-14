@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Component, ComponentProps, ComponentType, CSSProperties, FunctionComponent, PureComponent } from 'react';
+import { ComponentType, CSSProperties, PureComponent } from 'react';
 import {
     FooterOptions,
     initialFooterOptions,
@@ -7,7 +7,7 @@ import {
     SiteContainer,
     TopBarOptions,
 } from '../Site/SiteContainer';
-import { PromiseWithHandlers } from 'js-helper';
+import { PromiseWithHandlers } from '@ainias42/js-helper';
 import { SiteAnimationInterface } from './SiteAnimation/SiteAnimationInterface';
 import { DefaultSiteAnimation } from './SiteAnimation/DefaultSiteAnimation';
 import { SitesContext } from './Hooks';
@@ -20,9 +20,8 @@ import {
     Text,
     Flex,
     withMemo,
-    Dialog,
     DialogContainer,
-} from 'react-bootstrap-mobile';
+} from '@ainias42/react-bootstrap-mobile';
 import { NextRouter, withRouter } from 'next/router';
 import { AppProps } from 'next/app';
 import { UrlObject } from 'url';
@@ -98,7 +97,6 @@ class SitesInner extends PureComponent<Props, State> {
     private currentSiteId = -1;
     private sites = new Map<number, SiteData<any>>();
 
-    private lastDialogId = 0;
     private lastToastId = 0;
     private toasts = new Map<number, ToastData>();
     private pushingNewSite = true;
