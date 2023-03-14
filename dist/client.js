@@ -1,6 +1,6 @@
 /*!
  * 
- *   cordova-sites v0.0.1
+ *   cordova-sites v0.8.2
  *   git+https://github.com/Ainias/cordova-sites.git
  *   Copyright (c) Silas Günther and project contributors.
  *   This source code is licensed under the MIT license found in the
