@@ -9,7 +9,7 @@ import { NextRouter } from 'next/router';
 import { AppProps } from 'next/app';
 import { UrlObject } from 'url';
 import { PrefetchOptions } from 'next/dist/shared/lib/router/router';
-type TransitionOptions = {
+export type TransitionOptions = {
     scroll?: boolean;
     shallow?: boolean;
     locale?: string;
@@ -31,6 +31,7 @@ export type SiteData<PropsType> = {
     containerRefPromise: PromiseWithHandlers<React.RefObject<HTMLDivElement>>;
     footerOptions: FooterOptions;
     finished: boolean;
+    url: string;
 } & AppProps<PropsType>;
 declare const initialState: {
     isInitialized: boolean;
@@ -97,8 +98,9 @@ declare class SitesInner extends PureComponent<Props, State> {
     goBack(callOnBackListener?: boolean): Promise<void> | undefined;
     push(url: UrlObject | string, as?: UrlObject | string, options?: TransitionOptions): Promise<boolean>;
     prefetch(url: string, as?: string, prefetchOptions?: PrefetchOptions): Promise<void>;
-    removeSite(siteId: number): Promise<void>;
+    finish(siteId: number): Promise<void>;
     private checkCurrentSite;
+    private allSitesFinished;
     getSiteDataById(siteId: number): SiteData<any> | undefined;
     setOnBackListener(siteId: number, listener: () => boolean | void): void;
     updateFooterOptions(siteId: number, newOptions: FooterOptions): void;

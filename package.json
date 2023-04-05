@@ -16,8 +16,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@ainias42/js-helper": "^0.7.12",
-    "@ainias42/react-bootstrap-mobile": "^0.1.8"
+    "@ainias42/js-helper": ">=0.8.2",
+    "@ainias42/react-bootstrap-mobile": ">=0.1.9",
+    "zustand": "^4.3.6"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
@@ -28,8 +29,6 @@
     "react-dom": ">=17.0.0"
   },
   "devDependencies": {
-    "bootstrap": "^5.2.0",
-    "file-loader": "^6.2.0",
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "@babel/preset-react": "^7.14.5",
@@ -42,6 +41,7 @@
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
     "babel-loader": "^8.2.2",
+    "bootstrap": "^5.2.0",
     "css-loader": "^6.7.1",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",
@@ -49,6 +49,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-typescript": "^2.4.0",
     "eslint-plugin-react": "^7.25.1",
+    "file-loader": "^6.2.0",
     "mini-css-extract-plugin": "^2.6.0",
     "next": "^12.2.4",
     "npm-force-resolutions": "^0.0.10",

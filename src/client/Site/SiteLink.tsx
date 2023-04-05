@@ -35,7 +35,7 @@ const SiteLink = function SiteLink({
     const onClickHandler = useCallback(() => {
         sites?.push(href, undefined, { scroll, shallow });
         if (finishCurrentSite) {
-            sites?.removeSite(currentSiteId);
+            sites?.finish(currentSiteId);
         }
     }, [finishCurrentSite, sites, href, scroll, shallow, currentSiteId]);
 

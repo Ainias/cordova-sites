@@ -13,7 +13,7 @@ function FinishSiteLink({ style, children, className }: FinishSiteLinkProps) {
     const sites = useSites();
     const onClickHandler = useCallback(() => {
         if (id) {
-            sites?.removeSite(id);
+            sites?.finish(id);
         }
     }, [id, sites]);
 

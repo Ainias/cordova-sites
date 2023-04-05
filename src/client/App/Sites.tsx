@@ -28,8 +28,9 @@ import { UrlObject } from 'url';
 import { PrefetchOptions } from 'next/dist/shared/lib/router/router';
 
 import styles from './sites.scss';
+import { useSitesState } from '../useSitesState';
 
-type TransitionOptions = {
+export type TransitionOptions = {
     scroll?: boolean;
     shallow?: boolean;
     locale?: string;
@@ -56,6 +57,7 @@ export type SiteData<PropsType> = {
     containerRefPromise: PromiseWithHandlers<React.RefObject<HTMLDivElement>>;
     footerOptions: FooterOptions;
     finished: boolean;
+    url: string;
 } & AppProps<PropsType>;
 
 const initialState = {
@@ -121,6 +123,7 @@ class SitesInner extends PureComponent<Props, State> {
             containerRefPromise: new PromiseWithHandlers<React.RefObject<HTMLDivElement>>(),
             footerOptions: {},
             finished: false,
+            url: props.router.asPath,
         });
 
         // eslint-disable-next-line react/state-in-constructor
@@ -137,7 +140,16 @@ class SitesInner extends PureComponent<Props, State> {
     componentDidMount() {
         const { router } = this.props;
         router.beforePopState(() => false);
+        window.history.replaceState(null, '');
+        window.history.pushState(null, '', router.asPath);
         window.onpopstate = (e) => this.onPopState(e);
+
+        // router.events.on('beforeHistoryChange', () => {
+        //     console.log('LOG-d beforeHistoryChange!', window.history.state);
+        //     setTimeout(() => {
+        //         console.log('LOG-d stateChange?', window.history.state);
+        //     }, 1);
+        // });
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
@@ -300,22 +312,31 @@ class SitesInner extends PureComponent<Props, State> {
     };
 
     private onPopState = (e: PopStateEvent) => {
-        if (e.state?.obsolete) {
-            window.history.go(-1);
-        } else if (this.isInternalNavigation) {
-            window.history.replaceState({ obsolete: true }, '');
-            window.history.pushState({ obsolete: true }, '');
-            this.isInternalNavigation = false;
-        } else if (e.state !== null && !e.state.forward) {
-            window.history.pushState(e.state, '', '');
-            this.goBack();
-        }
+        console.log('LOG-d state', e.state);
+        // only back button triggers this. Therefore push again the state and handle internal change
+        window.history.pushState(null, '', this.sites.get(this.currentSiteId)?.url);
+        this.goBack();
+
+        // if (e.state?.obsolete) {
+        //     window.history.go(-1);
+        // } else if (this.isInternalNavigation) {
+        //     // window.history.replaceState({ obsolete: true }, '');
+        //     window.history.pushState({ obsolete: true }, '');
+        //     this.isInternalNavigation = false;
+        // } else if (e.state !== null && !e.state.forward) {
+        //     // HandleBrowser navigation
+        //     console.log('LOG-d handle Browser Navigation');
+        //
+        //     window.history.pushState(e.state, '', '');
+        //     this.goBack();
+        // }
         return false;
     };
 
     private addOrUpdateCurrentSite(nextPage: AppProps) {
         const id = this.currentSiteId;
         const { currentSiteId } = this.state;
+        const { router } = this.props;
 
         if (this.sites.has(id)) {
             const currentData = this.sites.get(id);
@@ -335,6 +356,7 @@ class SitesInner extends PureComponent<Props, State> {
                 containerRefPromise: new PromiseWithHandlers<React.RefObject<HTMLDivElement>>(),
                 footerOptions: {},
                 finished: false,
+                url: router.asPath,
             });
         }
 
@@ -357,7 +379,16 @@ class SitesInner extends PureComponent<Props, State> {
     }
 
     private getActiveSites() {
-        return Array.from(this.sites.values()).filter((s) => !s.finished) as SiteData<any>[];
+        let minSiteId = Infinity;
+        const sites = Array.from(this.sites.values()).filter((s) => {
+            if (!s.finished) {
+                minSiteId = Math.min(minSiteId, s.id);
+                return true;
+            }
+            return false;
+        }) as SiteData<any>[];
+        useSitesState.getState().setMinimumActiveSite(minSiteId);
+        return sites;
     }
 
     canGoBack() {
@@ -401,14 +432,14 @@ class SitesInner extends PureComponent<Props, State> {
             }
         }
 
-        return this.removeSite(currentSiteId);
+        return this.finish(currentSiteId);
     }
 
     push(url: UrlObject | string, as?: UrlObject | string, options?: TransitionOptions) {
         const { router } = this.props;
 
         this.pushingNewSite = true;
-        return router.push(url, as, options);
+        return router.replace(url, as, options);
     }
 
     prefetch(url: string, as?: string, prefetchOptions?: PrefetchOptions) {
@@ -417,7 +448,7 @@ class SitesInner extends PureComponent<Props, State> {
         return router.prefetch(url, as, prefetchOptions);
     }
 
-    async removeSite(siteId: number) {
+    async finish(siteId: number) {
         const siteData = this.sites.get(siteId);
         if (siteData && !siteData.finished) {
             siteData.finished = true;
@@ -432,14 +463,22 @@ class SitesInner extends PureComponent<Props, State> {
             deletedSites++;
         }
 
+        if (!this.sites.get(this.currentSiteId)) {
+            this.allSitesFinished();
+            return;
+        }
+
+        // console.log('LOG-d deletedSites', deletedSites, this.currentSiteId);
+
         const newState: Partial<State> = {
             currentSiteId: this.currentSiteId,
             sites: this.getActiveSites(),
             footerOptions: {},
         };
+
         if (deletedSites > 0) {
             this.isInternalNavigation = true;
-            window.history.go(-deletedSites);
+            window.history.replaceState(null, '', this.sites.get(this.currentSiteId)?.url);
             newState.animation = {
                 type: 'end',
                 leavingSite: this.currentSiteId + deletedSites,
@@ -448,6 +487,11 @@ class SitesInner extends PureComponent<Props, State> {
         }
 
         this.setState(newState as Readonly<State>);
+    }
+
+    private allSitesFinished() {
+        // Finished application, go back
+        window.history.go(-2);
     }
 
     getSiteDataById(siteId: number) {

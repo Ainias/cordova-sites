@@ -25,9 +25,12 @@ module.exports = (env) => {
     return {
         mode: env.production ? 'production' : 'development',
         devtool: env.production ? 'source-map' : 'eval-source-map',
-        entry: './src/client.ts',
+        entry: {
+            client: './src/client.ts',
+            shared: './src/shared.ts',
+        },
         output: {
-            filename: 'client.js',
+            filename: '[name].js',
             path: path.resolve(__dirname, 'dist'),
             library: { type: 'umd' },
             clean: true,

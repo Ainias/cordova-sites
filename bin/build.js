@@ -54,12 +54,6 @@ async function buildEntryPoints(fileOption, target) {
 
 buildEntryPoints(
     {
-        input: [path.resolve(process.cwd(), 'src/server/')],
-    },
-    './dist/server.ts'
-);
-buildEntryPoints(
-    {
         input: [path.resolve(process.cwd(), 'src/client/')],
     },
     './src/client.ts'
@@ -68,5 +62,5 @@ buildEntryPoints(
     {
         input: [path.resolve(process.cwd(), 'src/shared/')],
     },
-    './dist/shared.ts'
+    './src/shared.ts'
 );
