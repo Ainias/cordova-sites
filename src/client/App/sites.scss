@@ -11,3 +11,9 @@
   width: 100%;
   overflow: hidden;
 }
+
+@media print {
+  .siteContainer {
+    overflow: initial;
+  }
+}

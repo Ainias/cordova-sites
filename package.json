@@ -18,13 +18,14 @@
   "dependencies": {
     "@ainias42/js-helper": ">=0.8.2",
     "@ainias42/react-bootstrap-mobile": ">=0.1.9",
-    "zustand": "^4.3.6"
+    "zustand": "^4.3.6",
+    "isomorphic-style-loader": "^5.3.2"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
-    "next": "^12.2.4",
+    "next": ">=12.2.4",
     "react": ">=17.0.0",
     "react-dom": ">=17.0.0"
   },
