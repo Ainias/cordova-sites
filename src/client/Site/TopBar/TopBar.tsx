@@ -18,6 +18,7 @@ export type TopBarProps = {
     numberButtonsLG?: number;
     numberButtonsXL?: number;
     numberButtonsXXL?: number;
+    className?: string;
 };
 
 export const TopBar = React.memo(function TopBar({
@@ -35,6 +36,7 @@ export const TopBar = React.memo(function TopBar({
     numberButtonsLG = 5,
     numberButtonsXL = 5,
     numberButtonsXXL = 5,
+    className,
 }: TopBarProps) {
     const realNumberButtons =
         useBreakpointSelect([
@@ -79,6 +81,7 @@ export const TopBar = React.memo(function TopBar({
             hiddenButtons={hiddenButtons}
             transparent={transparent}
             drawBehind={drawBehind}
+            className={className}
         />
     );
 });

@@ -15,5 +15,6 @@ export type TopBarProps = {
     numberButtonsLG?: number;
     numberButtonsXL?: number;
     numberButtonsXXL?: number;
+    className?: string;
 };
 export declare const TopBar: React.NamedExoticComponent<TopBarProps>;
