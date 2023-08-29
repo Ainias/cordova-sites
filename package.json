@@ -1,7 +1,7 @@
 {
   "name": "@ainias42/cordova-sites",
   "displayName": "Cordova Sites",
-  "version": "0.8.10",
+  "version": "0.8.11",
   "description": "A Cordova JS/HTML/CSS-Framework similar to android (or at least i hope so).",
   "main": "dist/client.js",
   "scripts": {
