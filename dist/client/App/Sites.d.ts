@@ -4,7 +4,7 @@ import { ComponentType, CSSProperties, PureComponent } from 'react';
 import { FooterOptions, TopBarOptions } from '../Site/SiteContainer';
 import { PromiseWithHandlers } from '@ainias42/js-helper';
 import { SiteAnimationInterface } from './SiteAnimation/SiteAnimationInterface';
-import { Listener } from '@ainias42/react-bootstrap-mobile';
+import { Listener, EmptyProps } from '@ainias42/react-bootstrap-mobile';
 import { NextRouter } from 'next/router';
 import { AppProps } from 'next/app';
 import { UrlObject } from 'url';
@@ -72,6 +72,7 @@ type Props = {
     defaultFooterOptions?: FooterOptions;
 };
 declare class SitesInner extends PureComponent<Props, State> {
+    private static instance;
     readonly state: State;
     private currentSiteId;
     private sites;
@@ -79,7 +80,9 @@ declare class SitesInner extends PureComponent<Props, State> {
     private toasts;
     private pushingNewSite;
     private isInternalNavigation;
+    private dialogContainerRef;
     private readonly animationHandler;
+    static getInstance(): SitesInner;
     constructor(props: Props);
     componentDidMount(): void;
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): void;
@@ -95,6 +98,11 @@ declare class SitesInner extends PureComponent<Props, State> {
         action: (data?: Data) => void;
         actionData?: Data;
     }, duration?: number): void;
+    showDialog<P = EmptyProps, R = any, C extends ComponentType<(P & {
+        close: (result?: R) => void;
+    }) | P> = ComponentType<(P & {
+        close: (result?: R) => void;
+    }) | P>>(dialog: C, props?: Omit<P, 'close'>): Promise<R | void> | undefined;
     goBack(callOnBackListener?: boolean): Promise<void> | undefined;
     push(url: UrlObject | string, as?: UrlObject | string, options?: TransitionOptions): Promise<boolean>;
     prefetch(url: string, as?: string, prefetchOptions?: PrefetchOptions): Promise<void>;

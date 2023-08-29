@@ -20,7 +20,7 @@ import {
     Text,
     Flex,
     withMemo,
-    DialogContainer,
+    DialogContainer, DialogContainerProps, DialogContainerRef, ShowDialog, EmptyProps,
 } from '@ainias42/react-bootstrap-mobile';
 import { NextRouter, withRouter } from 'next/router';
 import { AppProps } from 'next/app';
@@ -29,6 +29,7 @@ import { PrefetchOptions } from 'next/dist/shared/lib/router/router';
 
 import styles from './sites.scss';
 import { useSitesState } from '../useSitesState';
+import hoistNonReactStatics from "hoist-non-react-statics";
 
 export type TransitionOptions = {
     scroll?: boolean;
@@ -95,19 +96,28 @@ type Props = {
 };
 
 class SitesInner extends PureComponent<Props, State> {
+    private static instance: SitesInner;
+
     readonly state: State;
     private currentSiteId = -1;
     private sites = new Map<number, SiteData<any>>();
+
 
     private lastToastId = 0;
     private toasts = new Map<number, ToastData>();
     private pushingNewSite = true;
     private isInternalNavigation = false;
+    private dialogContainerRef = React.createRef<DialogContainerRef>()
 
     private readonly animationHandler: SiteAnimationInterface;
 
+    public static getInstance(){
+        return SitesInner.instance;
+    }
+
     constructor(props: Props) {
         super(props);
+        SitesInner.instance = this;
 
         const { defaultTopBarOptions, defaultFooterOptions } = this.props;
 
@@ -143,13 +153,6 @@ class SitesInner extends PureComponent<Props, State> {
         window.history.replaceState(null, '');
         window.history.pushState(null, '', router.asPath);
         window.onpopstate = (e) => this.onPopState(e);
-
-        // router.events.on('beforeHistoryChange', () => {
-        //     console.log('LOG-d beforeHistoryChange!', window.history.state);
-        //     setTimeout(() => {
-        //         console.log('LOG-d stateChange?', window.history.state);
-        //     }, 1);
-        // });
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
@@ -250,7 +253,7 @@ class SitesInner extends PureComponent<Props, State> {
 
         const content = (
             <SitesContext.Provider value={this}>
-                <DialogContainer>
+                <DialogContainer ref={this.dialogContainerRef}>
                     <Flex className={styles.sites}>
                         <Block style={style} className={className || styles.siteContainer}>
                             {sites.map((data) => {
@@ -311,25 +314,10 @@ class SitesInner extends PureComponent<Props, State> {
         }
     };
 
-    private onPopState = (e: PopStateEvent) => {
-        console.log('LOG-d state', e.state);
+    private onPopState = (_: PopStateEvent) => {
         // only back button triggers this. Therefore push again the state and handle internal change
         window.history.pushState(null, '', this.sites.get(this.currentSiteId)?.url);
         this.goBack();
-
-        // if (e.state?.obsolete) {
-        //     window.history.go(-1);
-        // } else if (this.isInternalNavigation) {
-        //     // window.history.replaceState({ obsolete: true }, '');
-        //     window.history.pushState({ obsolete: true }, '');
-        //     this.isInternalNavigation = false;
-        // } else if (e.state !== null && !e.state.forward) {
-        //     // HandleBrowser navigation
-        //     console.log('LOG-d handle Browser Navigation');
-        //
-        //     window.history.pushState(e.state, '', '');
-        //     this.goBack();
-        // }
         return false;
     };
 
@@ -420,6 +408,15 @@ class SitesInner extends PureComponent<Props, State> {
         this.setState({ toasts: Array.from(this.toasts.values()) });
     }
 
+    showDialog<P = EmptyProps,
+        R = any,
+        C extends ComponentType<(P & { close: (result?: R) => void }) | P> = ComponentType<
+            (P & { close: (result?: R) => void }) | P
+        >>( dialog: C,
+            props?: Omit<P, 'close'>): Promise<R | void>|undefined {
+        return this.dialogContainerRef.current?.showDialog<P, R, C>(dialog, props);
+    }
+
     goBack(callOnBackListener = true) {
         const { currentSiteId } = this;
         if (callOnBackListener) {
@@ -505,34 +502,6 @@ class SitesInner extends PureComponent<Props, State> {
         }
     }
 
-    // updateDefaultTopBarOptions(newOptions: TopBarOptionsWithButtonFunctions) {
-    //     const { defaultTopBarOptions } = this.state;
-    //
-    //     if (typeof newOptions.rightButtons === 'function') {
-    //         newOptions.rightButtons = newOptions.rightButtons(defaultTopBarOptions.rightButtons ?? []);
-    //     }
-    //     if (typeof newOptions.leftButtons === 'function') {
-    //         newOptions.leftButtons = newOptions.leftButtons(defaultTopBarOptions.leftButtons ?? []);
-    //     }
-    //
-    //     this.setState({
-    //         defaultTopBarOptions: {
-    //             ...defaultTopBarOptions,
-    //             ...(newOptions as TopBarOptions),
-    //         },
-    //     });
-    // }
-    //
-    // updateDefaultFooterOptions(newOptions: FooterOptions) {
-    //     const { defaultFooterOptions } = this.state;
-    //     this.setState({
-    //         defaultFooterOptions: {
-    //             ...defaultFooterOptions,
-    //             ...newOptions,
-    //         },
-    //     });
-    // }
-
     updateFooterOptions(siteId: number, newOptions: FooterOptions) {
         const site = this.sites.get(siteId);
         const { currentSiteId } = this.state;
@@ -552,4 +521,5 @@ class SitesInner extends PureComponent<Props, State> {
 
 export type { SitesInner as SitesType };
 const SitesWithRouter = withRouter(withMemo(SitesInner, styles)) as typeof SitesInner;
+hoistNonReactStatics(SitesWithRouter, SitesInner);
 export { SitesWithRouter as Sites };

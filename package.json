@@ -18,8 +18,9 @@
   "dependencies": {
     "@ainias42/js-helper": ">=0.8.2",
     "@ainias42/react-bootstrap-mobile": ">=0.1.9",
-    "zustand": "^4.3.6",
-    "isomorphic-style-loader": "^5.3.2"
+    "hoist-non-react-statics": "^3.3.2",
+    "isomorphic-style-loader": "^5.3.2",
+    "zustand": "^4.3.6"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.36",

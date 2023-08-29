@@ -5,6 +5,7 @@ const fs = require('fs');
 const packageName = require('../package.json').name;
 
 let pathsToProjects = [
+    "/Users/sguenter/Projekte/Privat/dnd",
     // '/home/silas/Projekte/web/project-echo',
     // "/home/silas/Projekte/web/wordRotator",
     // '/home/silas/Projekte/web/dnd',
@@ -13,9 +14,9 @@ let pathsToProjects = [
     // '/home/silas/Projekte/web/crew',
     // '/home/silas/Projekte/web/hoffnungsfest',
     // '/home/silas/Projekte/web/nextjsTest/poc-nextjs',
-    '/home/silas/Projekte/web/bat',
-    '/home/silas/Projekte/web/games',
-    '/home/silas/Projekte/web/dnd',
+    // '/home/silas/Projekte/web/bat',
+    // '/home/silas/Projekte/web/games',
+    // '/home/silas/Projekte/web/dnd',
     // '/home/silas/Projekte/web/smd-mail',
     // '/home/silas/Projekte/web/worktime',
     // '/home/silas/Projekte/web/TaskList',
