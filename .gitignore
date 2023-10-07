@@ -7,3 +7,5 @@ tmp/*
 
 #idea-ide
 /.idea/*
+
+dist/
