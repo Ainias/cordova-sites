@@ -12,6 +12,7 @@ export type SiteLinkProps = RbmComponentProps<
         scroll?: boolean;
         finishCurrentSite?: boolean;
         style?: CSSProperties;
+        hidden?: boolean;
     },
     { children: ReactNode }
 >;
@@ -25,6 +26,7 @@ const SiteLink = function SiteLink({
     style,
     className,
     children,
+    hidden
 }: SiteLinkProps) {
     const sites = useSites();
     const currentSiteId = useSiteId();
@@ -52,7 +54,7 @@ const SiteLink = function SiteLink({
             interactable={true}
             style={style}
             onClick={onClickHandler}
-            href={href}
+            href={hidden ?undefined :href}
             ref={linkRef}
             __allowChildren="text"
             className={className}

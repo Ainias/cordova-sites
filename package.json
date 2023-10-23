@@ -16,8 +16,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@ainias42/js-helper": ">=0.8.9",
-    "@ainias42/react-bootstrap-mobile": ">=0.1.19",
+    "@ainias42/js-helper": ">=0.8.10",
+    "@ainias42/react-bootstrap-mobile": ">=0.1.21",
     "hoist-non-react-statics": "^3.3.2",
     "isomorphic-style-loader": "^5.3.2",
     "zustand": "^4.3.6"
