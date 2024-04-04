@@ -6,7 +6,7 @@ import { TopBar, TopBarProps } from './TopBar/TopBar';
 import { SiteContainerContext } from '../App/Hooks';
 import { Container, Override, Block, withMemo, TopBarButtonType, Flex } from '@ainias42/react-bootstrap-mobile';
 import { FooterButton } from './Footer/Footer';
-
+import classNames from "classnames";
 import styles from './siteContainer.scss';
 
 export const initialTopBarOptions: TopBarProps = {
@@ -38,6 +38,7 @@ export type FooterOptions = Partial<typeof initialFooterOptions & { activeTab: n
 const initialState = {
     topBarOptions: {} as TopBarOptionsWithButtonFunctions,
     useFullWidth: false,
+    containerClass: undefined as undefined|string,
 };
 
 type State = Readonly<typeof initialState>;
@@ -88,7 +89,7 @@ class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsTy
             this.props;
         const Base = siteComponent;
 
-        const { topBarOptions, useFullWidth } = this.state;
+        const { topBarOptions, useFullWidth, containerClass } = this.state;
 
         if (typeof topBarOptions.rightButtons === 'function') {
             topBarOptions.rightButtons = topBarOptions.rightButtons([...(defaultTopBarOptions.rightButtons ?? [])]);
@@ -109,7 +110,7 @@ class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsTy
                             <VisibleContext.Provider value={visible}>
                                 <TopBar {...defaultTopBarOptions} {...(topBarOptions as TopBarOptions)} />
                                 <Flex className={styles.container}>
-                                    <Container fluid="xxl" className={useFullWidth ? styles.fullWidth : undefined}>
+                                    <Container fluid="xxl" className={classNames({[styles.fullWidth]: useFullWidth}, containerClass)}>
                                         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                                         {/* @ts-ignore */}
                                         <Base {...siteProps} />
@@ -125,6 +126,9 @@ class SiteContainer<SitePropsType> extends React.PureComponent<Props<SitePropsTy
 
     setUseFullWidth(useFullWidth: boolean) {
         this.setState({ useFullWidth });
+    }
+    setContainerClass(className: string){
+        this.setState({containerClass: className});
     }
 
     updateTopBarOptions(newOptions: TopBarOptionsWithButtonFunctions) {

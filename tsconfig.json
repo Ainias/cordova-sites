@@ -28,7 +28,6 @@
     ],
     "declaration": true,
     "noUnusedParameters": true,
-    "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": false,
     "strict": false
